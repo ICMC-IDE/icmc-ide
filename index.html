@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+  <section id="asm">
+    <header>
+      <h1>Assembly</h1>
+    </header>
+
+    <div id="asm-editor"></div>
+  </section>
+
+  <section id="screen">
+    <header>
+      <h1>State</h1>
+    </header>
+
+    <div>
+      <canvas width="320" height="240" id="canvas"></canvas>
+
+      <div id="toolbar">
+        <div>
+          <button onclick="compile()"><img src="images/construction-worker.png"> Compile</button>
+          <button onclick="reset()"><img src="images/reset.png"> Reset</button>
+          <button onclick="play()"><img src="images/play.png"> Play</button>
+          <button onclick="next()"><img src="images/end.png"> Next</button>
+        </div>
+
+        <form id="reg-editor">
+          <div>
+            <span class="register">R0: <input type="text" value="0000"></span>
+            <span class="register">R1: <input type="text" value="0000"></span>
+            <span class="register">R2: <input type="text" value="0000"></span>
+            <span class="register">R3: <input type="text" value="0000"></span>
+            <span class="register">R4: <input type="text" value="0000"></span>
+            <span class="register">R5: <input type="text" value="0000"></span>
+            <span class="register">R6: <input type="text" value="0000"></span>
+            <span class="register">R7: <input type="text" value="0000"></span>
+          </div>
+          <div>
+            <span class="register">FR: <input type="text" value="0000"></span>
+            <span class="register">SP: <input type="text" value="FFFF"></span>
+            <span class="register">PC: <input type="text" value="0000"></span>
+            <span class="register">IR: <input type="text" value="0000"></span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <header>
+      <h1>Memory</h1>
+    </header>
+
+    <div id="mem-editor"></div>
+  </section>
+
+  <section>
+    <header>
+      <h1>Log</h1>
+    </header>
+
+    <div id="log-editor"></div>
+  </section>
+
+  <script src="scripts/modules/monaco-editor/min/vs/loader.js"></script>
+  <script src="scripts/main.js" type="module"></script>
+</body>
+
+</html>
