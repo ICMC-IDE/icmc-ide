@@ -269,6 +269,10 @@ exports.languages = [
     "entry": "vs/basic-languages/apex/apex.contribution"
   },
   {
+    "label": "asm",
+    "entry": "vs/basic-languages/asm/asm.contribution"
+  },
+  {
     "label": "azcli",
     "entry": "vs/basic-languages/azcli/azcli.contribution"
   },
@@ -592,6 +596,10 @@ exports.languages = [
       "id": "vs/language/typescript/tsWorker",
       "entry": "vs/language/typescript/ts.worker"
     }
+  },
+  {
+    "label": "typespec",
+    "entry": "vs/basic-languages/typespec/typespec.contribution"
   },
   {
     "label": "vb",

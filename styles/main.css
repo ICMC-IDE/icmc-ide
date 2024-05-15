@@ -196,7 +196,7 @@ body {
   }
 }
 
-#asm-editor2 {
+#log-editor {
   & span {
     color: oklch(70% 0.1 var(--hue));
   }
@@ -207,27 +207,11 @@ body {
 
   & .label,
   & .raw {
-    color: oklch(70% 0.01 var(--hue));
+    color: oklch(70% 0.0 var(--hue));
   }
 
-  & .keyword {
-    --hue: 340;
-  }
-
-  & .number {
-    --hue: 60;
-  }
-
-  & .string {
-    --hue: 145;
-  }
-
-  & .register {
-    --hue: 88;
-  }
-
-  & .instruction {
-    --hue: 235;
+  & .error {
+    --hue: 29;
   }
 }
 
@@ -257,3 +241,4 @@ button {
     height: 1em;
   }
 }
+

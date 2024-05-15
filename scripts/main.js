@@ -3,6 +3,7 @@ import { setCallback } from "./modules/ide.js";
 
 const memEditor = document.getElementById("mem-editor");
 const regEditor = document.getElementById("reg-editor");
+const logEditor = document.getElementById("log-editor");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -125,8 +126,24 @@ class Emulator {
       this.#symbols = backend.symbols(code);
 
       this.reset();
+      logEditor.innerHTML = "";
     } catch (err) {
-      console.error(err);
+        // Code copied from https://github.com/hlorenzi/customasm/blob/b6978f90891915f1e4844d498a179249819406bd/web/main.js
+
+        let output = err;
+      	output = output.replace(/\</g, "&lt;");
+      	output = output.replace(/\>/g, "&gt;");
+      	output = output.replace(/\n/g, "<br>");
+      	output = output.replace(/\x1b\[90m/g, '</span><span class="comment">');
+      	output = output.replace(/\x1b\[91m/g, '</span><span class="error">');
+      	output = output.replace(/\x1b\[93m/g, '</span><span>');
+      	output = output.replace(/\x1b\[96m/g, '</span><span>');
+      	output = output.replace(/\x1b\[97m/g, '</span><span class="raw">');
+      	output = output.replace(/\x1b\[1m/g, '</span><span>');
+      	output = output.replace(/\x1b\[0m/g, '</span><span>');
+	
+      	output = '<span class="raw">' + output + "</span>";
+        logEditor.innerHTML = output;
     }
   }
 
@@ -346,7 +363,7 @@ require.config({
   }
 });
 
-require(["vs/editor/editor.main"], function () {
+require(["vs/editor/editor.main", "vs/editor/editor.main.nls"], function () {
   asmEditor = monaco.editor.create(document.getElementById("asm-editor"), {
     language: "asm",
     theme: "vs-dark",
