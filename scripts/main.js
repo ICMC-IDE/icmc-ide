@@ -4,12 +4,27 @@ import { setCallback } from "./modules/ide.js";
 const memEditor = document.getElementById("mem-editor");
 const regEditor = document.getElementById("reg-editor");
 const logEditor = document.getElementById("log-editor");
+const frequency = document.getElementById("frequency");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 let asmEditor;
 
 const modules = await Promise.all([initBackend()]);
+const names = ["1 Hz", "10 Hz", "100 Hz", "1 kHz", "10 kHz", "100 kHz", "1 MHz", "10 MHz", "100 MHz", "FAST!"];
+
+let interval = 1e-3;
+
+frequency.addEventListener("input", function() {
+  if (this.valueAsNumber == 9) {
+    interval = 0;
+  } else {
+    interval = 1e3 * (10 ** -this.valueAsNumber);
+  }
+  this.nextSibling.innerText = names[this.valueAsNumber];
+});
+
+frequency.nextSibling.innerText = names[frequency.valueAsNumber];
 
 function parseCharmap(data) {
   const imageData = ctx.createImageData(8, 1024);
@@ -394,7 +409,7 @@ window.compile = function() {
 window.play = function() {
   if (!window.next()) return;
 
-  setTimeout(window.play, 40);
+  setTimeout(window.play, interval);
 }
 
 window.reset = function() {

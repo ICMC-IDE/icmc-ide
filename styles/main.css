@@ -227,7 +227,7 @@ button {
   border: solid .0625rem var(--gray2);
 }
 
-input {
+input[type=text] {
   width: calc(4ch + .5rem + .125rem);
 }
 
@@ -242,3 +242,7 @@ button {
   }
 }
 
+.frequency {
+  display: flex;
+  align-items: center;
+}
