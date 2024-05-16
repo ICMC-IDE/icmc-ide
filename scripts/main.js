@@ -122,8 +122,12 @@ class Emulator {
 
   loadAsm(code) {
     try {
-      this.#bin = backend.compile(code);
-      this.#symbols = backend.symbols(code);
+      const result = new backend.Code(code);
+
+      this.#bin = result.binary();
+      this.#symbols = result.symbols();
+
+      console.log(result);
 
       this.reset();
       logEditor.innerHTML = "";
@@ -156,6 +160,7 @@ class Emulator {
   }
 
   reset() {
+    this.#isHalted = false;
     this.load(this.#bin, this.#symbols);
   }
 

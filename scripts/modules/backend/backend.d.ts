@@ -1,15 +1,22 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @param {string} src
-* @returns {Uint16Array}
 */
-export function compile(src: string): Uint16Array;
+export class Code {
+  free(): void;
 /**
 * @param {string} src
+*/
+  constructor(src: string);
+/**
 * @returns {string}
 */
-export function symbols(src: string): string;
+  symbols(): string;
+/**
+* @returns {Uint16Array}
+*/
+  binary(): Uint16Array;
+}
 /**
 */
 export class Vm {
@@ -50,8 +57,10 @@ export interface InitOutput {
   readonly vm_tick: (a: number) => void;
   readonly vm_memory: (a: number) => number;
   readonly vm_registers: (a: number) => number;
-  readonly compile: (a: number, b: number, c: number) => void;
-  readonly symbols: (a: number, b: number, c: number) => void;
+  readonly __wbg_code_free: (a: number) => void;
+  readonly code_new: (a: number, b: number) => number;
+  readonly code_symbols: (a: number, b: number) => void;
+  readonly code_binary: (a: number, b: number) => void;
   readonly wasm_assemble: (a: number, b: number) => number;
   readonly wasm_get_version: () => number;
   readonly wasm_string_new: (a: number) => number;
@@ -61,8 +70,8 @@ export interface InitOutput {
   readonly wasm_string_set_byte: (a: number, b: number, c: number) => void;
   readonly __wbindgen_export_0: WebAssembly.Table;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
-  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
+  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __externref_table_dealloc: (a: number) => void;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_start: () => void;
