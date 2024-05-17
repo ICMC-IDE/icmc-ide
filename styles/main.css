@@ -23,8 +23,8 @@
 body {
   background-color: var(--black);
   display: grid;
-  grid-template-areas: "main screen" "main memory" "main log";
-  grid-template-columns: 80ch 1fr;
+  grid-template-areas: "main screen state" "main memory memory" "main log log";
+  grid-template-columns: 80ch 640px 1fr;
   grid-template-rows: min-content 2fr 1fr;
 
   inset: 0;
@@ -66,7 +66,6 @@ body {
 #mem-editor {
   display: flex;
   flex-direction: column;
-  grid-area: memory;
 }
 
 #asm-editor {
@@ -79,12 +78,26 @@ body {
   & canvas {
     background-color: black;
     display: block;
+    image-rendering: pixelated;
   }
 
   &>div {
     display: flex;
     flex-direction: row;
+    height: 480px;
   }
+}
+
+#state {
+  grid-area: state;
+}
+
+#memory {
+  grid-area: memory;
+}
+
+#log {
+  grid-area: log;
 }
 
 #toolbar {

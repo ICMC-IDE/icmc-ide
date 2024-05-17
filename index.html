@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
+  <meta content="width=device-width,initial-scale=1" name="viewport">
+  <meta content="Emulator for the CPU Architecture developed at ICMC" name="description">
+  <meta content="icmc, processador, cpu, emulador, emulator, processor, asm, assembly" name="keywords">
   <link rel="stylesheet" href="styles/main.css">
-  <title>ICMC CPU Emulator</title>
+  <title>ICMC's CPU Emulator</title>
 </head>
 
 <body>
@@ -18,12 +21,20 @@
 
   <section id="screen">
     <header>
-      <h1>State</h1>
+      <h1>Screen</h1>
     </header>
 
     <div>
       <canvas width="320" height="240" id="canvas"></canvas>
+    </div>
+  </section>
 
+  <section id="state">
+    <header>
+      <h1>State</h1>
+    </header>
+
+    <div>
       <div id="toolbar">
         <div>
           <button onclick="compile()"><img src="images/construction-worker.png"> Compile</button>
@@ -43,6 +54,8 @@
             <span class="register">R1: <input type="text" value="0000"></span>
             <span class="register">R2: <input type="text" value="0000"></span>
             <span class="register">R3: <input type="text" value="0000"></span>
+          </div>
+          <div>
             <span class="register">R4: <input type="text" value="0000"></span>
             <span class="register">R5: <input type="text" value="0000"></span>
             <span class="register">R6: <input type="text" value="0000"></span>
@@ -64,7 +77,7 @@
     </div>
   </section>
 
-  <section>
+  <section id="memory">
     <header>
       <h1>Memory</h1>
     </header>
@@ -72,7 +85,7 @@
     <div id="mem-editor"></div>
   </section>
 
-  <section>
+  <section id="log">
     <header>
       <h1>Log</h1>
     </header>

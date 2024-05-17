@@ -9,6 +9,7 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
 let asmEditor;
+let key = 255;
 
 const modules = await Promise.all([initBackend()]);
 const names = ["1 Hz", "10 Hz", "100 Hz", "1 kHz", "10 kHz", "100 kHz", "1 MHz", "10 MHz", "100 MHz", "FAST!"];
@@ -370,6 +371,8 @@ class Emulator {
           ascii.innerText = ".";
         }
         break;
+      case "read":
+        return key;
       default:
         console.log("cb", ...arguments);
     }
@@ -444,7 +447,10 @@ window.play = function() {
 
     const result = emulator.tick(ticks_missing);
 
-    if (!result) return;
+    if (!result) {
+      clearInterval(play_interval);
+      return;
+    }
 
     ticks_missing -= result;
     ticks += result;
@@ -471,7 +477,7 @@ window.reset = function() {
 }
 
 window.next = function() {
-  return emulator.tick();
+  return emulator.tick(1);
 }
 
 window.exportMif = function() {
@@ -503,4 +509,12 @@ emulator.loadCharmapMif(charmap);
 
 setCallback(function() {
   return emulator.callback(...arguments);
+});
+
+window.addEventListener("keydown", function(event) {
+  key = event.keyCode;
+});
+
+window.addEventListener("keyup", function() {
+  key = 255;
 });
