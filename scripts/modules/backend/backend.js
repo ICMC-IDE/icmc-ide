@@ -188,6 +188,33 @@ export class Code {
             wasm.__wbindgen_add_to_stack_pointer(16);
         }
     }
+    /**
+    * @returns {string}
+    */
+    mif() {
+        let deferred2_0;
+        let deferred2_1;
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            wasm.code_mif(retptr, this.__wbg_ptr);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            var r2 = getInt32Memory0()[retptr / 4 + 2];
+            var r3 = getInt32Memory0()[retptr / 4 + 3];
+            var ptr1 = r0;
+            var len1 = r1;
+            if (r3) {
+                ptr1 = 0; len1 = 0;
+                throw takeFromExternrefTable0(r2);
+            }
+            deferred2_0 = ptr1;
+            deferred2_1 = len1;
+            return getStringFromWasm0(ptr1, len1);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+        }
+    }
 }
 
 const VmFinalization = (typeof FinalizationRegistry === 'undefined')
@@ -231,9 +258,11 @@ export class Vm {
         wasm.vm_store(this.__wbg_ptr, address, value);
     }
     /**
+    * @returns {number}
     */
     tick() {
-        wasm.vm_tick(this.__wbg_ptr);
+        const ret = wasm.vm_tick(this.__wbg_ptr);
+        return ret;
     }
     /**
     * @returns {number}

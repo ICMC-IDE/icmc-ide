@@ -16,6 +16,10 @@ export class Code {
 * @returns {Uint16Array}
 */
   binary(): Uint16Array;
+/**
+* @returns {string}
+*/
+  mif(): string;
 }
 /**
 */
@@ -34,8 +38,9 @@ export class Vm {
 */
   store(address: number, value: number): void;
 /**
+* @returns {number}
 */
-  tick(): void;
+  tick(): number;
 /**
 * @returns {number}
 */
@@ -54,13 +59,14 @@ export interface InitOutput {
   readonly vm_new: () => number;
   readonly vm_load: (a: number, b: number, c: number) => void;
   readonly vm_store: (a: number, b: number, c: number) => void;
-  readonly vm_tick: (a: number) => void;
+  readonly vm_tick: (a: number) => number;
   readonly vm_memory: (a: number) => number;
   readonly vm_registers: (a: number) => number;
   readonly __wbg_code_free: (a: number) => void;
   readonly code_new: (a: number, b: number) => number;
   readonly code_symbols: (a: number, b: number) => void;
   readonly code_binary: (a: number, b: number) => void;
+  readonly code_mif: (a: number, b: number) => void;
   readonly wasm_assemble: (a: number, b: number) => number;
   readonly wasm_get_version: () => number;
   readonly wasm_string_new: (a: number) => number;

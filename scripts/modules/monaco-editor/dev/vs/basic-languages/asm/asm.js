@@ -113,10 +113,10 @@ var moduleExports = (() => {
         [/^\s*[\w.]+\s*:/, "number"]
       ],
       command: [
-        [/^\s*#[a-zA-Z_][\w]*/, { token: "annotation", log: "annotation token: $0" }]
+        [/^\s*#[a-zA-Z_][\w]*/, { token: "annotation" }]
       ],
       instruction: [
-        [/^\s*[a-zA-Z_]\w*(\.\w+)?/, { token: "keyword", log: "annotation token: $0" }]
+        [/^\s*[a-zA-Z_]\w*(\.\w+)?/, { token: "keyword" }]
       ]
     }
   };

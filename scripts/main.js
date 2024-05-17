@@ -13,18 +13,39 @@ let asmEditor;
 const modules = await Promise.all([initBackend()]);
 const names = ["1 Hz", "10 Hz", "100 Hz", "1 kHz", "10 kHz", "100 kHz", "1 MHz", "10 MHz", "100 MHz", "FAST!"];
 
-let interval = 1e-3;
+// in Hz
+let clock = 10 ** frequency.valueAsNumber;
 
 frequency.addEventListener("input", function() {
   if (this.valueAsNumber == 9) {
-    interval = 0;
+    clock = 0;
   } else {
-    interval = 1e3 * (10 ** -this.valueAsNumber);
+    clock = 10 ** this.valueAsNumber;
   }
   this.nextSibling.innerText = names[this.valueAsNumber];
 });
 
 frequency.nextSibling.innerText = names[frequency.valueAsNumber];
+
+function download(blob, name) {
+  const blobUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = blobUrl;
+  link.download = name;
+
+  document.body.appendChild(link);
+
+  link.dispatchEvent(
+    new MouseEvent("click", { 
+      bubbles: true, 
+      cancelable: true, 
+      view: window, 
+    })
+  );
+
+  document.body.removeChild(link);
+}
 
 function parseCharmap(data) {
   const imageData = ctx.createImageData(8, 1024);
@@ -112,6 +133,9 @@ class Emulator {
   #cells;
   #bin;
   #symbols;
+  #result;
+  #old_pc = 0;
+  #old_sp = (1 << 16) - 1;
 
   constructor() {}
 
@@ -139,30 +163,32 @@ class Emulator {
     try {
       const result = new backend.Code(code);
 
+      this.#result = result;
+
       this.#bin = result.binary();
       this.#symbols = result.symbols();
 
-      console.log(result);
-
       this.reset();
       logEditor.innerHTML = "";
+      return true;
     } catch (err) {
-        // Code copied from https://github.com/hlorenzi/customasm/blob/b6978f90891915f1e4844d498a179249819406bd/web/main.js
+      // Code copied from https://github.com/hlorenzi/customasm/blob/b6978f90891915f1e4844d498a179249819406bd/web/main.js
 
-        let output = err;
-      	output = output.replace(/\</g, "&lt;");
-      	output = output.replace(/\>/g, "&gt;");
-      	output = output.replace(/\n/g, "<br>");
-      	output = output.replace(/\x1b\[90m/g, '</span><span class="comment">');
-      	output = output.replace(/\x1b\[91m/g, '</span><span class="error">');
-      	output = output.replace(/\x1b\[93m/g, '</span><span>');
-      	output = output.replace(/\x1b\[96m/g, '</span><span>');
-      	output = output.replace(/\x1b\[97m/g, '</span><span class="raw">');
-      	output = output.replace(/\x1b\[1m/g, '</span><span>');
-      	output = output.replace(/\x1b\[0m/g, '</span><span>');
-	
-      	output = '<span class="raw">' + output + "</span>";
-        logEditor.innerHTML = output;
+      let output = err;
+    	output = output.replace(/\</g, "&lt;");
+    	output = output.replace(/\>/g, "&gt;");
+    	output = output.replace(/\n/g, "<br>");
+    	output = output.replace(/\x1b\[90m/g, '</span><span class="comment">');
+    	output = output.replace(/\x1b\[91m/g, '</span><span class="error">');
+    	output = output.replace(/\x1b\[93m/g, '</span><span>');
+    	output = output.replace(/\x1b\[96m/g, '</span><span>');
+    	output = output.replace(/\x1b\[97m/g, '</span><span class="raw">');
+    	output = output.replace(/\x1b\[1m/g, '</span><span>');
+    	output = output.replace(/\x1b\[0m/g, '</span><span>');
+
+    	output = '<span class="raw">' + output + "</span>";
+      logEditor.innerHTML = output;
+      return false;
     }
   }
 
@@ -206,20 +232,24 @@ class Emulator {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
-  tick() {
-    const pc = this.pc;
-    const sp = this.sp;
+  tick(n) {
+    let clocks = 0;
 
-    if (this.#isHalted) return false;
-    this.#vm.tick();
+    while (clocks < n) {
+      if (this.#isHalted) return false;
+      clocks += this.#vm.tick();
+    }
 
-    this.#cells[pc].forEach((el) => el.classList.toggle("pc", pc == this.pc));
-    this.#cells[sp].forEach((el) => el.classList.toggle("sp", sp == this.sp));
+    return clocks;
+  }
 
+  update() {
     this.updateRegisters();
-    this.updateCursor(pc, sp);
+    this.updateCursor();
+  }
 
-    return true;
+  exportMif() {
+    return this.#result.mif();
   }
 
   renderMemoryBlock(data, region_name, originOffset = 0, cells) {
@@ -357,12 +387,17 @@ class Emulator {
     return this.registers[9];
   }
 
-  updateCursor(pc = 0, sp = 1 << 16 - 1) {
-    this.#cells[pc].forEach((el) => el.classList.toggle("pc", pc == this.pc));
-    this.#cells[sp].forEach((el) => el.classList.toggle("sp", sp == this.sp));
+  updateCursor() {
+    if (!this.#cells) return;
+
+    this.#cells[this.#old_pc].forEach((el) => el.classList.toggle("pc", this.#old_pc == this.pc));
+    this.#cells[this.#old_sp].forEach((el) => el.classList.toggle("sp", this.#old_sp == this.sp));
 
     this.#cells[this.pc].forEach((el) => el.classList.toggle("pc", true));
     this.#cells[this.sp].forEach((el) => el.classList.toggle("sp", true));
+
+    this.#old_pc = this.pc;
+    this.#old_sp = this.sp;
   }
 
   updateRegisters() {
@@ -394,23 +429,42 @@ require(["vs/editor/editor.main", "vs/editor/editor.main.nls"], function () {
   asmEditor.setValue(code);
 });
 
+let ticks_missing = 0;
+let last_tick;
+let last_check;
+let ticks = 0;
+let play_interval;
 
-let halted = false;
-let running = false;
+window.play = function() {
+  last_tick = performance.now();
 
-setCallback(function() {
-  return emulator.callback(...arguments);
-});
+  play_interval = setInterval(function() {
+    ticks_missing += (performance.now() - last_tick) * clock * 1e-3;
+    last_tick = performance.now();
+
+    const result = emulator.tick(ticks_missing);
+
+    if (!result) return;
+
+    ticks_missing -= result;
+    ticks += result;
+  }, 0);
+
+  setInterval(function() {
+    const now = performance.now();
+
+    if (last_check) {
+      console.log(1e3 * ticks / (now - last_check), "Hz");
+    }
+
+    ticks = 0;
+    last_check = now;
+  }, 1000);
+}
 
 window.compile = function() {
   emulator.loadAsm(asmEditor.getValue());
 };
-
-window.play = function() {
-  if (!window.next()) return;
-
-  setTimeout(window.play, interval);
-}
 
 window.reset = function() {
   return emulator.reset();  
@@ -420,4 +474,33 @@ window.next = function() {
   return emulator.tick();
 }
 
+window.exportMif = function() {
+  const ok = emulator.loadAsm(asmEditor.getValue());
+
+  if (!ok) return;
+
+  const blob = new Blob([emulator.exportMif()], { type: "text/x-mif" });
+  download(blob, "program.mif");
+}
+
+window.downloadAsm = function() {
+  const blob = new Blob([asmEditor.getValue()], { type: "text/x-asm" });
+  download(blob, "program.asm");
+}
+
+window.stop = function() {
+  if (!play_interval) return;
+  clearInterval(play_interval);
+}
+
+function draw() {
+  emulator.update();
+  requestAnimationFrame(draw);
+}
+
+requestAnimationFrame(draw);
 emulator.loadCharmapMif(charmap);
+
+setCallback(function() {
+  return emulator.callback(...arguments);
+});
