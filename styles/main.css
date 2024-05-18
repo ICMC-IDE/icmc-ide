@@ -24,7 +24,7 @@ body {
   background-color: var(--black);
   display: grid;
   grid-template-areas: "main screen state" "main memory memory" "main log log";
-  grid-template-columns: 80ch 640px 1fr;
+  grid-template-columns: 70ch 640px 1fr;
   grid-template-rows: min-content 2fr 1fr;
 
   inset: 0;
@@ -56,6 +56,18 @@ body {
     & h1 {
       margin: 0;
     }
+  }
+}
+
+@media (max-width: 1800px) {
+  :root {
+    font-size: 12px;    
+  }
+
+  body {
+    grid-template-areas: "main state" "memory screen" "log log";
+    grid-template-columns: 1fr 320px;
+    grid-template-rows: 1fr 240px min-content;
   }
 }
 

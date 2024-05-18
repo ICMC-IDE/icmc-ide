@@ -499,6 +499,14 @@ window.stop = function() {
   clearInterval(play_interval);
 }
 
+window.addEventListener("keydown", function(event) {
+  key = event.keyCode;
+});
+
+window.addEventListener("keyup", function() {
+  key = 255;
+});
+
 function draw() {
   emulator.update();
   requestAnimationFrame(draw);
@@ -511,10 +519,3 @@ setCallback(function() {
   return emulator.callback(...arguments);
 });
 
-window.addEventListener("keydown", function(event) {
-  key = event.keyCode;
-});
-
-window.addEventListener("keyup", function() {
-  key = 255;
-});
