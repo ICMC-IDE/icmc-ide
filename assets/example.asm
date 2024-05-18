@@ -1,5 +1,3 @@
-#include "icmc.asm"
-
 ; Teste das instrucoes que vao sendo implementadas!
 
 
