@@ -439,6 +439,8 @@ let ticks = 0;
 let play_interval;
 
 window.play = function() {
+  if (play_interval) return;
+
   last_tick = performance.now();
 
   play_interval = setInterval(function() {
@@ -447,25 +449,16 @@ window.play = function() {
 
     const result = emulator.tick(ticks_missing);
 
-    if (!result) {
+    // this can be 0, so it must be compared to false
+    if (result === false) {
       clearInterval(play_interval);
+      play_interval = undefined;
       return;
     }
 
     ticks_missing -= result;
     ticks += result;
   }, 0);
-
-  setInterval(function() {
-    const now = performance.now();
-
-    if (last_check) {
-      console.log(1e3 * ticks / (now - last_check), "Hz");
-    }
-
-    ticks = 0;
-    last_check = now;
-  }, 1000);
 }
 
 window.compile = function() {
@@ -496,7 +489,9 @@ window.downloadAsm = function() {
 
 window.stop = function() {
   if (!play_interval) return;
+
   clearInterval(play_interval);
+  play_interval = undefined;
 }
 
 window.addEventListener("keydown", function(event) {
@@ -519,3 +514,13 @@ setCallback(function() {
   return emulator.callback(...arguments);
 });
 
+setInterval(function() {
+  const now = performance.now();
+
+  if (last_check) {
+    console.log(1e3 * ticks / (now - last_check), "Hz");
+  }
+
+  ticks = 0;
+  last_check = now;
+}, 1000);
