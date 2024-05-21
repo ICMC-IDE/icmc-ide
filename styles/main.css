@@ -5,7 +5,8 @@
 
   --black: oklch(12.5% 0.00 230 / 1);
 
-  --gray0: oklch(18.0% 0.00 230 / 1);
+  --gray-1: oklch(18.0% 0.00 230 / 1);
+  --gray0: oklch(21.5% 0.00 230 / 1);
   --gray1: oklch(23.5% 0.00 230 / 1);
   --gray2: oklch(29.0% 0.00 230 / 1);
   --gray3: oklch(34.5% 0.00 230 / 1);
@@ -22,99 +23,40 @@
 
 body {
   background-color: var(--black);
-  display: grid;
-  grid-template-areas: "main screen state" "main memory memory" "main log log";
-  grid-template-columns: 70ch 640px 1fr;
-  grid-template-rows: min-content 2fr 1fr;
 
   inset: 0;
   position: absolute;
   margin: 0;
   font-family: ui-monospace, monospace;
-  gap: .0625rem;
 
-
-  &>section {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-
-    /* background-color: oklch(from var(--black) l c h / 1); */
-    background-color: var(--gray0);
-
-    &>div {
-      overflow: auto;
-    }
-
-    & header {
-      padding: .25rem;
-
-      background-color: var(--gray1);
-      border-bottom: solid .0625rem var(--gray2);
-    }
-
-    & h1 {
-      margin: 0;
-    }
-  }
+  overflow: hidden;
 }
 
 @media (max-width: 1800px) {
   :root {
-    font-size: 12px;    
-  }
-
-  body {
-    grid-template-areas: "main state" "memory screen" "log log";
-    grid-template-columns: 1fr 320px;
-    grid-template-rows: 1fr 240px min-content;
+    font-size: 12px;
   }
 }
 
-#asm {
-  grid-area: main;
+#memoryEditor {
+  overflow: auto;
 }
 
-#mem-editor {
-  display: flex;
-  flex-direction: column;
+#logViewer {
+  overflow: auto;
 }
 
-#asm-editor {
-  flex-grow: 1;
+#canvas {
+  background-color: black;
+  display: block;
+  image-rendering: pixelated;
+  aspect-ratio: 4/3;
+  min-width: 320px;
+  min-height: 240px;
 }
 
-#screen {
-  grid-area: screen;
-
-  & canvas {
-    background-color: black;
-    display: block;
-    image-rendering: pixelated;
-  }
-
-  &>div {
-    display: flex;
-    flex-direction: row;
-    height: 480px;
-  }
-}
-
-#state {
-  grid-area: state;
-}
-
-#memory {
-  grid-area: memory;
-}
-
-#log {
-  grid-area: log;
-}
-
-#toolbar {
-  display: flex;
+state-editor {
+  display: inline-flex;
   flex-direction: column;
   align-items: start;
   gap: .25rem;
@@ -133,96 +75,7 @@ body {
   }
 }
 
-.memory {
-  padding: inherit;
-  user-select: none;
-
-  & summary {
-    padding: .25rem;
-    position: sticky;
-    top: 0;
-    background-color: var(--gray0);
-    z-index: 1;
-  }
-
-  &:not(:last-of-type) {
-    border-bottom: solid .0625rem var(--gray1);
-  }
-
-  & .region {
-    display: flex;
-    background-color: var(--gray1);
-    overflow: hidden;
-    gap: .25rem;
-  }
-
-  & .address {
-    display: grid;
-    grid-template-columns: 1fr;
-    background-color: var(--gray2);
-
-    & span {
-      padding: 0.25em;
-    }
-  }
-
-  & .hex {
-    position: relative;
-    grid-template-columns: repeat(16, calc(4ch + .5em));
-
-    & span {
-      padding: 0.25em;
-
-      &:nth-of-type(2n) {
-        opacity: 0.7;
-      }
-
-      &:nth-of-type(16n + 9) {
-        margin-left: .0625rem;
-      }
-
-    }
-
-    &::before {
-      content: '';
-
-      position: absolute;
-      display: block;
-
-      inset: 0 auto 0 50%;
-
-      width: .0625rem;
-      background-color: var(--gray2);
-    }
-  }
-
-  & .char {
-    grid-template-columns: repeat(16, 1fr);
-  }
-
-  & .char,
-  & .hex {
-    display: grid;
-
-    & span {
-      padding: 0.25em;
-
-      &.hover {
-        background-color: var(--gray3);
-      }
-    }
-  }
-
-  & .pc {
-    background-color: oklch(40% 0.1 120);
-  }
-
-  & .sp {
-    background-color: oklch(40% 0.1 230);
-  }
-}
-
-#log-editor {
+log-viewer {
   & span {
     color: oklch(70% 0.1 var(--hue));
   }
@@ -247,10 +100,10 @@ button {
   background: inherit;
   outline: none;
   font: inherit;
-  background-color: var(--gray1);
+  background-color: var(--gray2);
 
   padding: .25rem;
-  border: solid .0625rem var(--gray2);
+  border: solid .0625rem var(--gray3);
 }
 
 input[type=text] {
@@ -273,4 +126,228 @@ button {
 .frequency {
   display: flex;
   align-items: center;
+}
+
+memory-editor {
+  flex-grow: 1;
+  contain: strict;
+
+  min-width: calc(17 * (5ch + 1rem) - 1ch);
+  min-height: 10rem;
+
+  & .memory {
+    padding: inherit;
+    user-select: none;
+
+    & summary {
+      padding: .25rem;
+      position: sticky;
+      top: 0;
+      background-color: var(--gray1);
+      z-index: 1;
+    }
+
+    &:not(:last-of-type) {
+      border-bottom: solid .0625rem var(--gray2);
+    }
+
+    & .region {
+      display: flex;
+      background-color: var(--gray-1);
+      overflow: hidden;
+      gap: .25rem;
+    }
+
+    & .address {
+      display: grid;
+      grid-template-columns: 1fr;
+      background-color: var(--gray0);
+
+      & span {
+        padding: 0.25em;
+      }
+    }
+
+    & .hex {
+      position: relative;
+      grid-template-columns: repeat(16, calc(4ch + .5em));
+
+      & span {
+        &:nth-of-type(2n) {
+          opacity: 0.7;
+        }
+
+        &:nth-of-type(16n + 9) {
+          margin-left: .0625rem;
+        }
+      }
+
+      &::before {
+        content: '';
+
+        position: absolute;
+        display: block;
+
+        inset: 0 auto 0 50%;
+
+        width: .0625rem;
+        background-color: var(--gray1);
+      }
+    }
+
+    & .ascii {
+      grid-template-columns: repeat(16, 1fr);
+
+      & span {
+        width: calc(1ch + .5em);
+      }
+    }
+
+    & .ascii,
+    & .hex {
+      display: grid;
+
+      & span {
+        padding: 0.25em;
+
+        &.hover {
+          background-color: var(--gray2);
+        }
+
+        &.pc,
+        &.sp {
+          padding-bottom: 0.125em;
+          border-bottom: solid .125em;
+        }
+
+        &.pc {
+          border-bottom-color: #569cd6;
+        }
+
+        &.sp {
+          border-bottom-color: #cc6666;
+        }
+      }
+    }
+
+  }
+}
+
+text-editor {
+  flex-grow: 1;
+  contain: strict;
+
+  min-width: 30ch;
+  min-height: 20rem;
+}
+
+state-editor {
+  min-width: fit-content;
+  max-width: fit-content;
+
+  min-height: fit-content;
+  max-height: fit-content;
+}
+
+log-viewer {
+  min-width: 30ch;
+  min-height: 10rem;
+}
+
+
+
+
+.wrapper {
+  translate: -1rem -1rem;
+}
+
+.window {
+  border: solid 1px red;
+  display: flex;
+  flex-direction: column;
+  contain: content;
+
+  background-color: var(--gray0);
+
+  box-shadow: 0 0.5rem 2rem black;
+  border: solid 0.0625rem var(--gray2);
+
+  & .dragger {
+    background-color: var(--gray1);
+    border-bottom: solid 0.0625rem var(--gray2);
+    cursor: move;
+    padding: 0.25rem;
+    font-weight: bolder;
+  }
+}
+
+.wrapper {
+  position: absolute;
+
+  will-change: left, top;
+  contain: layout style;
+
+  padding: 1rem;
+}
+
+.mover {
+  position: absolute;
+
+  &.n,
+  &.s,
+  &.nw,
+  &.ne,
+  &.sw,
+  &.se {
+    height: 1rem;
+  }
+
+  &.e,
+  &.w,
+  &.nw,
+  &.ne,
+  &.sw,
+  &.se {
+    width: 1rem;
+  }
+
+  &.n {
+    inset: 0 0 auto 0;
+    cursor: n-resize;
+  }
+
+  &.s {
+    inset: auto 0 0 0;
+    cursor: s-resize;
+  }
+
+  &.e {
+    inset: 0 0 0 auto;
+    cursor: e-resize;
+  }
+
+  &.w {
+    inset: 0 auto 0 0;
+    cursor: w-resize;
+  }
+
+  &.ne {
+    inset: 0 0 auto auto;
+    cursor: ne-resize;
+  }
+
+  &.se {
+    inset: auto 0 0 auto;
+    cursor: se-resize;
+  }
+
+  &.sw {
+    inset: auto auto 0 0;
+    cursor: sw-resize;
+  }
+
+  &.nw {
+    inset: 0 auto auto 0;
+    cursor: nw-resize;
+  }
 }

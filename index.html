@@ -7,94 +7,59 @@
   <meta content="Emulator for the CPU Architecture developed at ICMC" name="description">
   <meta content="icmc, processador, cpu, emulador, emulator, processor, asm, assembly" name="keywords">
   <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/winbox.min.css">
   <title>ICMC's CPU Emulator</title>
 </head>
 
 <body>
-  <section id="asm">
-    <header>
-      <h1>Assembly</h1>
-    </header>
+  <text-editor id="textEditor"></text-editor>
+  <state-editor id="stateEditor"></state-editor>
+  <memory-editor id="memoryEditor"></memory-editor>
+  <log-viewer id="logViewer"></log-viewer>
+  <canvas width="320" height="240" id="canvas"></canvas>
 
-    <div id="asm-editor"></div>
-  </section>
-
-  <section id="screen">
-    <header>
-      <h1>Screen</h1>
-    </header>
-
+  <template id="stateViewTemplate">
     <div>
-      <canvas width="320" height="240" id="canvas"></canvas>
+      <button onclick="assemble()"><img src="images/construction-worker.png"> Assemble</button>
+      <button onclick="reset()"><img src="images/reset.png"> Reset</button>
+      <button onclick="play()"><img src="images/play.png"> Play</button>
+      <button onclick="stop()"><img src="images/stop.png"> Stop</button>
+      <button onclick="next()"><img src="images/end.png"> Next</button>
     </div>
-  </section>
 
-  <section id="state">
-    <header>
-      <h1>State</h1>
-    </header>
+    <div class="frequency">
+      <input type="range" value="6" min="0" max="7" step="1" /><span>1 MHz</span>
+    </div>
 
-    <div>
-      <div id="toolbar">
-        <div>
-          <button onclick="compile()"><img src="images/construction-worker.png"> Compile</button>
-          <button onclick="reset()"><img src="images/reset.png"> Reset</button>
-          <button onclick="play()"><img src="images/play.png"> Play</button>
-          <button onclick="stop()"><img src="images/stop.png"> Stop</button>
-          <button onclick="next()"><img src="images/end.png"> Next</button>
-        </div>
-
-        <div class="frequency">
-          <input type="range" value="6" min="0" max="7" step="1" id="frequency" /><span>1 MHz</span>
-        </div>
-
-        <form id="reg-editor">
-          <div>
-            <span class="register">R0: <input type="text" value="0000"></span>
-            <span class="register">R1: <input type="text" value="0000"></span>
-            <span class="register">R2: <input type="text" value="0000"></span>
-            <span class="register">R3: <input type="text" value="0000"></span>
-          </div>
-          <div>
-            <span class="register">R4: <input type="text" value="0000"></span>
-            <span class="register">R5: <input type="text" value="0000"></span>
-            <span class="register">R6: <input type="text" value="0000"></span>
-            <span class="register">R7: <input type="text" value="0000"></span>
-          </div>
-          <div>
-            <span class="register">FR: <input type="text" value="0000"></span>
-            <span class="register">SP: <input type="text" value="FFFF"></span>
-            <span class="register">PC: <input type="text" value="0000"></span>
-            <span class="register">IR: <input type="text" value="0000"></span>
-          </div>
-        </form>
-
-        <div>
-          <button onclick="downloadAsm()"><img src="images/download.png"> Download ASM</button>
-          <button onclick="exportMif()"><img src="images/export.png"> Export MIF</button>
-        </div>
+    <form>
+      <div>
+        <span class="register">R0: <input type="text" value="0000"></span>
+        <span class="register">R1: <input type="text" value="0000"></span>
+        <span class="register">R2: <input type="text" value="0000"></span>
+        <span class="register">R3: <input type="text" value="0000"></span>
       </div>
+      <div>
+        <span class="register">R4: <input type="text" value="0000"></span>
+        <span class="register">R5: <input type="text" value="0000"></span>
+        <span class="register">R6: <input type="text" value="0000"></span>
+        <span class="register">R7: <input type="text" value="0000"></span>
+      </div>
+      <div>
+        <span class="register">FR: <input type="text" value="0000"></span>
+        <span class="register">SP: <input type="text" value="FFFF"></span>
+        <span class="register">PC: <input type="text" value="0000"></span>
+        <span class="register">IR: <input type="text" value="0000"></span>
+      </div>
+    </form>
+
+    <div>
+      <button onclick="downloadAsm()"><img src="images/download.png"> Download ASM</button>
+      <button onclick="exportMif()"><img src="images/export.png"> Export MIF</button>
     </div>
-  </section>
+  </template>
 
-  <section id="memory">
-    <header>
-      <h1>Memory</h1>
-    </header>
-
-    <div id="mem-editor"></div>
-  </section>
-
-  <section id="log">
-    <header>
-      <h1>Log</h1>
-    </header>
-
-    <div id="log-editor"></div>
-  </section>
-
-  <script src="scripts/modules/monaco-editor/min/vs/loader.js"></script>
-  <script src="scripts/main.js" type="module"></script>
+  <script src="scripts/modules/monaco-editor/min/vs/loader.js" async></script>
+  <script src="scripts/main.js" type="module" defer></script>
 </body>
 
 </html>

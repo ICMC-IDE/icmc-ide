@@ -2,12 +2,31 @@
 /* eslint-disable */
 /**
 */
-export class Code {
+export class Assembler {
   free(): void;
 /**
-* @param {string} src
 */
-  constructor(src: string);
+  constructor();
+/**
+* @param {string} filename
+* @param {string} contents
+*/
+  add_std_file(filename: string, contents: string): void;
+/**
+* @param {string} filename
+* @param {string} contents
+*/
+  add_file(filename: string, contents: string): void;
+/**
+* @param {string} filenames
+* @returns {Code}
+*/
+  assemble(filenames: string): Code;
+}
+/**
+*/
+export class Code {
+  free(): void;
 /**
 * @returns {string}
 */
@@ -63,7 +82,11 @@ export interface InitOutput {
   readonly vm_memory: (a: number) => number;
   readonly vm_registers: (a: number) => number;
   readonly __wbg_code_free: (a: number) => void;
-  readonly code_new: (a: number, b: number) => number;
+  readonly __wbg_assembler_free: (a: number) => void;
+  readonly assembler_new: () => number;
+  readonly assembler_add_std_file: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly assembler_add_file: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly assembler_assemble: (a: number, b: number, c: number, d: number) => void;
   readonly code_symbols: (a: number, b: number) => void;
   readonly code_binary: (a: number, b: number) => void;
   readonly code_mif: (a: number, b: number) => void;
