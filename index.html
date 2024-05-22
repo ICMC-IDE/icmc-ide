@@ -15,7 +15,8 @@
   <state-editor id="stateEditor"></state-editor>
   <memory-editor id="memoryEditor"></memory-editor>
   <log-viewer id="logViewer"></log-viewer>
-  <canvas width="320" height="240" id="canvas"></canvas>
+  <screen-viewer id="screenViewer" width="40" height="30"></screen-viewer>
+  <screen-editor id="screenEditor"></screen-editor>
 
   <template id="stateViewTemplate">
     <div>
@@ -57,8 +58,56 @@
     </div>
   </template>
 
+  <template id="screenEditorTemplate">
+    <screen-viewer width="32" height="8"></screen-viewer>
+    <screen-viewer width="1" height="1"></screen-viewer>
+    <screen-viewer width="40" height="30"></screen-viewer>
+    <canvas width="8" height="32"></canvas>
+  </template>
+
+  <script src="scripts/modules/glfx.js.js" async></script>
   <script src="scripts/modules/monaco-editor/min/vs/loader.js" async></script>
   <script src="scripts/main.js" type="module" defer></script>
+
+  <svg width="640" height="480" viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg">
+    <filter id="crt">
+      <!-- <feImage href="images/crt-lines.svg" result="line" /> -->
+      <feImage href="images/distortion.png" result="distortion" />
+
+      <!-- <feDisplacementMap in="SourceGraphic" in2="line" scale="1" xChannelSelector="R" yChannelSelector="B" -->
+      <!-- result="image" /> -->
+      <!-- <feBlend in="line" in2="SourceGraphic" mode="multiply" result="image" /> -->
+
+      <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0
+                                                      0 0 0 0 0
+                                                      0 0 0 0 0
+                                                      0 0 0 1 0" result="r" />
+      <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0
+                                                      0 1 0 0 0
+                                                      0 0 0 0 0
+                                                      0 0 0 1 0" result="g" />
+      <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0
+                                                      0 0 0 0 0
+                                                      0 0 1 0 0
+                                                      0 0 0 1 0" result="b" />
+
+      <feDisplacementMap in2="distortion" in="r" scale="-10" xChannelSelector="R" yChannelSelector="B"
+        result="rDistortion" />
+      <feDisplacementMap in2="distortion" in="g" scale="-12" xChannelSelector="R" yChannelSelector="B"
+        result="gDistortion" />
+      <feDisplacementMap in2="distortion" in="b" scale="-14" xChannelSelector="R" yChannelSelector="B"
+        result="bDistortion" />
+
+      <feBlend in="rDistortion" in2="gDistortion" mode="screen" result="rg" />
+      <feBlend in="rg" in2="bDistortion" mode="screen" result="rgb" />
+      <feGaussianBlur in="rgb" stdDeviation="3" result="light" />
+      <feColorMatrix in="light" type="matrix" values="1 0 0 0 0
+                                                      0 1 0 0 0
+                                                      0 0 1 0 0
+                                                      0 0 0 0.25 0" result="b" />
+      <feBlend in="rgb" in2="light2" mode="lighten" />
+    </filter>
+  </svg>
 </body>
 
 </html>

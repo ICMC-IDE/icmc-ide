@@ -3,7 +3,76 @@ import initBackend, * as backend from "./modules/backend/backend.js";
 import { setCallback } from "./modules/ide.js";
 import Fenster from "./modules/fenster.js";
 
-const ctx = canvas.getContext("2d");
+{
+  const text = new Fenster({
+    title: "Code",
+    body: textEditor,
+    style: {
+      left: "0.5rem",
+      top: "0.5rem",
+      width: "50ch",
+      height: "50rem",
+    },
+  });
+
+  const textBounds = text.getClientRect();
+
+  const state = new Fenster({
+    title: "State",
+    body: stateEditor,
+    style: {
+      left: `calc(${textBounds.right}px + 0.5rem)`,
+      top: "0.5rem",
+    },
+  });
+
+  const stateBounds = state.getClientRect();
+
+  const memory = new Fenster({
+    title: "Memory",
+    body: memoryEditor,
+    style: {
+      left: `calc(${textBounds.right}px + 0.5rem)`,
+      top: `calc(${stateBounds.bottom}px + 0.5rem)`,
+      height: "20rem",
+    },
+  });
+
+  const memoryBounds = memory.getClientRect();
+
+  const screen = new Fenster({
+    title: "Screen",
+    body: screenViewer,
+    style: {
+      left: `calc(${stateBounds.right}px + 0.5rem)`,
+      top: "0.5rem",
+      width: "640px",
+      height: "480px",
+      filter: "url(#crt)",
+    },
+  });
+
+  const log = new Fenster({
+    title: "Log",
+    body: logViewer,
+    style: {
+      left: `calc(${textBounds.right}px + 0.5rem)`,
+      top: `calc(${memoryBounds.bottom}px + 0.5rem)`,
+    },
+  });
+
+  new Fenster({
+    title: "Screen editor [WIP]",
+    body: screenEditor,
+    style: {
+      left: `calc(${stateBounds.right}px + 0.5rem)`,
+      top: "0.5rem",
+      width: "640px",
+      height: "480px",
+    },
+  });
+
+}
 
 let key = 255;
 let ticks_missing = 0;
@@ -35,8 +104,24 @@ function download(blob, name) {
   document.body.removeChild(link);
 }
 
+function color8bits(byte) {
+  byte = ~byte;
+  const r = (((byte & 0b11100000) >> 5) * 0xFF / 0b111) | 0;
+  const g = (((byte & 0b00011100) >> 2) * 0xFF / 0b111) | 0;
+  const b = (((byte & 0b00000011) >> 0) * 0xFF / 0b011) | 0;
+  return (r << 16) | (g << 8) | b;
+}
+
+const COLORS = (new Array(256))
+  .fill(0)
+  .map((_, i) => color8bits(i));
+
 function parseCharmap(data) {
-  const imageData = ctx.createImageData(8, 1024);
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  const imageData = context.createImageData(2048, 1024);
+  const pixels = new Uint32Array(imageData.data.buffer);
+
   data
     .split("\n")
     .filter((line) => /^\s*[\d\[].*:/.test(line))
@@ -51,11 +136,12 @@ function parseCharmap(data) {
         offset = parseInt(offset, 10);
         value = parseInt(value, 2);
 
-        for (let j = 0, k = 32 * offset; j < 8; j++) {
-          imageData.data[k++] = 0xFF * ((value >> (7 - j)) & 0b1);
-          imageData.data[k++] = 0xFF * ((value >> (7 - j)) & 0b1);
-          imageData.data[k++] = 0xFF * ((value >> (7 - j)) & 0b1);
-          imageData.data[k++] = 0xFF;
+        for (let l = 0, k = 2048 * offset; l < 0x100; l++) {
+          for (let j = 0; j < 8; j++) {
+            const on = (value >> (7 - j)) & 0b1;
+
+            pixels[k++] = COLORS[l] * on | 0xFF000000;
+          }
         }
       } else {
         let [_, from, to, value] = line.match(/^\[(\d+)\.\.(\d+)\]\s*:\s*([01]+)/);
@@ -65,16 +151,17 @@ function parseCharmap(data) {
         value = parseInt(value, 2);
 
         for (let offset = from; offset <= to; offset++) {
-          for (let j = 0, k = 32 * offset; j < 8; j++) {
-            imageData.data[k++] = 0xFF * ((value >> (7 - j)) & 0b1);
-            imageData.data[k++] = 0xFF * ((value >> (7 - j)) & 0b1);
-            imageData.data[k++] = 0xFF * ((value >> (7 - j)) & 0b1);
-            imageData.data[k++] = 0xFF;
+          for (let l = 0, k = 2048 * offset; l < 0x100; l++) {
+            for (let j = 0; j < 8; j++) {
+              const on = (value >> (7 - j)) & 0b1;
+
+              pixels[k++] = COLORS[l] * on | 0xFF000000;
+            }
           }
         }
-
       }
     });
+
   return imageData;
 }
 
@@ -152,10 +239,6 @@ class Emulator {
     }
   }
 
-  loadCharmapMif(mif) {
-    this.#charmap = parseCharmap(mif);
-  }
-
   loadMif(program) {
     parseMif(this.#memory, program);
   }
@@ -186,8 +269,7 @@ class Emulator {
 
     this.update();
 
-    ctx.fill = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    screenViewer.clear();
   }
 
   tick(n) {
@@ -219,7 +301,7 @@ class Emulator {
   callback(name, ...args) {
     switch (name) {
       case "write":
-        this.write(...args);
+        screenViewer.updateCell(args[1], args[0]);
         break;
       case "halt":
         this.#isHalted = true;
@@ -237,10 +319,6 @@ class Emulator {
       default:
         console.log("cb", ...arguments);
     }
-  }
-
-  write(char, offset) {
-    ctx.putImageData(this.#charmap, (offset % 40) * 8, Math.floor(offset / 40 - char) * 8, 0, char * 8, 8, 8);
   }
 
   updateCursor() {
@@ -360,11 +438,21 @@ window.addEventListener("keyup", function() {
 
 function draw() {
   emulator.update();
+
+  screenViewer.render();
+  screenEditor.render();
+
   requestAnimationFrame(draw);
 }
 
+{
+  const charmap = parseCharmap(assets[2]);
+
+  screenEditor.charmap = charmap;
+  screenViewer.charmap = charmap;
+}
+
 requestAnimationFrame(draw);
-emulator.loadCharmapMif(assets[2]);
 
 setCallback(function() {
   return emulator.callback(...arguments);
@@ -383,60 +471,3 @@ setInterval(function() {
   localStorage.setItem("script", textEditor.value);
 }, 1000);
 
-{
-  const text = new Fenster({
-    title: "Code",
-    body: textEditor,
-    style: {
-      left: "0.5rem",
-      top: "0.5rem",
-      width: "50ch",
-      height: "50rem",
-    },
-  });
-
-  const textBounds = text.getClientRect();
-
-  const state = new Fenster({
-    title: "State",
-    body: stateEditor,
-    style: {
-      left: `calc(${textBounds.right}px + 0.5rem)`,
-      top: "0.5rem",
-    },
-  });
-
-  const stateBounds = state.getClientRect();
-
-  const memory = new Fenster({
-    title: "Memory",
-    body: memoryEditor,
-    style: {
-      left: `calc(${textBounds.right}px + 0.5rem)`,
-      top: `calc(${stateBounds.bottom}px + 0.5rem)`,
-      height: "20rem",
-    },
-  });
-
-  const memoryBounds = memory.getClientRect();
-
-  const screenViewer = new Fenster({
-    title: "Screen",
-    body: canvas,
-    style: {
-      left: `calc(${stateBounds.right}px + 0.5rem)`,
-      top: "0.5rem",
-      width: "640px",
-      height: "480px",
-    },
-  });
-
-  const log = new Fenster({
-    title: "Log",
-    body: logViewer,
-    style: {
-      left: `calc(${textBounds.right}px + 0.5rem)`,
-      top: `calc(${memoryBounds.bottom}px + 0.5rem)`,
-    },
-  });
-}
