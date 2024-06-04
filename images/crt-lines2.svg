@@ -1,0 +1,6 @@
+<svg width="640" height="480" viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg">
+  <line x1="0" y1="320" x2="640" y2="320" id="line" stroke="red" stroke-width="16">
+    <animate attributeName="y1" values="0;480" dur="1s" repeatCount="indefinite" />
+    <animate attributeName="y2" values="0;480" dur="1s" repeatCount="indefinite" />
+  </line>
+</svg>

@@ -1,3 +1,5 @@
+import { screenHeight, screenWidth } from "../config.js";
+
 function color8bits(byte) {
   byte = ~byte;
   const r = (((byte & 0b11100000) >> 5) * 0xFF / 0b111) | 0;
@@ -56,29 +58,17 @@ export default class ScreenEditor extends HTMLElement {
       const y = (event.clientY - rect.top) / 16 | 0;
 
       that.pickColor(8 * y + x);
-      that.render();
     });
 
-
+    // FIXME
     this.#coloredChar.addEventListener("pointerdown", function(event) {
       const rect = this.getBoundingClientRect();
       const x = (event.clientX - rect.left) / 16 | 0;
       const y = (event.clientY - rect.top) / 16 | 0;
+      const char = that.#char;
+      const charmap = that.#charmap;
 
-      const pixels = new Uint32Array(that.#charmap.data.buffer);
-
-      const offset = that.#char * 8 * 2048 + x + 2048 * y;
-
-      // pixels[offset] = 0xFFFFFFFF;
-      let state = pixels[offset] & 0x00FFFFFF > 0;
-
-      for (let i = 0; i < 0x100; i++) {
-        pixels[offset + 8 * i] = 0xFF000000 | (COLORS[i] * !state);
-      }
-
-      that.render();
-
-      console.log(x, y);
+      charmap.togglePixel(x % 8, 8 * char + y);
     });
 
     this.#chars.addEventListener("pointerdown", function(event) {
@@ -87,17 +77,14 @@ export default class ScreenEditor extends HTMLElement {
       const y = (event.clientY - rect.top) / 16 | 0;
 
       that.pickChar(32 * y + x);
-      that.render();
     });
-
 
     this.#screen.addEventListener("pointerdown", function(event) {
       const rect = this.getBoundingClientRect();
       const x = (event.clientX - rect.left) / 16 | 0;
       const y = (event.clientY - rect.top) / 16 | 0;
 
-      that.#screen.updateCell(40 * y + x, that.#char | (that.#color << 8));
-      that.render();
+      that.#screen.updateCell(that.width * y + x, that.#char | (that.#color << 8));
     });
   }
 
@@ -136,6 +123,24 @@ export default class ScreenEditor extends HTMLElement {
     this.#screen.charmap = value;
     this.#chars.charmap = value;
     this.#coloredChar.charmap = value;
+  }
+
+  set width(value) {
+    this.#screen.width = value;
+    this.style.setProperty("--width", value);
+  }
+
+  get width() {
+    return this.#screen.width;
+  }
+
+  set height(value) {
+    this.#screen.height = value;
+    this.style.setProperty("--height", value);
+  }
+
+  get height() {
+    return this.#screen.height;
   }
 }
 

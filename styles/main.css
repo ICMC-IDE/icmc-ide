@@ -38,11 +38,11 @@ body {
   }
 }
 
-#memoryEditor {
+memory-editor {
   overflow: auto;
 }
 
-#logViewer {
+log-viewer {
   overflow: auto;
 }
 
@@ -54,8 +54,10 @@ screen-editor {
   justify-items: end;
 
   padding: 0.25rem;
-  min-width: calc(128px + 640px + .75rem);
-  min-height: calc(128px + 512px + .75rem);
+  min-width: calc(128px + 16px * max(var(--width), 32) + .75rem);
+  min-height: calc(128px + 16px * max(var(--height), 32) + .75rem);
+  max-width: calc(128px + 16px * max(var(--width), 32) + .75rem);
+  max-height: calc(128px + 16px * max(var(--height), 32) + .75rem);
 
   &>canvas {
     image-rendering: pixelated;
@@ -74,6 +76,7 @@ screen-editor {
 
 screen-viewer {
   display: block;
+  contain: strict;
 
   min-width: calc(16px * var(--width));
   min-height: calc(16px * var(--height));
@@ -83,6 +86,8 @@ screen-viewer {
 
   width: calc(16px * var(--width));
   height: calc(16px * var(--height));
+
+  /* filter: url(/#crt); */
 
   & canvas {
     transform-origin: 0 0;
@@ -133,6 +138,7 @@ log-viewer {
   }
 }
 
+select,
 input,
 button {
   border: none;
@@ -302,18 +308,34 @@ log-viewer {
   display: flex;
   flex-direction: column;
   contain: content;
+  overflow: hidden;
 
   background-color: var(--gray0);
 
   box-shadow: 0 0.5rem 2rem black;
   border: solid 0.0625rem var(--gray3);
 
+  &:not([open]) .dragger {
+    border-bottom: none;
+  }
+
   & .dragger {
     background-color: var(--gray2);
     border-bottom: solid 0.0625rem var(--gray3);
     cursor: move;
-    padding: 0.25rem;
-    font-weight: bolder;
+    /* padding: 0.25rem; */
+
+    display: flex;
+
+    & .title {
+      flex-grow: 1;
+      font-weight: bolder;
+      padding: 0.25rem;
+    }
+
+    & button {
+      margin: -0.0625rem;
+    }
   }
 }
 
@@ -385,5 +407,57 @@ log-viewer {
   &.nw {
     inset: 0 auto auto 0;
     cursor: nw-resize;
+  }
+}
+
+documentation-viewer {
+  color: #d4d4d4;
+  overflow: auto;
+
+  & .mnemonic {
+    color: #569cd6;
+  }
+
+  & .register {
+    color: #3dc9b0;
+  }
+
+  & .number {
+    color: #b5cea8;
+  }
+
+  & table {
+    margin: -1px;
+  }
+
+  & thead th {
+    background-color: var(--gray1);
+  }
+
+  & table,
+  & td,
+  & th {
+    border: solid 1px var(--gray2);
+    border-collapse: collapse;
+  }
+
+  & th {
+    background-color: var(--gray0);
+    padding: 0.25rem;
+  }
+
+  & td {
+    background-color: var(--gray-1);
+    padding: 0.25rem;
+  }
+}
+
+config-editor {
+  padding: .25rem;
+
+  & form div {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
   }
 }

@@ -2,30 +2,25 @@
 /* eslint-disable */
 /**
 */
-export class Assembler {
-  free(): void;
-/**
-*/
-  constructor();
-/**
-* @param {string} filename
-* @param {string} contents
-*/
-  add_std_file(filename: string, contents: string): void;
-/**
-* @param {string} filename
-* @param {string} contents
-*/
-  add_file(filename: string, contents: string): void;
-/**
-* @param {string} filenames
-* @returns {Code}
-*/
-  assemble(filenames: string): Code;
+export enum State {
+  Paused = 0,
+  BreakPoint = 1,
+  Halted = 2,
 }
 /**
 */
-export class Code {
+export class Assembler {
+  free(): void;
+/**
+* @param {Fs} fs
+* @param {string} filenames
+* @returns {Assembly}
+*/
+  static assemble(fs: Fs, filenames: string): Assembly;
+}
+/**
+*/
+export class Assembly {
   free(): void;
 /**
 * @returns {string}
@@ -41,8 +36,9 @@ export class Code {
   mif(): string;
 }
 /**
+* Reseting the Emulator is a common task, therefore it is convenient to have a copy of the original memory
 */
-export class Vm {
+export class Emulator {
   free(): void;
 /**
 */
@@ -52,14 +48,22 @@ export class Vm {
 */
   load(rom: Uint16Array): void;
 /**
+*/
+  reset(): void;
+/**
+* @returns {State}
+*/
+  state(): State;
+/**
 * @param {number} address
 * @param {number} value
 */
   store(address: number, value: number): void;
 /**
+* @param {number} ticks
 * @returns {number}
 */
-  tick(): number;
+  tick(ticks: number): number;
 /**
 * @returns {number}
 */
@@ -69,27 +73,47 @@ export class Vm {
 */
   registers(): number;
 }
+/**
+*/
+export class Fs {
+  free(): void;
+/**
+*/
+  constructor();
+/**
+* @param {string} filename
+* @param {string} contents
+*/
+  writeFile(filename: string, contents: string): void;
+/**
+* @param {string} filename
+* @returns {string | undefined}
+*/
+  readFile(filename: string): string | undefined;
+}
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
-  readonly memory: WebAssembly.Memory;
-  readonly __wbg_vm_free: (a: number) => void;
-  readonly vm_new: () => number;
-  readonly vm_load: (a: number, b: number, c: number) => void;
-  readonly vm_store: (a: number, b: number, c: number) => void;
-  readonly vm_tick: (a: number) => number;
-  readonly vm_memory: (a: number) => number;
-  readonly vm_registers: (a: number) => number;
-  readonly __wbg_code_free: (a: number) => void;
-  readonly __wbg_assembler_free: (a: number) => void;
-  readonly assembler_new: () => number;
-  readonly assembler_add_std_file: (a: number, b: number, c: number, d: number, e: number) => void;
-  readonly assembler_add_file: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly __wbg_emulator_free: (a: number) => void;
+  readonly emulator_new: () => number;
+  readonly emulator_load: (a: number, b: number, c: number) => void;
+  readonly emulator_reset: (a: number) => void;
+  readonly emulator_state: (a: number) => number;
+  readonly emulator_store: (a: number, b: number, c: number) => void;
+  readonly emulator_tick: (a: number, b: number) => number;
+  readonly emulator_memory: (a: number) => number;
+  readonly emulator_registers: (a: number) => number;
+  readonly __wbg_assembly_free: (a: number) => void;
   readonly assembler_assemble: (a: number, b: number, c: number, d: number) => void;
-  readonly code_symbols: (a: number, b: number) => void;
-  readonly code_binary: (a: number, b: number) => void;
-  readonly code_mif: (a: number, b: number) => void;
+  readonly assembly_symbols: (a: number, b: number) => void;
+  readonly assembly_binary: (a: number, b: number) => void;
+  readonly assembly_mif: (a: number, b: number) => void;
+  readonly __wbg_assembler_free: (a: number) => void;
+  readonly __wbg_fs_free: (a: number) => void;
+  readonly fs_new: () => number;
+  readonly fs_writeFile: (a: number, b: number, c: number, d: number, e: number) => void;
+  readonly fs_readFile: (a: number, b: number, c: number, d: number) => void;
   readonly wasm_assemble: (a: number, b: number) => number;
   readonly wasm_get_version: () => number;
   readonly wasm_string_new: (a: number) => number;
@@ -97,12 +121,14 @@ export interface InitOutput {
   readonly wasm_string_get_len: (a: number) => number;
   readonly wasm_string_get_byte: (a: number, b: number) => number;
   readonly wasm_string_set_byte: (a: number, b: number, c: number) => void;
-  readonly __wbindgen_export_0: WebAssembly.Table;
+  readonly memory: WebAssembly.Memory;
+  readonly __wbindgen_export_1: WebAssembly.Table;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
-  readonly __externref_table_dealloc: (a: number) => void;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+  readonly __externref_table_dealloc: (a: number) => void;
+  readonly __wbindgen_thread_destroy: (a?: number, b?: number) => void;
   readonly __wbindgen_start: () => void;
 }
 
@@ -112,17 +138,19 @@ export type SyncInitInput = BufferSource | WebAssembly.Module;
 * a precompiled `WebAssembly.Module`.
 *
 * @param {SyncInitInput} module
+* @param {WebAssembly.Memory} maybe_memory
 *
 * @returns {InitOutput}
 */
-export function initSync(module: SyncInitInput): InitOutput;
+export function initSync(module: SyncInitInput, maybe_memory?: WebAssembly.Memory): InitOutput;
 
 /**
 * If `module_or_path` is {RequestInfo} or {URL}, makes a request and
 * for everything else, calls `WebAssembly.instantiate` directly.
 *
 * @param {InitInput | Promise<InitInput>} module_or_path
+* @param {WebAssembly.Memory} maybe_memory
 *
 * @returns {Promise<InitOutput>}
 */
-export default function __wbg_init (module_or_path?: InitInput | Promise<InitInput>): Promise<InitOutput>;
+export default function __wbg_init (module_or_path?: InitInput | Promise<InitInput>, maybe_memory?: WebAssembly.Memory): Promise<InitOutput>;

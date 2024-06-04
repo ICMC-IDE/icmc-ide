@@ -6,6 +6,7 @@ export default class ScreenViewer extends HTMLElement {
 
   #width;
   #height;
+  #shouldUpdate = false;
 
   constructor() {
     super();
@@ -40,16 +41,14 @@ export default class ScreenViewer extends HTMLElement {
 
   updateCell(offset, value) {
     this.#memory[offset] = value;
-  }
-
-  renderCell(offset, value = this.#memory[offset]) {
-    const color = (value >> 0x08) & 0xFF;
-    const char = value & 0xFF;
-
-    this.#context.putImageData(this.#charmap, (offset % this.#width - color) * 8, Math.floor(offset / this.#width - char) * 8, color * 8, char * 8, 8, 8);
+    this.#shouldUpdate = true;
   }
 
   render() {
+    if (!this.#shouldUpdate) return;
+
+    this.#shouldUpdate = false;
+
     const charmap = this.#charmap;
     const context = this.#context;
     const memory = this.#memory;
@@ -60,7 +59,7 @@ export default class ScreenViewer extends HTMLElement {
       const color = (value >> 0x08) & 0xFF;
       const char = value & 0xFF;
 
-      context.putImageData(charmap, (offset % width - color) * 8, Math.floor(offset / width - char) * 8, color * 8, char * 8, 8, 8);
+      context.drawImage(charmap, color * 8, char * 8, 8, 8, (offset % width) * 8, Math.floor(offset / width) * 8, 8, 8);
     }
   }
 
@@ -70,14 +69,30 @@ export default class ScreenViewer extends HTMLElement {
   }
 
   #resize() {
-    this.#memory = new Uint16Array(this.#width * this.#height);
-    this.#canvas.width = this.width * 8;
-    this.#canvas.height = this.height * 8;
+    const newMemory = new Uint16Array(this.#width * this.#height);
+
+    if (this.#memory) {
+      const memory = this.#memory;
+      const length = Math.min(newMemory.length, memory.length);
+
+      for (let i = 0; i < length; i++) {
+        newMemory[i] = memory[i];
+      }
+    }
+
+    this.#memory = newMemory;
+    this.#canvas.width = this.#width * 8;
+    this.#canvas.height = this.#height * 8;
+    this.style.setProperty("--width", this.#width);
+    this.style.setProperty("--height", this.#height);
+    this.#shouldUpdate = true;
   }
 
   set width(value) {
+    if (value == this.#width) return;
+
     this.#width = value;
-    this.style.setProperty("--width", value);
+    this.#resize();
   }
 
   get width() {
@@ -85,8 +100,10 @@ export default class ScreenViewer extends HTMLElement {
   }
 
   set height(value) {
+    if (value == this.#height) return;
+
     this.#height = value;
-    this.style.setProperty("--height", value);
+    this.#resize();
   }
 
   get height() {
@@ -95,7 +112,12 @@ export default class ScreenViewer extends HTMLElement {
 
   set charmap(value) {
     this.#charmap = value;
-    this.render();
+    this.#shouldUpdate = true;
+
+    const that = this;
+    this.#charmap.await(function() {
+      that.#shouldUpdate = true;
+    });
   }
 }
 

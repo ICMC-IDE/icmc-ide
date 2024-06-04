@@ -9,10 +9,10 @@ export default class Fenster {
   #wrapper;
   #window;
 
-  constructor({ body, title, style }) {
+  constructor({ body, title, style, open }) {
     const wrapper = this.#wrapper = document.createElement("div");
-    const dragger = this.#dragger = document.createElement("div");
-    const window = this.#window = document.createElement("div");
+    const dragger = this.#dragger = document.createElement("summary");
+    const window = this.#window = document.createElement("details");
 
     const {left, top, ...others} = style;
 
@@ -31,6 +31,8 @@ export default class Fenster {
     wrapper.classList.add("wrapper");
     dragger.classList.add("dragger");
     window.classList.add("window");
+
+    window.open = open ?? true;
 
     this.#body = body;
 
@@ -94,6 +96,11 @@ export default class Fenster {
     };
 
     const draggerPointerDown = function(event) {
+      if (event.altKey) {
+        window.open ^= true;
+        return;        
+      }
+
       event.preventDefault();
       this.setPointerCapture(event.pointerId);
 
@@ -112,6 +119,11 @@ export default class Fenster {
 
         wrapper.style.left = `${event.x - offsetX}px`;
         wrapper.style.top = `${event.y - offsetY}px`;
+    };
+
+    const draggerClick = function(event) {
+      event.preventDefault();
+      return false;
     };
 
     for (const side of SIDES) {
@@ -136,6 +148,7 @@ export default class Fenster {
 
     dragger.addEventListener("pointerdown", draggerPointerDown);
     dragger.addEventListener("pointermove", draggerPointerMove);
+    dragger.addEventListener("click", draggerClick);
 
     document.body.appendChild(wrapper);
   }
@@ -184,5 +197,9 @@ export default class Fenster {
 
   getClientRect() {
     return this.#window.getBoundingClientRect();
+  }
+
+  get body() {
+    return this.#body;
   }
 }

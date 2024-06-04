@@ -2,8 +2,8 @@ export default class MemoryEditor extends HTMLElement {
   #memory;
   #symbols;
 
-  #hexCells = new Array(0xFFFF);
-  #asciiCells = new Array(0xFFFF);
+  #hexCells = new Array(0x10000);
+  #asciiCells = new Array(0x10000);
 
   #hovering;
   #pc = 0x0000;
@@ -43,7 +43,23 @@ export default class MemoryEditor extends HTMLElement {
 
   load(memory, symbols) {
     this.#memory = memory;
-    this.#symbols = symbols;
+
+    if (typeof symbols === "string") {
+      const labels = symbols
+        .split("\n")
+        .filter((line) => line.includes("="))
+        .map((line) => {
+          const [name, address] = line.split(" = ");
+          return [name, parseInt(address)];
+        });
+
+
+      if (labels.length == 0 || labels[0][1] > 0) {
+        labels.splice(0, 0, ["...", 0]);
+      }
+
+      this.#symbols = labels;
+    }
 
     this.#renderMemory();
   }
