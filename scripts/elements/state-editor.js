@@ -1,3 +1,5 @@
+import { frequency } from "../config.js";
+
 const FREQUENCIES = ["1 Hz", "10 Hz", "100 Hz", "1 kHz", "10 kHz", "100 kHz", "1 MHz", "10 MHz", "100 MHz", "FAST!"];
 
 export default class StateEditor extends HTMLElement {
@@ -18,11 +20,17 @@ export default class StateEditor extends HTMLElement {
     this.#buttons = forms[0].elements;
     this.#elements = forms[1].elements;
 
-    this.#buttons.frequency.addEventListener("input", function() {
-      this.nextSibling.innerText = FREQUENCIES[this.valueAsNumber];
+    frequency.subscribe((value) => {
+      this.#buttons.frequency.nextSibling.innerText = FREQUENCIES[this.#buttons.frequency.valueAsNumber];
+
+      if (this.#buttons.frequency.valueAsNumber !== value) {
+        this.#buttons.frequency.value = value;
+      }
     });
 
-    this.#buttons.frequency.nextSibling.innerText = FREQUENCIES[this.#buttons.frequency.valueAsNumber];
+    this.#buttons.frequency.addEventListener("input", function() {
+      frequency.set(this.valueAsNumber);
+    });
   }
 
   disconnectedCallback() {
@@ -47,7 +55,7 @@ export default class StateEditor extends HTMLElement {
   }
 
   get frequency() {
-    return 10 ** this.#buttons.frequency.valueAsNumber;
+    return 10 ** frequency.get();
   }
 
   set registers(registers) {

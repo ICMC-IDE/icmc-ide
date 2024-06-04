@@ -49,3 +49,4 @@ export const language = Field.with("language", "asm");
 export const screenWidth = Field.with("screenWidth", 40);
 export const screenHeight = Field.with("screenHeight", 30);
 export const sourceCode = await Field.async_with("sourceCode", async () => await (await fetch("../assets/example.asm")).text());
+export const frequency = Field.with("frequency", 6);

@@ -678,45 +678,43 @@
         <td><span class="mnemonic">or</span> <span class="register">rx</span>, <span class="register">ry</span>, <span
             class="register">rz</span></td>
         <td>010011</td>
-        <td></td>
+        <td>rx = ry | rz</td>
       </tr>
       <tr>
         <td><span class="mnemonic">or</span> <span class="register">rx</span>, <span class="register">ry</span></td>
         <td>010011</td>
-        <td></td>
+        <td>rx |= ry</td>
       </tr>
       <tr>
         <td><span class="mnemonic">xor</span> <span class="register">rx</span>, <span class="register">ry</span>, <span
             class="register">rz</span></td>
         <td>010100</td>
-        <td></td>
+        <td>rx = ry ^ rz</td>
       </tr>
       <tr>
         <td><span class="mnemonic">xor</span> <span class="register">rx</span>, <span class="register">ry</span></td>
         <td>010100</td>
-        <td></td>
+        <td>rx ^= ry</td>
       </tr>
 
       <tr>
         <td><span class="mnemonic">not</span> <span class="register">rx</span>, <span class="register">ry</span></td>
         <td>010101</td>
-        <td></td>
+        <td>rx = ~ry</td>
       </tr>
       <tr>
         <td><span class="mnemonic">not</span> <span class="register">rx</span></td>
         <td>010101</td>
-        <td></td>
+        <td>rx = ~ry</td>
       </tr>
 
       <tr>
         <td><span class="mnemonic">rotl</span> <span class="register">rx</span>, #<span class="number">bits</span></td>
         <td>010000</td>
-        <td></td>
       </tr>
       <tr>
         <td><span class="mnemonic">rotr</span> <span class="register">rx</span>, #<span class="number">bits</span></td>
         <td>010000</td>
-        <td></td>
       </tr>
 
       <tr>
@@ -729,7 +727,7 @@
         <td><span class="mnemonic">shiftl1</span> <span class="register">rx</span>, #<span class="number">bits</span>
         </td>
         <td>010000</td>
-        <td>rx = rx &lt;&lt; bits | 1 &lt;&lt; - 1</td>
+        <td>rx = rx &lt;&lt; bits | (1 &lt;&lt; bits - 1)</td>
       </tr>
       <tr>
         <td><span class="mnemonic">shiftr0</span> <span class="register">rx</span>, #<span class="number">bits</span>

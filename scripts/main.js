@@ -37,6 +37,10 @@ windows.screen.body.height = (windows.charmap.body.height = config.screenHeight.
 
 windows.text.body.value = config.sourceCode.get();
 
+config.frequency.subscribe((value) => {
+  worker.postMessage(["frequency", value]);
+});
+
 window.play = function(mode) {
   return worker.postMessage("play");
 }

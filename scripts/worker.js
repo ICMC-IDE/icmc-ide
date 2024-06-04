@@ -14,7 +14,6 @@ let frequency = 1e6;
 const modules = await Promise.all([initBackend()]);
 
 self.addEventListener("message", function({data}) {
-  console.log(data);
   if (typeof data === "string") {
     switch (data) {
       case "play":
@@ -34,6 +33,9 @@ self.addEventListener("message", function({data}) {
         return build(data[1], data[2]);
       case "key":
         keyPressed = data[1];
+        break;
+      case "frequency":
+        frequency = 10 ** data[1];
         break;
       default:
         console.log(data);
@@ -138,17 +140,16 @@ setCallback(function(name, ...args) {
       self.postMessage([...arguments]);
       break;
     case "halt":
+      self.postMessage("stop");
       break;
     case "store":
       break;
     case "read":
-      // return key;
+      return keyPressed;
     case "breakpoint":
-      // clearInterval(play_interval);
-      // play_interval = undefined;
-      break;
+      return stop();
     default:
-      // console.log("cb", ...arguments);
+      console.log("cb", ...arguments);
   }
 });
 
@@ -161,6 +162,4 @@ setInterval(function() {
 
   ticksHandled = 0;
   lastCheck = now;
-
-  // localStorage.setItem("script", textEditor.value);
 }, 1000);

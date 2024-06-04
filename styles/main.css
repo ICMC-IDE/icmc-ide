@@ -332,17 +332,17 @@ log-viewer {
     background-color: var(--gray2);
     border-bottom: solid 0.0625rem var(--gray3);
     cursor: move;
-    /* padding: 0.25rem; */
 
     display: flex;
 
     & .title {
       flex-grow: 1;
       font-weight: bolder;
-      padding: 0.25rem;
+      padding: 0.25rem 0.5rem;
     }
 
     & button {
+      padding: 0.25rem;
       margin: -0.0625rem;
     }
   }
