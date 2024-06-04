@@ -17,5 +17,7 @@ export default class ConfigEditor extends Fenster {
       body,
       style,
     });
+
+    this.toggleMinimize();
   }
 }

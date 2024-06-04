@@ -4,24 +4,6 @@ export default class AsmEditor extends Fenster {
   constructor({ style }) {
     const body = document.createElement("text-editor");
     const title = document.createDocumentFragment();
-
-    {
-      const button = document.createElement("button");
-      const icon = document.createElement("img");
-
-      icon.src = "images/minimize.png";
-      button.append(icon);
-      title.appendChild(button);
-    }
-
-    {
-      const button = document.createElement("button");
-      const icon = document.createElement("img");
-
-      icon.src = "images/maximize-3.png";
-      button.append(icon);
-      title.appendChild(button);
-    }
     
     {
       const span = document.createElement("span");

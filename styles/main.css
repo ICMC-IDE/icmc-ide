@@ -75,27 +75,36 @@ screen-editor {
 }
 
 screen-viewer {
-  display: block;
+  display: flex;
   contain: strict;
+  justify-content: center;
+  align-items: center;
 
   min-width: calc(16px * var(--width));
   min-height: calc(16px * var(--height));
 
-  max-width: calc(16px * var(--width));
-  max-height: calc(16px * var(--height));
-
-  width: calc(16px * var(--width));
-  height: calc(16px * var(--height));
+  background-color: black;
 
   /* filter: url(/#crt); */
 
+  & div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: 100%;
+    max-width: 100%;
+
+    aspect-ratio: var(--width)/var(--height);
+  }
+
   & canvas {
-    transform-origin: 0 0;
-    scale: 2;
-    background-color: black;
+    /* transform-origin: 0 0; */
+    /* scale: 2; */
+    width: 100%;
     display: block;
     image-rendering: pixelated;
-    aspect-ratio: 4/3;
+    aspect-ratio: var(--width)/var(--height);
   }
 }
 

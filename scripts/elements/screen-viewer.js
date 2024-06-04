@@ -13,6 +13,7 @@ export default class ScreenViewer extends HTMLElement {
   }
 
   connectedCallback() {
+    const div = document.createElement("div");
     if (this.attributes.width) {
       this.width = this.attributes.width.value * 1;
     } else {
@@ -26,7 +27,8 @@ export default class ScreenViewer extends HTMLElement {
     }
 
     this.#resize();
-    this.appendChild(this.#canvas);
+    div.appendChild(this.#canvas);
+    this.appendChild(div);
   }
 
   disconnectedCallback() {

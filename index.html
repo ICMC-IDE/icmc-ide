@@ -17,12 +17,12 @@
   <template id="stateViewTemplate">
     <form onsubmit="return false;">
       <div>
-        <button name="build" onclick="window.build()"><img src="images/construction-worker.png"> Build</button>
+        <button name="build" onclick="window.build()"><img src="images/build.png"> Build</button>
         <button name="reset" onclick="window.reset()"><img src="images/reset.png"> Reset</button>
-        <button name="play" onclick="window.play(true)"><img src="images/play.png"> Play</button>
-        <button name="stop" onclick="window.play(false)" style="display: none;"><img src="images/stop.png">
+        <button name="play" onclick="window.play()"><img src="images/play.png"> Play</button>
+        <button name="stop" onclick="window.stop()" style="display: none;"><img src="images/stop.png">
           Stop</button>
-        <button name="next" onclick="window.next()"><img src="images/end.png"> Next</button>
+        <button name="next" onclick="window.next()"><img src="images/next.png"> Next</button>
       </div>
 
       <div class="frequency">

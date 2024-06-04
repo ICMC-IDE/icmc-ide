@@ -6,6 +6,23 @@ export default class ScreenViewer extends Fenster {
     const body = document.createElement("screen-viewer");
     const title = document.createDocumentFragment();
 
+    const buttonsLeft = [];
+
+    {
+      const button = document.createElement("button");
+      const icon = document.createElement("img");
+
+      icon.src = "images/toggle-full-screen.png";
+      button.append(icon);
+      button.addEventListener("click", () => {
+        body.requestFullscreen().catch((error) => {
+          console.error(error);
+        });
+      });
+
+      buttonsLeft.push(button);
+    }
+
     {
       const span = document.createElement("span");
       span.innerText = "Screen";
@@ -25,6 +42,7 @@ export default class ScreenViewer extends Fenster {
       title,
       body,
       style,
+      buttonsLeft,
     });
   }
 }

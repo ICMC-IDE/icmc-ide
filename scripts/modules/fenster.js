@@ -8,13 +8,14 @@ export default class Fenster {
   #dragger;
   #wrapper;
   #window;
+  #maximized = false;
 
-  constructor({ body, title, style, open }) {
+  constructor({ body, title, style, open, buttonsLeft, buttonsRight }) {
     const wrapper = this.#wrapper = document.createElement("div");
     const dragger = this.#dragger = document.createElement("summary");
     const window = this.#window = document.createElement("details");
 
-    const {left, top, ...others} = style;
+    const { left, top, ...others } = style;
 
     for (const name in others) {
       body.style[name] = style[name];
@@ -36,7 +37,35 @@ export default class Fenster {
 
     this.#body = body;
 
+    {
+      const button = document.createElement("button");
+      const icon = document.createElement("img");
+
+      icon.src = "images/minimize.png";
+      button.append(icon);
+      title.appendChild(button);
+
+      button.addEventListener("click", () => {
+        this.toggleMinimize();
+      });
+
+      window.addEventListener("toggle", () => {
+        icon.src = window.open ? "images/minimize.png" : "images/unminimize.png";
+      });
+
+      dragger.append(button);
+    }
+
+    if (buttonsLeft) {
+      dragger.append(...buttonsLeft);
+    }
+
     dragger.append(title);
+
+    if (buttonsRight) {
+      dragger.append(...buttonsRight);
+    }
+
     window.append(dragger, body);
     wrapper.append(window);
 
@@ -96,11 +125,6 @@ export default class Fenster {
     };
 
     const draggerPointerDown = function(event) {
-      if (event.altKey) {
-        window.open ^= true;
-        return;        
-      }
-
       event.preventDefault();
       this.setPointerCapture(event.pointerId);
 
@@ -114,11 +138,11 @@ export default class Fenster {
     };
 
     const draggerPointerMove = function(event) {
-        if (event.buttons !== 1) return;
-        event.preventDefault();
+      if (event.buttons !== 1) return;
+      event.preventDefault();
 
-        wrapper.style.left = `${event.x - offsetX}px`;
-        wrapper.style.top = `${event.y - offsetY}px`;
+      wrapper.style.left = `${event.x - offsetX}px`;
+      wrapper.style.top = `${event.y - offsetY}px`;
     };
 
     const draggerClick = function(event) {
@@ -201,5 +225,15 @@ export default class Fenster {
 
   get body() {
     return this.#body;
+  }
+
+  toggleMinimize() {
+    this.#window.open ^= true;
+    return this.#window.open;
+  }
+
+  toggleMaximize() {
+    this.#maximized ^= true;
+    return this.#maximized;
   }
 }

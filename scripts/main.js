@@ -38,7 +38,11 @@ windows.screen.body.height = (windows.charmap.body.height = config.screenHeight.
 windows.text.body.value = config.sourceCode.get();
 
 window.play = function(mode) {
-  return worker.postMessage(mode ? "play" : "stop");
+  return worker.postMessage("play");
+}
+
+window.stop = function() {
+  return worker.postMessage("stop");
 }
 
 // FIXME: postMessage should get the code from the correct editor

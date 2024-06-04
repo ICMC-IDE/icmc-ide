@@ -14,6 +14,7 @@ let frequency = 1e6;
 const modules = await Promise.all([initBackend()]);
 
 self.addEventListener("message", function({data}) {
+  console.log(data);
   if (typeof data === "string") {
     switch (data) {
       case "play":
@@ -75,10 +76,9 @@ function reset() {
 function play() {
   if (playInterval) return;
 
-  lastTick = performance.now();
-
   self.postMessage("play");
 
+  lastTick = performance.now();
   playInterval = setInterval(function() {
     ticksPending += (performance.now() - lastTick) * frequency * 1e-3;
     lastTick = performance.now();
@@ -90,14 +90,11 @@ function play() {
     const ticks = emulator.tick(ticksPending);
 
     if (emulator.state() !== State.Paused) {
-      self.postMessage("stop");
-      clearInterval(playInterval);
-      playInterval = undefined;
-      return;
+      return stop();
     }
 
-    ticksPending -= ticks;
     ticksHandled += ticks;
+    ticksPending -= ticks;
   }, 0);
 }
 

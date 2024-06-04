@@ -24,5 +24,7 @@ export default class DocumentationViewer extends Fenster {
       body,
       style,
     });
+
+    this.toggleMinimize();
   }
 }

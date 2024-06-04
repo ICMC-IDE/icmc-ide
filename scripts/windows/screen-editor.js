@@ -13,13 +13,15 @@ export default class ScreenEditor extends Fenster {
       title.appendChild(span);
     }
 
+    const buttonsRight = [];
+
     {
       const button = document.createElement("button");
       const icon = document.createElement("img");
 
       icon.src = "images/export.png";
       button.append(icon, "Export CharMap");
-      title.appendChild(button);
+      buttonsRight.push(button);
     }
 
     {
@@ -28,7 +30,7 @@ export default class ScreenEditor extends Fenster {
 
       icon.src = "images/import.png";
       button.append(icon, "Import CharMap");
-      title.appendChild(button);
+      buttonsRight.push(button);
     }
 
     screenWidth.subscribe((value) => {
@@ -43,6 +45,9 @@ export default class ScreenEditor extends Fenster {
       title,
       body,
       style,
+      buttonsRight,
     });
+
+    this.toggleMinimize();
   }
 }
