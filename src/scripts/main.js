@@ -138,6 +138,9 @@ worker.addEventListener("message", function({ data }) {
       case "log":
         windows.log.body.write(data[1]);
         break;
+      case "store":
+        windows.memory.body.update(data[1], data[2]);
+        break;
       default:
         console.log(data);
     }

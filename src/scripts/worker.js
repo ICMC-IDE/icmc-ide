@@ -73,6 +73,7 @@ function build({ language, syntax, source }) {
 }
 
 function reset() {
+  stop();
   self.postMessage(["memory", memory()]);
   return emulator.reset();
 }
@@ -145,6 +146,7 @@ setCallback(function (name, ...args) {
       self.postMessage("stop");
       break;
     case "store":
+      self.postMessage([...arguments]);
       break;
     case "read":
       return keyPressed;
