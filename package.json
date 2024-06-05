@@ -4,8 +4,8 @@
   "description": "An Emulator for the CPU developed at ICMC",
   "homepage": "https://github.com/ViniciusGiroto/icmc-emulator",
   "scripts": {
-    "build": "cp -r src/{index.html,styles,scripts} dist/",
-    "clean": "rm -r dist/{index.html,styles,scripts}"
+    "build": "cp -r src/index.html src/styles src/scripts dist/",
+    "clean": "rm -r dist/index.html dist/styles dist/scripts"
   },
   "author": "Vinicius Giroto <viniciusgiroto@usp.br> (https://giroto.dev)",
   "contributors": [
