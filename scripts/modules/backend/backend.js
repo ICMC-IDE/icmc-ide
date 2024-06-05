@@ -243,6 +243,58 @@ export class Assembly {
     }
 }
 
+const CompilerFinalization = (typeof FinalizationRegistry === 'undefined')
+    ? { register: () => {}, unregister: () => {} }
+    : new FinalizationRegistry(ptr => wasm.__wbg_compiler_free(ptr >>> 0));
+/**
+*/
+export class Compiler {
+
+    __destroy_into_raw() {
+        const ptr = this.__wbg_ptr;
+        this.__wbg_ptr = 0;
+        CompilerFinalization.unregister(this);
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_compiler_free(ptr);
+    }
+    /**
+    * @param {Fs} fs
+    * @param {string} filenames
+    * @returns {string}
+    */
+    static compile(fs, filenames) {
+        let deferred3_0;
+        let deferred3_1;
+        try {
+            const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+            _assertClass(fs, Fs);
+            const ptr0 = passStringToWasm0(filenames, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            const len0 = WASM_VECTOR_LEN;
+            wasm.compiler_compile(retptr, fs.__wbg_ptr, ptr0, len0);
+            var r0 = getInt32Memory0()[retptr / 4 + 0];
+            var r1 = getInt32Memory0()[retptr / 4 + 1];
+            var r2 = getInt32Memory0()[retptr / 4 + 2];
+            var r3 = getInt32Memory0()[retptr / 4 + 3];
+            var ptr2 = r0;
+            var len2 = r1;
+            if (r3) {
+                ptr2 = 0; len2 = 0;
+                throw takeFromExternrefTable0(r2);
+            }
+            deferred3_0 = ptr2;
+            deferred3_1 = len2;
+            return getStringFromWasm0(ptr2, len2);
+        } finally {
+            wasm.__wbindgen_add_to_stack_pointer(16);
+            wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+        }
+    }
+}
+
 const EmulatorFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_emulator_free(ptr >>> 0));
@@ -437,7 +489,7 @@ function __wbg_get_imports() {
 }
 
 function __wbg_init_memory(imports, maybe_memory) {
-    imports.wbg.memory = maybe_memory || new WebAssembly.Memory({initial:18,maximum:16384,shared:true});
+    imports.wbg.memory = maybe_memory || new WebAssembly.Memory({initial:19,maximum:16384,shared:true});
 }
 
 function __wbg_finalize_init(instance, module) {

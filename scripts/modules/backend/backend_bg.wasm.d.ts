@@ -9,6 +9,8 @@ export function emulator_store(a: number, b: number, c: number): void;
 export function emulator_tick(a: number, b: number): number;
 export function emulator_memory(a: number): number;
 export function emulator_registers(a: number): number;
+export function compiler_compile(a: number, b: number, c: number, d: number): void;
+export function __wbg_compiler_free(a: number): void;
 export function __wbg_assembly_free(a: number): void;
 export function assembler_assemble(a: number, b: number, c: number, d: number): void;
 export function assembly_symbols(a: number, b: number): void;

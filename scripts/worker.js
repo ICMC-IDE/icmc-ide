@@ -1,4 +1,4 @@
-import initBackend, { Emulator, State, Fs, Assembler } from "./modules/backend/backend.js";
+import initBackend, { Emulator, State, Fs, Assembler, Compiler } from "./modules/backend/backend.js";
 import { setCallback } from "./modules/ide.js";
 
 let lastTick;
@@ -13,7 +13,7 @@ let frequency = 1e6;
 
 const modules = await Promise.all([initBackend()]);
 
-self.addEventListener("message", function({data}) {
+self.addEventListener("message", function ({ data }) {
   if (typeof data === "string") {
     switch (data) {
       case "play":
@@ -26,7 +26,7 @@ self.addEventListener("message", function({data}) {
         return next();
       default:
         console.log(data);
-    }    
+    }
   } else {
     switch (data[0]) {
       case "build":
@@ -50,12 +50,14 @@ const fs = new Fs();
 fs.writeFile("icmc.asm", assets[0]);
 fs.writeFile("giroto.asm", assets[1]);
 
-function build({language, syntax, source}) {
+function build({ language, syntax, source }) {
   try {
     if (language === "asm") {
       fs.writeFile("program.asm", source);
     } else if (language === "c") {
-      // add C logic here
+      fs.writeFile("program.c", source);
+      const asm = Compiler.compile(fs, "program.c");
+      fs.writeFile("program.asm", asm);
     }
 
     const result = Assembler.assemble(fs, `${syntax}.asm:program.asm`);;
@@ -81,7 +83,7 @@ function play() {
   self.postMessage("play");
 
   lastTick = performance.now();
-  playInterval = setInterval(function() {
+  playInterval = setInterval(function () {
     ticksPending += (performance.now() - lastTick) * frequency * 1e-3;
     lastTick = performance.now();
 
@@ -134,7 +136,7 @@ function loadMif(program) {
   parseMif(memory(), program);
 }
 
-setCallback(function(name, ...args) {
+setCallback(function (name, ...args) {
   switch (name) {
     case "write":
       self.postMessage([...arguments]);
@@ -153,7 +155,7 @@ setCallback(function(name, ...args) {
   }
 });
 
-setInterval(function() {
+setInterval(function () {
   const now = performance.now();
 
   if (lastCheck) {

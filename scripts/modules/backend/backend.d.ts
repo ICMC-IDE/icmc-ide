@@ -36,6 +36,17 @@ export class Assembly {
   mif(): string;
 }
 /**
+*/
+export class Compiler {
+  free(): void;
+/**
+* @param {Fs} fs
+* @param {string} filenames
+* @returns {string}
+*/
+  static compile(fs: Fs, filenames: string): string;
+}
+/**
 * Reseting the Emulator is a common task, therefore it is convenient to have a copy of the original memory
 */
 export class Emulator {
@@ -104,6 +115,8 @@ export interface InitOutput {
   readonly emulator_tick: (a: number, b: number) => number;
   readonly emulator_memory: (a: number) => number;
   readonly emulator_registers: (a: number) => number;
+  readonly compiler_compile: (a: number, b: number, c: number, d: number) => void;
+  readonly __wbg_compiler_free: (a: number) => void;
   readonly __wbg_assembly_free: (a: number) => void;
   readonly assembler_assemble: (a: number, b: number, c: number, d: number) => void;
   readonly assembly_symbols: (a: number, b: number) => void;
