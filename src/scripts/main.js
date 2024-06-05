@@ -49,8 +49,12 @@ window.stop = function() {
   return worker.postMessage("stop");
 }
 
-// FIXME: postMessage should get the code from the correct editor
 window.build = function() {
+  config.sourceCode.update((value) => {
+    value[config.language.get()] = windows.text.body.value;
+    return value;
+  });
+
   return worker.postMessage(["build", {
     language: config.language.get(),
     syntax: config.syntax.get(),

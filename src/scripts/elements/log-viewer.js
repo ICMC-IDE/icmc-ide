@@ -5,8 +5,7 @@ export default class LogViewer extends HTMLElement {
 
   write(error) {
     // Code copied from https://github.com/hlorenzi/customasm/blob/b6978f90891915f1e4844d498a179249819406bd/web/main.js
-
-    let output = error;
+    let output = error.toString();
 
     output = output.replaceAll("&", "&amp;");
     output = output.replaceAll("<", "&lt;");
