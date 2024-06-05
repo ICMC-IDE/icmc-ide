@@ -2,12 +2,12 @@ import ScreenEditor from "./screen-editor.js";
 import MemoryEditor from "./memory-editor.js";
 import ScreenViewer from "./screen-viewer.js";
 import LogViewer from "./log-viewer.js";
-import AsmEditor from "./asm-editor.js";
 import StateEditor from "./state-editor.js";
 import ConfigEditor from "./config-editor.js";
+import SourceEditor from "./source-editor.js";
 import DocumentationViewer from "./documentation-viewer.js";
 
-export const text = new AsmEditor({
+export const text = new SourceEditor({
   style: {
     left: "0.5rem",
     top: "0.5rem",

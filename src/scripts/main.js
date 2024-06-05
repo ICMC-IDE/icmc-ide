@@ -35,7 +35,7 @@ function download(blob, name) {
 windows.screen.body.width = (windows.charmap.body.width = config.screenWidth.get());
 windows.screen.body.height = (windows.charmap.body.height = config.screenHeight.get());
 
-windows.text.body.value = config.sourceCode.get();
+windows.text.body.value = config.sourceCode.get()[config.language.get()];
 
 config.frequency.subscribe((value) => {
   worker.postMessage(["frequency", value]);

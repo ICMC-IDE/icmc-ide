@@ -1,0 +1,15 @@
+{
+  "name": "icmc-emulator",
+  "version": "1.0.0",
+  "description": "An Emulator for the CPU developed at ICMC",
+  "homepage": "https://github.com/ViniciusGiroto/icmc-emulator",
+  "scripts": {
+    "build": "cp -r src/{index.html,styles,scripts} dist/",
+    "clean": "rm -r dist/{index.html,styles,scripts}"
+  },
+  "author": "Vinicius Giroto <viniciusgiroto@usp.br> (https://giroto.dev)",
+  "contributors": [
+    "Thiago"
+  ],
+  "license": "GPL-3.0"
+}

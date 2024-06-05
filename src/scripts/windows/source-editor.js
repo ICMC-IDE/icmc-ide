@@ -1,13 +1,13 @@
 import Fenster from "../modules/fenster.js";
 
-export default class AsmEditor extends Fenster {
+export default class SourceEditor extends Fenster {
   constructor({ style }) {
     const body = document.createElement("text-editor");
     const title = document.createDocumentFragment();
     
     {
       const span = document.createElement("span");
-      span.innerText = "Asm Editor";
+      span.innerText = "Source Editor";
       span.classList.add("title");
       title.appendChild(span);
     }

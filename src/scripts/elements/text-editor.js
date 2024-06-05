@@ -1,3 +1,5 @@
+import { language, sourceCode } from "../config.js";
+
 export default class TextEditor extends HTMLElement {
   #editor;
   #observer;
@@ -6,10 +8,15 @@ export default class TextEditor extends HTMLElement {
     super();
 
     this.#editor = monaco.editor.create(this, {
-      language: "asm",
+      language: language.get(),
       theme: "vs-dark",
       fontFamily: "ui-monospace",
       // fontSize: 16
+    });
+
+    language.subscribe((value) => {
+      monaco.editor.setModelLanguage(this.#editor.getModel(), value);
+      this.#editor.setValue(sourceCode.get()[value]);
     });
 
     this.#observer = new ResizeObserver(() => {
