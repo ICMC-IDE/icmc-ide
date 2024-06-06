@@ -78,11 +78,19 @@ export class Emulator {
 /**
 * @returns {number}
 */
-  memory(): number;
+  registers(): number;
 /**
 * @returns {number}
 */
-  registers(): number;
+  rom(): number;
+/**
+* @returns {number}
+*/
+  ram(): number;
+/**
+* @returns {number}
+*/
+  vram(): number;
 }
 /**
 */
@@ -113,8 +121,10 @@ export interface InitOutput {
   readonly emulator_state: (a: number) => number;
   readonly emulator_store: (a: number, b: number, c: number) => void;
   readonly emulator_tick: (a: number, b: number) => number;
-  readonly emulator_memory: (a: number) => number;
   readonly emulator_registers: (a: number) => number;
+  readonly emulator_rom: (a: number) => number;
+  readonly emulator_ram: (a: number) => number;
+  readonly emulator_vram: (a: number) => number;
   readonly compiler_compile: (a: number, b: number, c: number, d: number) => void;
   readonly __wbg_compiler_free: (a: number) => void;
   readonly __wbg_assembly_free: (a: number) => void;

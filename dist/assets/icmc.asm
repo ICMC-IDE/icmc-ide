@@ -115,10 +115,10 @@
 
     ; Stack
     push {rx: reg}                        => 0b000101 @ rx @ 0b0000000
-    push fr                               => 0b000101 @ rx @ 0b1000000
+    push fr                               => 0b000101 @ 0b0001000000
 
     pop {rx: reg}                         => 0b000110 @ rx @ 0b0000000
-    pop fr                                => 0b000110 @ rx @ 0b1000000
+    pop fr                                => 0b000110 @ 0b0001000000
 
     ; Control
     clearc                                => 0b001000 @ 0b0000000000

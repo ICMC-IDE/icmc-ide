@@ -6,7 +6,13 @@ export default class TextEditor extends HTMLElement {
 
   constructor() {
     super();
+  }
 
+  set value(code) {
+    this.#editor.setValue(code);
+  }
+
+  connectedCallback() {
     this.#editor = monaco.editor.create(this, {
       language: language.get(),
       theme: "vs-dark",
@@ -26,12 +32,8 @@ export default class TextEditor extends HTMLElement {
     this.#observer.observe(this);
   }
 
-  set value(code) {
-    this.#editor.setValue(code);
-  }
-
   get value() {
-    return this.#editor.getValue();    
+    return this.#editor.getValue();
   }
 }
 

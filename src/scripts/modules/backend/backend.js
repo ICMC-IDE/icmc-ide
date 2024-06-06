@@ -359,15 +359,29 @@ export class Emulator {
     /**
     * @returns {number}
     */
-    memory() {
-        const ret = wasm.emulator_memory(this.__wbg_ptr);
+    registers() {
+        const ret = wasm.emulator_registers(this.__wbg_ptr);
         return ret >>> 0;
     }
     /**
     * @returns {number}
     */
-    registers() {
-        const ret = wasm.emulator_registers(this.__wbg_ptr);
+    rom() {
+        const ret = wasm.emulator_rom(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
+    * @returns {number}
+    */
+    ram() {
+        const ret = wasm.emulator_ram(this.__wbg_ptr);
+        return ret >>> 0;
+    }
+    /**
+    * @returns {number}
+    */
+    vram() {
+        const ret = wasm.emulator_vram(this.__wbg_ptr);
         return ret >>> 0;
     }
 }

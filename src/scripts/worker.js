@@ -115,10 +115,10 @@ function next() {
   return emulator.tick(1);
 }
 
-let memoryArray = new Uint16Array(modules[0].memory.buffer, emulator.memory(), 0x10000);
+let memoryArray = new Uint16Array(modules[0].memory.buffer, emulator.ram(), 0x10000);
 function memory() {
   if (memoryArray.length === 0) {
-    memoryArray = new Uint16Array(modules[0].memory.buffer, emulator.memory(), 0x10000);
+    memoryArray = new Uint16Array(modules[0].memory.buffer, emulator.ram(), 0x10000);
   }
 
   return memoryArray;

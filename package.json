@@ -11,5 +11,11 @@
   "contributors": [
     "Thiago"
   ],
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@swc/cli": "^0.3.12",
+    "@swc/core": "^1.5.25",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
+  }
 }

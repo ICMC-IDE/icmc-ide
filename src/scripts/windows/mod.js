@@ -7,80 +7,85 @@ import ConfigEditor from "./config-editor.js";
 import SourceEditor from "./source-editor.js";
 import DocumentationViewer from "./documentation-viewer.js";
 
-export const text = new SourceEditor({
-  style: {
-    left: "0.5rem",
-    top: "0.5rem",
-    width: "50ch",
-    height: "50rem",
-  },
-});
+export function createWindows() {
+  const result = {};
 
-const textBounds = text.getClientRect();
+  result.text = new SourceEditor({
+    style: {
+      left: "0.5rem",
+      top: "0.5rem",
+      width: "50ch",
+      height: "50rem",
+    },
+  });
 
-export const state = new StateEditor({
-  style: {
-    left: `calc(${textBounds.right}px + 0.5rem)`,
-    top: "0.5rem",
-  },
-});
+  const textBounds = result.text.getClientRect();
 
-const stateBounds = state.getClientRect();
+  result.state = new StateEditor({
+    style: {
+      left: `calc(${textBounds.right}px + 0.5rem)`,
+      top: "0.5rem",
+    },
+  });
 
-export const memory = new MemoryEditor({
-  style: {
-    left: `calc(${textBounds.right}px + 0.5rem)`,
-    top: `calc(${stateBounds.bottom}px + 0.5rem)`,
-    height: "20rem",
-  },
-});
+  const stateBounds = result.state.getClientRect();
 
-const memoryBounds = memory.getClientRect();
+  result.memory = new MemoryEditor({
+    style: {
+      left: `calc(${textBounds.right}px + 0.5rem)`,
+      top: `calc(${stateBounds.bottom}px + 0.5rem)`,
+      height: "20rem",
+    },
+  });
 
-export const screen = new ScreenViewer({
-  style: {
-    left: `calc(${stateBounds.right}px + 0.5rem)`,
-    top: "0.5rem",
-    width: "640px",
-    height: "480px",
-    // filter: "url(/#crt)",
-  },
-});
+  const memoryBounds = result.memory.getClientRect();
 
-export const log = new LogViewer({
-  style: {
-    left: `calc(${textBounds.right}px + 0.5rem)`,
-    top: `calc(${memoryBounds.bottom}px + 0.5rem)`,
-  },
-});
+  result.screen = new ScreenViewer({
+    style: {
+      left: `calc(${stateBounds.right}px + 0.5rem)`,
+      top: "0.5rem",
+      width: "640px",
+      height: "480px",
+      // filter: "url(/#crt)",
+    },
+  });
 
-export const charmap = new ScreenEditor({
-  open: false,
-  style: {
-    left: `calc(${stateBounds.right}px + 0.5rem)`,
-    top: "0.5rem",
-    width: "640px",
-    height: "480px",
-  },
-});
+  result.log = new LogViewer({
+    style: {
+      left: `calc(${textBounds.right}px + 0.5rem)`,
+      top: `calc(${memoryBounds.bottom}px + 0.5rem)`,
+    },
+  });
 
-export const config = new ConfigEditor({
-  open: false,
-  style: {
-    left: `calc(${stateBounds.right}px + 0.5rem)`,
-    top: "0.5rem",
-    width: "640px",
-    height: "480px",
-  },
-});
+  result.charmap = new ScreenEditor({
+    open: false,
+    style: {
+      left: `calc(${stateBounds.right}px + 0.5rem)`,
+      top: "0.5rem",
+      width: "640px",
+      height: "480px",
+    },
+  });
 
-export const documentation = new DocumentationViewer({
-  open: false,
-  style: {
-    left: `calc(${stateBounds.right}px + 0.5rem)`,
-    top: "0.5rem",
-    width: "640px",
-    height: "480px",
-  },
-});
+  result.config = new ConfigEditor({
+    open: false,
+    style: {
+      left: `calc(${stateBounds.right}px + 0.5rem)`,
+      top: "0.5rem",
+      width: "640px",
+      height: "480px",
+    },
+  });
 
+  result.documentation = new DocumentationViewer({
+    open: false,
+    style: {
+      left: `calc(${stateBounds.right}px + 0.5rem)`,
+      top: "0.5rem",
+      width: "640px",
+      height: "480px",
+    },
+  });
+
+  return result;
+};
