@@ -42,15 +42,15 @@ async function main() {
     worker.postMessage(["frequency", value]);
   });
 
-  window.play = function(mode) {
+  window.play = function (mode) {
     return worker.postMessage("play");
   }
 
-  window.stop = function() {
+  window.stop = function () {
     return worker.postMessage("stop");
   }
 
-  window.build = function() {
+  window.build = function () {
     config.sourceCode.update((value) => {
       value[config.language.get()] = windows.text.body.value;
       return value;
@@ -63,15 +63,15 @@ async function main() {
     }]);
   };
 
-  window.reset = function() {
+  window.reset = function () {
     return worker.postMessage("reset");
   }
 
-  window.next = function() {
+  window.next = function () {
     return worker.postMessage("next");
   }
 
-  window.exportMif = function() {
+  window.exportMif = function () {
     /*
     const ok = emulator.assemble(textEditor.value);
 
@@ -82,18 +82,18 @@ async function main() {
     */
   }
 
-  window.downloadAsm = function() {
+  window.downloadAsm = function () {
     /*
     const blob = new Blob([textEditor.value], { type: "text/x-asm" });
     download(blob, "program.asm");
     */
   }
 
-  window.addEventListener("keydown", function(event) {
+  window.addEventListener("keydown", function (event) {
     return worker.postMessage(["key", event.keyCode]);
   });
 
-  window.addEventListener("keyup", function() {
+  window.addEventListener("keyup", function () {
     return worker.postMessage(["key", 255]);
   });
 
@@ -114,7 +114,7 @@ async function main() {
 
   requestAnimationFrame(draw);
 
-  worker.addEventListener("message", function({ data }) {
+  worker.addEventListener("message", function ({ data }) {
     if (typeof data === "string") {
       switch (data) {
         case "stop":
@@ -136,6 +136,9 @@ async function main() {
         case "memory":
           windows.log.body.clear();
           return windows.memory.body.load(data[1], data[2]);
+        case "asmsource":
+          config.sourceCode.set({ ...config.sourceCode.get(), ['asm']: data[1] });
+          break;
         case "log":
           windows.log.body.write(data[1]);
           break;
@@ -148,11 +151,11 @@ async function main() {
     }
   });
 
-  worker.addEventListener("messageerror", function(event) {
+  worker.addEventListener("messageerror", function (event) {
     console.error(event);
   });
 
-  worker.addEventListener("error", function(event) {
+  worker.addEventListener("error", function (event) {
     console.error(event);
   });
 }

@@ -52,12 +52,16 @@ fs.writeFile("giroto.asm", assets[1]);
 
 function build({ language, syntax, source }) {
   try {
-    if (language === "asm") {
-      fs.writeFile("program.asm", source);
-    } else if (language === "c") {
-      fs.writeFile("program.c", source);
-      const asm = Compiler.compile(fs, "program.c");
-      fs.writeFile("program.asm", asm);
+    let asm = source;
+    switch (language) {
+      case "asm":
+        fs.writeFile("program.asm", source);
+        break;
+      case "c":
+        fs.writeFile("program.c", source);
+        asm = Compiler.compile(fs, "program.c");
+        fs.writeFile("program.asm", asm);
+        break
     }
 
     const result = Assembler.assemble(fs, `${syntax}.asm:program.asm`);;
@@ -67,6 +71,7 @@ function build({ language, syntax, source }) {
 
     self.postMessage(["registers", registers()]);
     self.postMessage(["memory", memory(), result.symbols()]);
+    self.postMessage(["asmsource", asm]);
   } catch (error) {
     self.postMessage(["log", error]);
   }
