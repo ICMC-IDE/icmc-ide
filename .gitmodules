@@ -1,0 +1,6 @@
+[submodule "mif"]
+	path = mif
+	url = https://github.com/ViniciusGiroto/mif
+[submodule "emulator"]
+	path = emulator
+	url = https://github.com/ViniciusGiroto/icmc-emulator
