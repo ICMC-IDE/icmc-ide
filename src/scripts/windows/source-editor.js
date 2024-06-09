@@ -1,15 +1,14 @@
-import Fenster from "../modules/fenster.js";
+import Fenster from "../fenster.js";
 
 export default class SourceEditor extends Fenster {
-  constructor({ style }) {
+  constructor({ style }, config) {
     const body = document.createElement("text-editor");
-    const title = document.createDocumentFragment();
-    
+    const title = document.createElement("span");
+    const buttonsRight = [];
+
     {
-      const span = document.createElement("span");
-      span.innerText = "Source Editor";
-      span.classList.add("title");
-      title.appendChild(span);
+      title.innerText = "Source Editor";
+      title.classList.add("title");
     }
 
     {
@@ -18,7 +17,7 @@ export default class SourceEditor extends Fenster {
 
       icon.src = "images/export.png";
       button.append(icon, "Export");
-      title.appendChild(button);
+      buttonsRight.push(button);
     }
 
     {
@@ -27,13 +26,18 @@ export default class SourceEditor extends Fenster {
 
       icon.src = "images/import.png";
       button.append(icon, "Import");
-      title.appendChild(button);
+      buttonsRight.push(button);
     }
 
     super({
       title,
       body,
       style,
+      buttonsRight,
     });
+  }
+
+  set model(model) {
+    this.body.model = model;
   }
 }

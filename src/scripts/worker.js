@@ -1,5 +1,6 @@
-import initBackend, { Emulator, State, Fs, Assembler, Compiler } from "./modules/backend/backend.js";
-import { setCallback } from "./modules/ide.js";
+import { setCallback } from "./ide.js";
+
+const { default: initBackend, Emulator, State, Fs, Assembler, Compiler } = await import("./modules/backend/backend.js");
 
 let lastTick;
 let keyPressed = 255;
@@ -13,7 +14,7 @@ let frequency = 1e6;
 
 const modules = await Promise.all([initBackend()]);
 
-self.addEventListener("message", function ({ data }) {
+self.addEventListener("message", function({ data }) {
   if (typeof data === "string") {
     switch (data) {
       case "play":
@@ -89,7 +90,7 @@ function play() {
   self.postMessage("play");
 
   lastTick = performance.now();
-  playInterval = setInterval(function () {
+  playInterval = setInterval(function() {
     ticksPending += (performance.now() - lastTick) * frequency * 1e-3;
     lastTick = performance.now();
 
@@ -142,7 +143,7 @@ function loadMif(program) {
   parseMif(memory(), program);
 }
 
-setCallback(function (name, ...args) {
+setCallback(function(name, ...args) {
   switch (name) {
     case "write":
       self.postMessage([...arguments]);
@@ -162,7 +163,7 @@ setCallback(function (name, ...args) {
   }
 });
 
-setInterval(function () {
+setInterval(function() {
   const now = performance.now();
 
   if (lastCheck) {

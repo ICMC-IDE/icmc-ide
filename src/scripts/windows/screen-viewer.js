@@ -1,12 +1,15 @@
-import { screenWidth, screenHeight } from "../config.js";
-import Fenster from "../modules/fenster.js";
+import Fenster from "../fenster.js";
 
 export default class ScreenViewer extends Fenster {
-  constructor({ style }) {
+  constructor({ style }, config) {
     const body = document.createElement("screen-viewer");
-    const title = document.createDocumentFragment();
-
+    const title = document.createElement("span");
     const buttonsLeft = [];
+
+    {
+      title.innerText = "Screen";
+      title.classList.add("title");
+    }
 
     {
       const button = document.createElement("button");
@@ -23,26 +26,19 @@ export default class ScreenViewer extends Fenster {
       buttonsLeft.push(button);
     }
 
-    {
-      const span = document.createElement("span");
-      span.innerText = "Screen";
-      span.classList.add("title");
-      title.appendChild(span);
-    }
-
-    screenWidth.subscribe((value) => {
-      body.width = value;
-    });
-
-    screenHeight.subscribe((value) => {
-      body.height = value;
-    });
-
     super({
       title,
       body,
       style,
       buttonsLeft,
+    });
+
+    config.screenWidth.subscribe((width) => {
+      body.width = width;
+    });
+
+    config.screenHeight.subscribe((height) => {
+      body.height = height;
     });
   }
 }

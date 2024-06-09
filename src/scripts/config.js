@@ -4,7 +4,7 @@ class Field {
   #name;
 
   static async async_with(name, defaultValue) {
-    const storedValue = localStorage.getItem(`config.${name}`);
+    const storedValue = localStorage.getItem(name);
 
     try {
       if (storedValue !== null) {
@@ -16,7 +16,7 @@ class Field {
   }
 
   static with(name, defaultValue) {
-    const storedValue = localStorage.getItem(`config.${name}`);
+    const storedValue = localStorage.getItem(name);
 
     try {
       if (storedValue !== null) {
@@ -41,8 +41,7 @@ class Field {
 
   set(value) {
     this.#value = value;
-
-    localStorage.setItem(`config.${this.#name}`, JSON.stringify(value));
+    this.save();
 
     for (const handler of this.#handlers) {
       handler(value);
@@ -51,25 +50,38 @@ class Field {
 
   subscribe(handler) {
     this.#handlers.push(handler);
+    handler(this.#value);
   }
 
   update(func) {
     this.set(func(this.#value));
   }
+
+  save() {
+    localStorage.setItem(this.#name, JSON.stringify(this.#value));
+  }
 }
-
-
 
 const assets = (async () => {
   const responses = await Promise.all(["example.c", "example.asm"].map((filename) => fetch(`../assets/${filename}`)));
   const [c, asm] = await Promise.all(responses.map((response) => response.text()));
-  return { c, asm };
+  return { "example.c": c, "example.asm": asm };
 })();
 
-
+export const version = Field.with("version", 1);
 export const syntax = Field.with("syntax", "icmc");
-export const language = Field.with("language", "asm");
 export const screenWidth = Field.with("screenWidth", 40);
 export const screenHeight = Field.with("screenHeight", 30);
-export const sourceCode = await Field.async_with("sourceCode", async () => await assets);
 export const frequency = Field.with("frequency", 6);
+export const files = await Field.async_with("files", async () => await assets);
+export const entryFile = Field.with("entryFile", "example.asm");
+
+localStorage.clear();
+
+version.save();
+syntax.save();
+screenWidth.save();
+screenHeight.save();
+frequency.save();
+files.save();
+entryFile.save();

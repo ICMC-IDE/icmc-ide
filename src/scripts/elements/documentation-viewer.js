@@ -1,4 +1,4 @@
-export default class DocumentationViewer extends HTMLElement {
+class DocumentationViewer extends HTMLElement {
   constructor() {
     super();
   }

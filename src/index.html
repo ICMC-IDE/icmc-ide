@@ -18,6 +18,9 @@
     <form onsubmit="return false;">
       <div>
         <button name="build" onclick="window.build()"><img src="images/build.png"> Build</button>
+        <select name="file"></select>
+      </div>
+      <div>
         <button name="reset" onclick="window.reset()"><img src="images/reset.png"> Reset</button>
         <button name="play" onclick="window.play()"><img src="images/play.png"> Play</button>
         <button name="stop" onclick="window.stop()" style="display: none;"><img src="images/stop.png">
@@ -55,10 +58,6 @@
   <template id="configEditorTemplate">
     <form>
       <div>
-        <span class="parameter">Language: <select name="language">
-            <option value="asm">ASM</option>
-            <option value="c">C</option>
-          </select></span>
         <span class="parameter" style="display: none;">CRT Filter: <select name="crtFilter">
             <option value="off">Off</option>
             <option value="basic">Basic</option>
@@ -68,8 +67,8 @@
             <option value="icmc">ICMC</option>
             <option value="giroto">Giroto</option>
           </select></span>
-        <span class="parameter">Screen size: <input type="number" min="1" max="65536" value="40"
-            name="screenWidth">&Cross;<input type="number" min="1" max="65536" value="30" name="screenHeight"></span>
+        <span class="parameter">Screen size: <input type="number" min="1" max="128" value="40"
+            name="screenWidth">&Cross;<input type="number" min="1" max="128" value="30" name="screenHeight"></span>
       </div>
     </form>
   </template>
@@ -964,50 +963,18 @@
     <canvas width="8" height="32"></canvas>
   </template>
 
-  <script src="scripts/modules/monaco-editor/min/vs/loader.js" async></script>
+  <script src="scripts/elements/mod.js" type="module" defer></script>
   <script src="scripts/main.js" type="module" defer></script>
+  <script src="scripts/modules/monaco-editor/min/vs/loader.js"></script>
+  <script>
+    require.config({
+      paths: {
+        vs: "scripts/modules/monaco-editor/min/vs"
+      }
+    });
 
-  <!--
-  <svg width="640" height="480" viewBox="0 0 640 480" xmlns="http://www.w3.org/2000/svg">
-    <filter id="crt">
-      <feImage href="images/crt-lines.svg" result="line" />
-      <feImage href="images/crt-lines2.svg" result="line2" />
-      <feImage href="images/distortion.png" result="distortion" />
-
-      <feDisplacementMap in="SourceGraphic" in2="line2" scale="1" xChannelSelector="R" yChannelSelector="B"
-        result="image0" />
-      <feBlend in="line" in2="0" mode="multiply" result="image" />
-
-      <feColorMatrix in="image" type="matrix" values="1 0 0 0 0
-                                                      0 0 0 0 0
-                                                      0 0 0 0 0
-                                                      0 0 0 1 0" result="r" />
-      <feColorMatrix in="image" type="matrix" values="0 0 0 0 0
-                                                      0 1 0 0 0
-                                                      0 0 0 0 0
-                                                      0 0 0 1 0" result="g" />
-      <feColorMatrix in="image" type="matrix" values="0 0 0 0 0
-                                                      0 0 0 0 0
-                                                      0 0 1 0 0
-                                                      0 0 0 1 0" result="b" />
-
-      <feDisplacementMap in2="distortion" in="r" scale="-10" xChannelSelector="R" yChannelSelector="B"
-        result="rDistortion" />
-      <feDisplacementMap in2="distortion" in="g" scale="-12" xChannelSelector="R" yChannelSelector="B"
-        result="gDistortion" />
-      <feDisplacementMap in2="distortion" in="b" scale="-14" xChannelSelector="R" yChannelSelector="B"
-        result="bDistortion" />
-
-      <feBlend in="rDistortion" in2="gDistortion" mode="screen" result="rg" />
-      <feBlend in="rg" in2="bDistortion" mode="screen" result="rgb" />
-      <feGaussianBlur in="rgb" stdDeviation="3" result="light" />
-      <feColorMatrix in="light" type="matrix" values="1 0 0 0 0
-                                                      0 1 0 0 0
-                                                      0 0 1 0 0
-                                                      0 0 0 0.25 0" result="b" />
-      <feBlend in="rgb" in2="light2" mode="lighten" />
-    </filter>
-  </svg>-->
+    require(["vs/editor/editor.main"], () => { });
+  </script>
 </body>
 
 </html>

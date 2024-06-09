@@ -1,4 +1,4 @@
-export default class ScreenViewer extends HTMLElement {
+class ScreenViewer extends HTMLElement {
   #canvas = document.createElement("canvas");
   #context = this.#canvas.getContext("2d");
   #memory;
@@ -117,7 +117,7 @@ export default class ScreenViewer extends HTMLElement {
     this.#shouldUpdate = true;
 
     const that = this;
-    this.#charmap.await(function() {
+    this.#charmap.subscribe(function() {
       that.#shouldUpdate = true;
     });
   }

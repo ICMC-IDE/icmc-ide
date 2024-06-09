@@ -1,12 +1,18 @@
 import * as config from "./config.js";
-import "./elements/mod.js";
-import { createWindows } from "./windows/mod.js";
+import * as events from "./events.js";
+
+import { createWindows, SourceEditor } from "./windows/mod.js";
 import CharMap from "./charmap.js";
 
-async function main() {
+const { default: initMif, parseMif } = await import("./modules/mif/mif.js");
+const colorPalette = ["#FFFFFF", "#FFFFAA", "#FFFF55", "#FFFF00", "#FFDAFF", "#FFDAAA", "#FFDA55", "#FFDA00", "#FFB6FF", "#FFB6AA", "#FFB655", "#FFB600", "#FF91FF", "#FF91AA", "#FF9155", "#FF9100", "#FF6DFF", "#FF6DAA", "#FF6D55", "#FF6D00", "#FF48FF", "#FF48AA", "#FF4855", "#FF4800", "#FF24FF", "#FF24AA", "#FF2455", "#FF2400", "#FF00FF", "#FF00AA", "#FF0055", "#FF0000", "#DAFFFF", "#DAFFAA", "#DAFF55", "#DAFF00", "#DADAFF", "#DADAAA", "#DADA55", "#DADA00", "#DAB6FF", "#DAB6AA", "#DAB655", "#DAB600", "#DA91FF", "#DA91AA", "#DA9155", "#DA9100", "#DA6DFF", "#DA6DAA", "#DA6D55", "#DA6D00", "#DA48FF", "#DA48AA", "#DA4855", "#DA4800", "#DA24FF", "#DA24AA", "#DA2455", "#DA2400", "#DA00FF", "#DA00AA", "#DA0055", "#DA0000", "#B6FFFF", "#B6FFAA", "#B6FF55", "#B6FF00", "#B6DAFF", "#B6DAAA", "#B6DA55", "#B6DA00", "#B6B6FF", "#B6B6AA", "#B6B655", "#B6B600", "#B691FF", "#B691AA", "#B69155", "#B69100", "#B66DFF", "#B66DAA", "#B66D55", "#B66D00", "#B648FF", "#B648AA", "#B64855", "#B64800", "#B624FF", "#B624AA", "#B62455", "#B62400", "#B600FF", "#B600AA", "#B60055", "#B60000", "#91FFFF", "#91FFAA", "#91FF55", "#91FF00", "#91DAFF", "#91DAAA", "#91DA55", "#91DA00", "#91B6FF", "#91B6AA", "#91B655", "#91B600", "#9191FF", "#9191AA", "#919155", "#919100", "#916DFF", "#916DAA", "#916D55", "#916D00", "#9148FF", "#9148AA", "#914855", "#914800", "#9124FF", "#9124AA", "#912455", "#912400", "#9100FF", "#9100AA", "#910055", "#910000", "#6DFFFF", "#6DFFAA", "#6DFF55", "#6DFF00", "#6DDAFF", "#6DDAAA", "#6DDA55", "#6DDA00", "#6DB6FF", "#6DB6AA", "#6DB655", "#6DB600", "#6D91FF", "#6D91AA", "#6D9155", "#6D9100", "#6D6DFF", "#6D6DAA", "#6D6D55", "#6D6D00", "#6D48FF", "#6D48AA", "#6D4855", "#6D4800", "#6D24FF", "#6D24AA", "#6D2455", "#6D2400", "#6D00FF", "#6D00AA", "#6D0055", "#6D0000", "#48FFFF", "#48FFAA", "#48FF55", "#48FF00", "#48DAFF", "#48DAAA", "#48DA55", "#48DA00", "#48B6FF", "#48B6AA", "#48B655", "#48B600", "#4891FF", "#4891AA", "#489155", "#489100", "#486DFF", "#486DAA", "#486D55", "#486D00", "#4848FF", "#4848AA", "#484855", "#484800", "#4824FF", "#4824AA", "#482455", "#482400", "#4800FF", "#4800AA", "#480055", "#480000", "#24FFFF", "#24FFAA", "#24FF55", "#24FF00", "#24DAFF", "#24DAAA", "#24DA55", "#24DA00", "#24B6FF", "#24B6AA", "#24B655", "#24B600", "#2491FF", "#2491AA", "#249155", "#249100", "#246DFF", "#246DAA", "#246D55", "#246D00", "#2448FF", "#2448AA", "#244855", "#244800", "#2424FF", "#2424AA", "#242455", "#242400", "#2400FF", "#2400AA", "#240055", "#240000", "#00FFFF", "#00FFAA", "#00FF55", "#00FF00", "#00DAFF", "#00DAAA", "#00DA55", "#00DA00", "#00B6FF", "#00B6AA", "#00B655", "#00B600", "#0091FF", "#0091AA", "#009155", "#009100", "#006DFF", "#006DAA", "#006D55", "#006D00", "#0048FF", "#0048AA", "#004855", "#004800", "#0024FF", "#0024AA", "#002455", "#002400", "#0000FF", "#0000AA", "#000055", "#000000"];
+
+async function main(config, events) {
   const worker = new Worker("./scripts/worker.js", { type: "module" });
   const assets = await Promise.all((await Promise.all(["charmap.mif", "example.asm"].map((filename) => fetch(`../assets/${filename}`)))).map((data) => data.text()));
-  const windows = createWindows();
+  const windows = createWindows(config, events);
+
+  await initMif();
 
   /*
   function download(blob, name) {
@@ -33,45 +39,79 @@ async function main() {
   // config.sourceCode.update((value) => value ?? assets[1]);
   // textEditor.value = localStorage.getItem(`script.${configEditor.language}`) ?? assets[1];
 
-  windows.screen.body.width = (windows.charmap.body.width = config.screenWidth.get());
-  windows.screen.body.height = (windows.charmap.body.height = config.screenHeight.get());
+  const openFiles = {
 
-  windows.text.body.value = config.sourceCode.get()[config.language.get()];
+  };
 
-  config.frequency.subscribe((value) => {
-    worker.postMessage(["frequency", value]);
+  events.openFile.subscribe((fileName) => {
+    openFiles[fileName] ??= (() => {
+      const extension = fileName.match(/\.(.*)$/);
+      let language;
+
+      if (extension) {
+        language = extension[1].toLowerCase();
+      }
+
+      return monaco.editor.createModel(config.files.get()[fileName], language);
+    })();
+
+    const editor = new SourceEditor({
+      style: {
+        left: "0.5rem",
+        top: "0.5rem",
+        width: "50ch",
+        height: "50rem",
+      },
+    }, config, events);
+
+    editor.model = openFiles[fileName];
   });
 
-  window.play = function (mode) {
+  config.frequency.subscribe((frequency) => {
+    worker.postMessage(["frequency", frequency]);
+  });
+
+  window.play = function(mode) {
     return worker.postMessage("play");
   }
 
-  window.stop = function () {
+  window.stop = function() {
     return worker.postMessage("stop");
   }
 
-  window.build = function () {
-    config.sourceCode.update((value) => {
-      value[config.language.get()] = windows.text.body.value;
-      return value;
-    });
+  window.build = function() {
+    const entryFile = config.entryFile.get();
+    let source;
+
+    if (openFiles[entryFile]) {
+      source = openFiles[entryFile].getValue();
+    } else {
+      source = config.files.get()[entryFile];
+    }
+    
+    const extension = entryFile.match(/\.(.*)$/);
+    let language;
+
+    if (extension) {
+      language = extension[1].toLowerCase();
+    }
 
     return worker.postMessage(["build", {
-      language: config.language.get(),
       syntax: config.syntax.get(),
-      source: windows.text.body.value,
+      language,
+      source,
     }]);
   };
 
-  window.reset = function () {
+  window.reset = function() {
     return worker.postMessage("reset");
   }
 
-  window.next = function () {
+  window.next = function() {
     return worker.postMessage("next");
   }
 
-  window.exportMif = function () {
+  window.exportMif = function() {
     /*
     const ok = emulator.assemble(textEditor.value);
 
@@ -82,18 +122,18 @@ async function main() {
     */
   }
 
-  window.downloadAsm = function () {
+  window.downloadAsm = function() {
     /*
     const blob = new Blob([textEditor.value], { type: "text/x-asm" });
     download(blob, "program.asm");
     */
   }
 
-  window.addEventListener("keydown", function (event) {
+  window.addEventListener("keydown", function(event) {
     return worker.postMessage(["key", event.keyCode]);
   });
 
-  window.addEventListener("keyup", function () {
+  window.addEventListener("keyup", function() {
     return worker.postMessage(["key", 255]);
   });
 
@@ -106,7 +146,10 @@ async function main() {
   }
 
   {
-    const charmap = CharMap.fromMif(assets[0]);
+    const result = parseMif(assets[0]);
+    const charmap = CharMap.fromBytes(result, colorPalette);
+
+    windows.charmap.colorPalette = colorPalette;
 
     windows.screen.body.charmap = charmap;
     windows.charmap.body.charmap = charmap;
@@ -114,7 +157,7 @@ async function main() {
 
   requestAnimationFrame(draw);
 
-  worker.addEventListener("message", function ({ data }) {
+  worker.addEventListener("message", function({ data }) {
     if (typeof data === "string") {
       switch (data) {
         case "stop":
@@ -137,7 +180,7 @@ async function main() {
           windows.log.body.clear();
           return windows.memory.body.load(data[1], data[2]);
         case "asmsource":
-          config.sourceCode.set({ ...config.sourceCode.get(), ['asm']: data[1] });
+          // config.sourceCode.set({ ...config.sourceCode.get(), ['asm']: data[1] });
           break;
         case "log":
           windows.log.body.write(data[1]);
@@ -151,14 +194,14 @@ async function main() {
     }
   });
 
-  worker.addEventListener("messageerror", function (event) {
+  worker.addEventListener("messageerror", function(event) {
     console.error(event);
   });
 
-  worker.addEventListener("error", function (event) {
+  worker.addEventListener("error", function(event) {
     console.error(event);
   });
 }
 
-main()
+main(config, events)
   .catch((error) => console.error(error));

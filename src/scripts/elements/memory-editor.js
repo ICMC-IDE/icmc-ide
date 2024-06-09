@@ -1,4 +1,4 @@
-export default class MemoryEditor extends HTMLElement {
+class MemoryEditor extends HTMLElement {
   #memory;
   #symbols;
 
@@ -11,7 +11,9 @@ export default class MemoryEditor extends HTMLElement {
 
   constructor() {
     super();
+  }
 
+  connectedCallback() {
     for (let i = 0; i < 0x10000; i++) {
       this.#hexCells[i] = this.#createHexCell(i);
       this.#asciiCells[i] = this.#createAsciiCell(i);
@@ -115,7 +117,7 @@ export default class MemoryEditor extends HTMLElement {
     name.innerText = `${region_name} (${length} B)`;
 
     const group = [];
-    
+
     // debugger;
     for (let i = 0; i < length; i++) {
       const value = data[offset + i];

@@ -3,7 +3,7 @@
 
   --hue: 230;
 
-  --black: oklch(12.5% 0.00 230 / 1);
+  --black: oklch(15% 0.00 230 / 1);
 
   --gray-1: oklch(18.0% 0.00 230 / 1);
   --gray0: oklch(21.5% 0.00 230 / 1);
@@ -22,7 +22,7 @@
 }
 
 body {
-  background-color: var(--black);
+  background-color: var(--gray-1);
 
   inset: 0;
   position: absolute;
@@ -72,6 +72,15 @@ screen-editor {
     scale: 8;
     transform-origin: top right;
   }
+
+  &>screen-viewer {
+    min-width: calc(16px * var(--width));
+    min-height: calc(16px * var(--height));
+
+    &>div {
+      flex-grow: 1;
+    }
+  }
 }
 
 screen-viewer {
@@ -80,8 +89,8 @@ screen-viewer {
   justify-content: center;
   align-items: center;
 
-  min-width: calc(16px * var(--width));
-  min-height: calc(16px * var(--height));
+  min-width: calc(8px * var(--width));
+  min-height: calc(8px * var(--height));
 
   background-color: black;
 
@@ -468,5 +477,30 @@ config-editor {
     display: flex;
     flex-direction: column;
     gap: .25rem;
+  }
+}
+
+file-picker {
+  min-width: fit-content;
+  min-height: 10rem;
+  overflow: auto;
+
+  flex-grow: 1;
+
+  & div {
+    display: flex;
+    flex-direction: row-reverse;
+    background-color: var(--gray1);
+    border-bottom: solid .0625rem var(--gray2);
+
+    & button {
+      margin: -0.0625rem;
+      background-color: var(--gray1);
+
+      &:first-child {
+        flex-grow: 1;
+        order: 100;
+      }
+    }
   }
 }

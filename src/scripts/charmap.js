@@ -1,51 +1,32 @@
-function color8bits(byte) {
-  byte = ~byte;
-  const r = (((byte & 0b11100000) >> 5) * 0xFF / 0b111) | 0;
-  const g = (((byte & 0b00011100) >> 2) * 0xFF / 0b111) | 0;
-  const b = (((byte & 0b00000011) >> 0) * 0xFF / 0b011) | 0;
-  return (r << 16) | (g << 8) | b;
-}
-
-const COLORS = (new Array(256))
-  .fill(0)
-  .map((_, i) => color8bits(i));
-
 export default class CharMap extends OffscreenCanvas {
-  // #canvas = new OffscreenCanvas(2048, 1024);
   #context = this.getContext("2d");
-  #pixel = this.#context.createImageData(1, 1);
-  #color = new Uint32Array(this.#pixel.data.buffer);
   #handlers = [];
+  #colorPalette;
+  #bytes = new Uint8Array(8 * 256);
 
-  constructor() {
-    super(2048, 1024);
-  }
-
-  setPixel(x, y, on = true) {
-    this.#color[0] = 0xFF000000 | (on * COLORS[(x / 8) | 0]);
-    this.#context.putImageData(this.#pixel, x, y);
-
-    return this.emmit();
-  }
-
-  rawSetPixel(x, y, on = true) {
-    this.#color[0] = 0xFF000000 | (on * COLORS[(x / 8) | 0]);
-    this.#context.putImageData(this.#pixel, x, y);
+  constructor(colorPalette) {
+    super(8 * 256, 8 * 256);
+    this.#colorPalette = colorPalette;
   }
 
   togglePixel(x, y) {
-    const pixel = this.#context.getImageData(x, y, 1, 1);
-    const on = !(pixel.data[0] & 0x00FFFFFF);
+    const ctx = this.#context;
+    const byte = this.#bytes[y];
+    const mask = 0b1 << (7 - x);
+    const on = byte & mask;
+
+    this.#bytes[y] = (byte & ~mask) | (~byte & mask);
 
     for (let i = 0; i < 0x100; i++) {
-      this.#color[0] = 0xFF000000 | (on * COLORS[i]);
-      this.#context.putImageData(this.#pixel, x + 8 * i, y);
+      ctx.fillStyle = on ? "#000" : this.#colorPalette[i];
+      console.log(ctx.fillStyle);
+      ctx.fillRect(8 * i + x, y, 1, 1);
     }
 
     return this.emmit();
   }
 
-  await(callback) {
+  subscribe(callback) {
     this.#handlers.push(callback);
   }
 
@@ -55,44 +36,47 @@ export default class CharMap extends OffscreenCanvas {
     }
   }
 
-  static fromMif(data) {
-    const charmap = new CharMap();
+  static fromBytes(data, colorPalette) {
+    const charmap = new CharMap(colorPalette);
+    const chars = new OffscreenCanvas(8, 8 * 256);
 
-    data
-      .split("\n")
-      .filter((line) => /^\s*[\d\[].*:/.test(line))
-      .forEach((line) => {
-        line = line.trim();
+    {
+      const ctx = chars.getContext("2d");
+      const imageData = ctx.createImageData(8, 8 * 256);
+      const pixels = new Uint32Array(imageData.data.buffer);
+      const bytes = charmap.#bytes;
 
-        const res = line.match(/^(\d+)\s*:\s*([0-1]+)/);
+      for (let y = 0, i = 0; y < bytes.length; y++) {
+        let bitmask = data[y] ?? bytes[y];
+        bytes[y] = bitmask;
 
-        if (res) {
-          let [_, y, value] = res;
-
-          y = parseInt(y, 10);
-          value = parseInt(value, 2);
-
-          for (let l = 0, x = 0; l < 0x100; l++) {
-            for (let j = 0; j < 8; j++, x++) {
-              charmap.rawSetPixel(x, y, (value >> (7 - j)) & 0b1);
-            }
-          }
-        } else {
-          let [_, from, to, value] = line.match(/^\[(\d+)\.\.(\d+)\]\s*:\s*([01]+)/);
-
-          from = parseInt(from, 10);
-          to = parseInt(to, 10);
-          value = parseInt(value, 2);
-
-          for (let y = from; y <= to; y++) {
-            for (let l = 0, x = 0; l < 0x100; l++) {
-              for (let j = 0; j < 8; j++, x++) {
-                charmap.rawSetPixel(x, y, (value >> (7 - j)) & 0b1);
-              }
-            }
-          }
+        for (let x = 0; x < 8; x++, i++) {
+          pixels[i] = (0xFFFFFF * ((bitmask >> (7 - x)) & 0b1)) | 0xFF000000;
         }
-      });
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    {
+      const ctx = charmap.#context;
+      let x = 0;
+
+      ctx.save();
+
+      ctx.globalCompositeOperation = "multiply";
+      ctx.strokeStyle = "transparent";
+
+      for (const color of colorPalette) {
+        ctx.fillStyle = color;
+        ctx.fillRect(x, 0, 8, 256 * 8);
+        ctx.drawImage(chars, 0, 0, 8, 8 * 256, x, 0, 8, 8 * 256);
+
+        x += 8;
+      }
+
+      ctx.restore();
+    }
 
     return charmap;
   }

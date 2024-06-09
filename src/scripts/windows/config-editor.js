@@ -1,15 +1,19 @@
-import Fenster from "../modules/fenster.js";
+import Fenster from "../fenster.js";
 
 export default class ConfigEditor extends Fenster {
-  constructor({ style }) {
+  constructor({ style }, config) {
     const body = document.createElement("config-editor");
-    const title = document.createDocumentFragment();
+    const title = document.createElement("span");
 
     {
-      const span = document.createElement("span");
-      span.innerText = "Config";
-      span.classList.add("title");
-      title.appendChild(span);
+      title.innerText = "Config";
+      title.classList.add("title");
+    }
+
+    {
+      body.addEventListener("change-config", ({ detail: { name, value } }) => {
+        config[name].set(value);
+      });
     }
 
     super({

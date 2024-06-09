@@ -1,4 +1,4 @@
-import Fenster from "../modules/fenster.js";
+import Fenster from "../fenster.js";
 
 export default class LogViewer extends Fenster {
   constructor({ style }) {

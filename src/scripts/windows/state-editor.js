@@ -1,21 +1,41 @@
-import Fenster from "../modules/fenster.js";
+import Fenster from "../fenster.js";
 
 export default class StateEditor extends Fenster {
-  constructor({ style }) {
+  constructor({ style }, config) {
     const body = document.createElement("state-editor");
-    const title = document.createDocumentFragment();
+    const title = document.createElement("span");
 
     {
-      const span = document.createElement("span");
-      span.innerText = "State";
-      span.classList.add("title");
-      title.appendChild(span);
+      title.innerText = "State";
+      title.classList.add("title");
+    }
+
+    {
+      body.addEventListener("change-frequency", ({ detail: frequency }) => {
+        config.frequency.set(frequency);
+      });
+
+      body.addEventListener("change-file", ({ detail: fileName }) => {
+        config.entryFile.set(fileName);
+      });
     }
 
     super({
       title,
       body,
       style,
+    });
+
+    config.frequency.subscribe((frequency) => {
+      body.frequency = frequency;
+    });
+
+    config.files.subscribe((files) => {
+      body.files = Object.keys(files);
+    });
+
+    config.entryFile.subscribe((fileName) => {
+      body.entryFile = fileName;
     });
   }
 }

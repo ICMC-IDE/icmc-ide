@@ -1,8 +1,7 @@
-import { screenHeight, screenWidth } from "../config.js";
-import Fenster from "../modules/fenster.js";
+import Fenster from "../fenster.js";
 
 export default class ScreenEditor extends Fenster {
-  constructor({ style }) {
+  constructor({ style }, config) {
     const body = document.createElement("screen-editor");
     const title = document.createDocumentFragment();
 
@@ -33,14 +32,6 @@ export default class ScreenEditor extends Fenster {
       buttonsRight.push(button);
     }
 
-    screenWidth.subscribe((value) => {
-      body.width = value;
-    });
-
-    screenHeight.subscribe((value) => {
-      body.height = value;
-    });
-
     super({
       title,
       body,
@@ -48,6 +39,18 @@ export default class ScreenEditor extends Fenster {
       buttonsRight,
     });
 
+    config.screenWidth.subscribe((width) => {
+      body.width = width;
+    });
+
+    config.screenHeight.subscribe((height) => {
+      body.height = height;
+    });
+
     this.toggleMinimize();
+  }
+
+  set colorPalette(palette) {
+    this.body.colorPalette = palette;
   }
 }

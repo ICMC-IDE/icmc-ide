@@ -1,8 +1,7 @@
-import { syntax } from "../config.js";
-import Fenster from "../modules/fenster.js";
+import Fenster from "../fenster.js";
 
 export default class DocumentationViewer extends Fenster {
-  constructor({ style }) {
+  constructor({ style }, config) {
     const title = document.createDocumentFragment();
     const body = document.createElement("documentation-viewer");
 
@@ -13,9 +12,9 @@ export default class DocumentationViewer extends Fenster {
       title.appendChild(span);
     }
 
-    body.syntax = syntax.get();
+    body.syntax = config.syntax.get();
 
-    syntax.subscribe((value) => {
+    config.syntax.subscribe((value) => {
       body.syntax = value;
     });
 

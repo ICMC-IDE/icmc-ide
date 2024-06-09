@@ -1,4 +1,4 @@
-export default class LogViewer extends HTMLElement {
+class LogViewer extends HTMLElement {
   constructor() {
     super();
   }

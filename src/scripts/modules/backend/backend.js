@@ -1,4 +1,4 @@
-import * as __wbg_star0 from '../ide.js';
+import * as __wbg_star0 from '../../ide.js';
 
 let wasm;
 
@@ -497,7 +497,7 @@ function __wbg_get_imports() {
         table.set(offset + 3, false);
         ;
     };
-    imports['../ide.js'] = __wbg_star0;
+    imports['../../ide.js'] = __wbg_star0;
 
     return imports;
 }

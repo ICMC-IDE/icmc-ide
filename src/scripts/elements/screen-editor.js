@@ -1,18 +1,5 @@
-import { screenHeight, screenWidth } from "../config.js";
 
-function color8bits(byte) {
-  byte = ~byte;
-  const r = (((byte & 0b11100000) >> 5) * 0xFF / 0b111) | 0;
-  const g = (((byte & 0b00011100) >> 2) * 0xFF / 0b111) | 0;
-  const b = (((byte & 0b00000011) >> 0) * 0xFF / 0b011) | 0;
-  return (r << 16) | (g << 8) | b;
-}
-
-const COLORS = (new Array(256))
-  .fill(0)
-  .map((_, i) => color8bits(i));
-
-export default class ScreenEditor extends HTMLElement {
+class ScreenEditor extends HTMLElement {
   #chars;
   #screen;
   #colors;
@@ -37,18 +24,6 @@ export default class ScreenEditor extends HTMLElement {
 
     this.pickColor(0);
     this.pickChar(65);
-
-    {
-      const context = this.#colors.getContext("2d");
-      const imageData = context.getImageData(0, 0, this.#colors.width, this.#colors.height);
-      const pixels = new Uint32Array(imageData.data.buffer);
-
-      for (let i = 0; i < 0x100; i++) {
-        pixels[i] = COLORS[i] | 0xFF000000;
-      }
-
-      context.putImageData(imageData, 0, 0);
-    }
 
     const that = this;
 
@@ -118,6 +93,17 @@ export default class ScreenEditor extends HTMLElement {
     this.#coloredChar.updateCell(0, (this.#color << 8) | char);
   }
 
+  #generatePalette(palette) {
+    const ctx = this.#colors.getContext("2d");
+
+    for (let y = 0, i = 0; i < palette.length; y++) {
+      for (let x = 0; x < 8; x++, i++) {
+        ctx.fillStyle = palette[i];
+        ctx.fillRect(x, y, 1, 1);
+      }
+    }
+  }
+
   set charmap(value) {
     this.#charmap = value;
     this.#screen.charmap = value;
@@ -125,9 +111,16 @@ export default class ScreenEditor extends HTMLElement {
     this.#coloredChar.charmap = value;
   }
 
+  set colorPalette(palette) {
+    this.#generatePalette(palette);
+  }
+
   set width(value) {
-    this.#screen.width = value;
     this.style.setProperty("--width", value);
+
+    if (this.#screen) {
+      this.#screen.width = value;
+    }
   }
 
   get width() {
@@ -135,8 +128,11 @@ export default class ScreenEditor extends HTMLElement {
   }
 
   set height(value) {
-    this.#screen.height = value;
     this.style.setProperty("--height", value);
+
+    if (this.#screen) {
+      this.#screen.height = value;
+    }
   }
 
   get height() {

@@ -1,28 +1,17 @@
-import { language, sourceCode } from "../config.js";
-
-export default class TextEditor extends HTMLElement {
+class TextEditor extends HTMLElement {
   #editor;
   #observer;
+  #model = null;
 
   constructor() {
     super();
   }
 
-  set value(code) {
-    this.#editor.setValue(code);
-  }
-
   connectedCallback() {
     this.#editor = monaco.editor.create(this, {
-      language: language.get(),
       theme: "vs-dark",
       fontFamily: "ui-monospace",
-      // fontSize: 16
-    });
-
-    language.subscribe((value) => {
-      monaco.editor.setModelLanguage(this.#editor.getModel(), value);
-      this.#editor.setValue(sourceCode.get()[value]);
+      model: this.#model,
     });
 
     this.#observer = new ResizeObserver(() => {
@@ -32,21 +21,13 @@ export default class TextEditor extends HTMLElement {
     this.#observer.observe(this);
   }
 
-  get value() {
-    return this.#editor.getValue();
+  set model(model) {
+    if (this.#editor) {
+      this.#editor.setModel(model);
+    } else {
+      this.#model = model;
+    }
   }
 }
-
-await new Promise((resolve) => {
-  require.config({
-    paths: {
-      vs: "scripts/modules/monaco-editor/min/vs"
-    }
-  });
-
-  require(["vs/editor/editor.main"], function() {
-    resolve();
-  });
-});
 
 customElements.define("text-editor", TextEditor);
