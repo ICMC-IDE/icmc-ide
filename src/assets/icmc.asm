@@ -5,6 +5,12 @@
     r{n: u3} => n
 }
 
+#subruledef ireg
+{
+    s{n: u6} => n,
+    fr       => 0b000000
+}
+
 #subruledef addr
 {
     {n: u16} => n
@@ -115,10 +121,10 @@
 
     ; Stack
     push {rx: reg}                        => 0b000101 @ rx @ 0b0000000
-    push fr                               => 0b000101 @ 0b0001000000
+    push {ri: ireg}                       => 0b000101 @ 0b0001 @ ri
 
     pop {rx: reg}                         => 0b000110 @ rx @ 0b0000000
-    pop fr                                => 0b000110 @ 0b0001000000
+    pop {ri: ireg}                        => 0b000110 @ 0b0001 @ ri
 
     ; Control
     clearc                                => 0b001000 @ 0b0000000000
