@@ -3,7 +3,6 @@ import { setCallback } from "./ide.js";
 const { default: initBackend, Emulator, State, Fs, Assembler, Compiler } = await import("./modules/backend/backend.js");
 
 let lastTick;
-let keyPressed = 255;
 
 let ticksHandled = 0;
 let ticksPending = 0;
@@ -13,6 +12,48 @@ let playInterval;
 let frequency = 1e6;
 
 const modules = await Promise.all([initBackend()]);
+const assets = await Promise.all((await Promise.all(["icmc.asm", "giroto.asm"].map((filename) => fetch(`../assets/${filename}`)))).map((data) => data.text()));
+const emulator = new Emulator();
+const fs = new Fs();
+
+const memories = {
+  _ram: new Uint16Array(modules[0].memory.buffer, emulator.ram(), 0x10000),
+  _vram: new Uint16Array(modules[0].memory.buffer, emulator.vram(), 0x10000),
+  _registers: new Uint16Array(modules[0].memory.buffer, emulator.registers(), 8),
+  _internalRegisters: new Uint16Array(modules[0].memory.buffer, emulator.internal_registers(), 64),
+
+  get ram() {
+    if (this._ram.length === 0) {
+      return this._ram = new Uint16Array(modules[0].memory.buffer, emulator.ram(), 0x10000);
+    }
+
+    return this._ram;
+  },
+
+  get vram() {
+    if (this._vram.length === 0) {
+      return this._vram = new Uint16Array(modules[0].memory.buffer, emulator.vram(), 0x10000);
+    }
+
+    return this._vram;
+  },
+
+  get registers() {
+    if (this._registers.length === 0) {
+      return this._registers = new Uint16Array(modules[0].memory.buffer, emulator.registers(), 8);
+    }
+
+    return this._registers;
+  },
+
+  get internalRegisters() {
+    if (this._internalRegisters.length === 0) {
+      return this._internalRegisters = new Uint16Array(modules[0].memory.buffer, emulator.internal_registers(), 64);
+    }
+
+    return this._internalRegisters;
+  },
+};
 
 self.addEventListener("message", function({ data }) {
   if (typeof data === "string") {
@@ -32,8 +73,6 @@ self.addEventListener("message", function({ data }) {
     switch (data[0]) {
       case "build":
         return build(data[1], data[2]);
-      case "key":
-        keyPressed = data[1];
         break;
       case "frequency":
         frequency = 10 ** data[1];
@@ -43,10 +82,6 @@ self.addEventListener("message", function({ data }) {
     }
   }
 });
-
-const assets = await Promise.all((await Promise.all(["icmc.asm", "giroto.asm"].map((filename) => fetch(`../assets/${filename}`)))).map((data) => data.text()));
-const emulator = new Emulator();
-const fs = new Fs();
 
 fs.writeFile("icmc.asm", assets[0]);
 fs.writeFile("giroto.asm", assets[1]);
@@ -70,17 +105,22 @@ function build({ language, syntax, source }) {
     emulator.load(result.binary());
     emulator.reset();
 
-    self.postMessage(["registers", registers()]);
-    self.postMessage(["memory", memory(), result.symbols()]);
+    self.postMessage(["build", {
+      ram: memories.ram,
+      vram: memories.vram,
+      registers: memories.registers,
+      internalRegisters: memories.internalRegisters,
+      symbols: result.symbols(),
+    }]);
+
     self.postMessage(["asmsource", asm]);
   } catch (error) {
-    self.postMessage(["log", error]);
+    self.postMessage(["build", { error }]);
   }
 }
 
 function reset() {
   stop();
-  self.postMessage(["memory", memory()]);
   return emulator.reset();
 }
 
@@ -94,8 +134,8 @@ function play() {
     ticksPending += (performance.now() - lastTick) * frequency * 1e-3;
     lastTick = performance.now();
 
-    if (ticksPending > 10000) {
-      ticksPending = 10000;
+    if (ticksPending > 100000) {
+      ticksPending = 100000;
     }
 
     const ticks = emulator.tick(ticksPending);
@@ -121,43 +161,11 @@ function next() {
   return emulator.tick(1);
 }
 
-let memoryArray = new Uint16Array(modules[0].memory.buffer, emulator.ram(), 0x10000);
-function memory() {
-  if (memoryArray.length === 0) {
-    memoryArray = new Uint16Array(modules[0].memory.buffer, emulator.ram(), 0x10000);
-  }
-
-  return memoryArray;
-}
-
-let registersArray = new Uint16Array(modules[0].memory.buffer, emulator.registers(), 12);
-function registers() {
-  if (registersArray.length === 0) {
-    registersArray = new Uint16Array(modules[0].memory.buffer, emulator.registers(), 12);
-  }
-
-  return registersArray;
-}
-
-function loadMif(program) {
-  parseMif(memory(), program);
-}
-
 setCallback(function(name, ...args) {
   switch (name) {
-    case "write":
-      self.postMessage([...arguments]);
-      break;
-    case "halt":
-      self.postMessage("stop");
-      break;
     case "store":
       self.postMessage([...arguments]);
       break;
-    case "read":
-      return keyPressed;
-    case "breakpoint":
-      return stop();
     default:
       console.log("cb", ...arguments);
   }
@@ -167,7 +175,8 @@ setInterval(function() {
   const now = performance.now();
 
   if (lastCheck) {
-    console.info(1e3 * ticksHandled / (now - lastCheck), "Hz");
+    const currentFrequency = 1e3 * ticksHandled / (now - lastCheck);
+    console.info("%c%s %cHz | %c%s", "color: cyan", currentFrequency.toFixed(2), "color: white", "color: yellow", (currentFrequency / frequency).toFixed(4));
   }
 
   ticksHandled = 0;

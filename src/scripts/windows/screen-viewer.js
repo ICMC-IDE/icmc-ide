@@ -1,7 +1,11 @@
+import { IREG_KB, IREG_WC } from "../enums.js";
 import Fenster from "../fenster.js";
 
 export default class ScreenViewer extends Fenster {
-  constructor({ style }, config) {
+  #internalRegisters;
+  #wc = 0;
+
+  constructor({ style }, config, events) {
     const body = document.createElement("screen-viewer");
     const title = document.createElement("span");
     const buttonsLeft = [];
@@ -26,6 +30,21 @@ export default class ScreenViewer extends Fenster {
       buttonsLeft.push(button);
     }
 
+    {
+      body.tabIndex = 1;
+      body.addEventListener("keydown", ({ keyCode }) => {
+        if (this.#internalRegisters) {
+          this.#internalRegisters[IREG_KB] = keyCode;
+        }
+      });
+
+      body.addEventListener("keyup", ({ keyCode }) => {
+        if (this.#internalRegisters) {
+          this.#internalRegisters[IREG_KB] = 0xFF;
+        }
+      });
+    }
+
     super({
       title,
       body,
@@ -40,5 +59,25 @@ export default class ScreenViewer extends Fenster {
     config.screenHeight.subscribe((height) => {
       body.height = height;
     });
+
+    events.refresh.subscribe(({ vram, internalRegisters }) => {
+      if (vram) {
+        body.memory = vram;
+      }
+
+      if (internalRegisters) {
+        this.#internalRegisters = internalRegisters;
+      }
+    });
+  }
+
+  render() {
+    if (!this.#internalRegisters) return;
+    const newWc = this.#internalRegisters[IREG_WC];
+    if (newWc === this.#wc) return;
+
+    this.body.shouldUpdate = true;
+    this.body.render();
+    this.#wc = newWc;
   }
 }

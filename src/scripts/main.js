@@ -129,16 +129,8 @@ async function main(config, events) {
     */
   }
 
-  window.addEventListener("keydown", function(event) {
-    return worker.postMessage(["key", event.keyCode]);
-  });
-
-  window.addEventListener("keyup", function() {
-    return worker.postMessage(["key", 255]);
-  });
-
   function draw() {
-    windows.screen.body.render();
+    windows.screen.render();
     windows.charmap.body.render();
     windows.state.body.render();
 
@@ -171,19 +163,11 @@ async function main(config, events) {
       }
     } else {
       switch (data[0]) {
-        case "write":
-          return windows.screen.body.updateCell(data[2], data[1]);
-        case "registers":
-          windows.state.body.registers = data[1];
+        case "build":
+          events.refresh.emmit(data[1]);
           break;
-        case "memory":
-          windows.log.body.clear();
-          return windows.memory.body.load(data[1], data[2]);
         case "asmsource":
           // config.sourceCode.set({ ...config.sourceCode.get(), ['asm']: data[1] });
-          break;
-        case "log":
-          windows.log.body.write(data[1]);
           break;
         case "store":
           windows.memory.body.update(data[1], data[2]);

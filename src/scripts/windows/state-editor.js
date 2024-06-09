@@ -1,7 +1,7 @@
 import Fenster from "../fenster.js";
 
 export default class StateEditor extends Fenster {
-  constructor({ style }, config) {
+  constructor({ style }, config, events) {
     const body = document.createElement("state-editor");
     const title = document.createElement("span");
 
@@ -36,6 +36,16 @@ export default class StateEditor extends Fenster {
 
     config.entryFile.subscribe((fileName) => {
       body.entryFile = fileName;
+    });
+
+    events.refresh.subscribe(({ registers, internalRegisters }) => {
+      if (registers) {
+        this.body.registers = registers;
+      }
+
+      if (internalRegisters) {
+        this.body.internalRegisters = internalRegisters;
+      }
     });
   }
 }

@@ -14,3 +14,4 @@ class EventEmitter {
 
 export const deleteFile = new EventEmitter();
 export const openFile = new EventEmitter();
+export const refresh = new EventEmitter();

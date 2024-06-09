@@ -1,15 +1,14 @@
 import Fenster from "../fenster.js";
 
 export default class MemoryEditor extends Fenster {
-  constructor({ style }) {
+  constructor({ style }, _config, events) {
     const body = document.createElement("memory-editor");
-    const title = document.createDocumentFragment();
+    const title = document.createElement("span");
+    const buttonsRight = [];
 
     {
-      const span = document.createElement("span");
-      span.innerText = "Memory Editor";
-      span.classList.add("title");
-      title.appendChild(span);
+      title.innerText = "Memory Editor";
+      title.classList.add("title");
     }
 
     {
@@ -18,7 +17,7 @@ export default class MemoryEditor extends Fenster {
 
       icon.src = "images/export.png";
       button.append(icon, "Export");
-      title.appendChild(button);
+      buttonsRight.push(button)
     }
 
     {
@@ -27,13 +26,20 @@ export default class MemoryEditor extends Fenster {
 
       icon.src = "images/import.png";
       button.append(icon, "Import");
-      title.appendChild(button);
+      buttonsRight.push(button);
     }
 
     super({
       title,
       body,
       style,
+      buttonsRight,
+    });
+
+    events.refresh.subscribe(({ ram, symbols }) => {
+      if (ram) {
+        body.load(ram, symbols);
+      }
     });
   }
 }

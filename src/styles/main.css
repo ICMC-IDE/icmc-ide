@@ -32,11 +32,13 @@ body {
   overflow: hidden;
 }
 
+/*
 @media (max-width: 1800px) {
   :root {
     font-size: 12px;
   }
 }
+*/
 
 memory-editor {
   overflow: auto;

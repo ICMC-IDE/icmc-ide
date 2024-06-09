@@ -7,7 +7,7 @@
 
 #subruledef ireg
 {
-    s{n: u6} => n,
+    s{n: u6} => n
     fr       => 0b000000
 }
 

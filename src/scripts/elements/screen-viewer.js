@@ -1,12 +1,13 @@
 class ScreenViewer extends HTMLElement {
   #canvas = document.createElement("canvas");
   #context = this.#canvas.getContext("2d");
-  #memory;
   #charmap;
 
   #width;
   #height;
-  #shouldUpdate = false;
+  shouldUpdate = false;
+
+  memory = new Uint16Array(0x10000);
 
   constructor() {
     super();
@@ -42,21 +43,21 @@ class ScreenViewer extends HTMLElement {
   }
 
   updateCell(offset, value) {
-    this.#memory[offset] = value;
-    this.#shouldUpdate = true;
+    this.memory[offset] = value;
+    this.shouldUpdate = true;
   }
 
   render() {
-    if (!this.#shouldUpdate) return;
-
-    this.#shouldUpdate = false;
+    if (!this.shouldUpdate) return;
+    this.shouldUpdate = false;
 
     const charmap = this.#charmap;
     const context = this.#context;
-    const memory = this.#memory;
+    const memory = this.memory;
     const width = this.#width;
+    const length = width * this.#height;
 
-    for (let offset = 0; offset < memory.length; offset++) {
+    for (let offset = 0; offset < length; offset++) {
       const value = memory[offset];
       const color = (value >> 0x08) & 0xFF;
       const char = value & 0xFF;
@@ -73,8 +74,8 @@ class ScreenViewer extends HTMLElement {
   #resize() {
     const newMemory = new Uint16Array(this.#width * this.#height);
 
-    if (this.#memory) {
-      const memory = this.#memory;
+    if (this.memory) {
+      const memory = this.memory;
       const length = Math.min(newMemory.length, memory.length);
 
       for (let i = 0; i < length; i++) {
@@ -82,12 +83,12 @@ class ScreenViewer extends HTMLElement {
       }
     }
 
-    this.#memory = newMemory;
+    this.memory = newMemory;
     this.#canvas.width = this.#width * 8;
     this.#canvas.height = this.#height * 8;
     this.style.setProperty("--width", this.#width);
     this.style.setProperty("--height", this.#height);
-    this.#shouldUpdate = true;
+    this.shouldUpdate = true;
   }
 
   set width(value) {
@@ -114,11 +115,11 @@ class ScreenViewer extends HTMLElement {
 
   set charmap(value) {
     this.#charmap = value;
-    this.#shouldUpdate = true;
+    this.shouldUpdate = true;
 
     const that = this;
     this.#charmap.subscribe(function() {
-      that.#shouldUpdate = true;
+      that.shouldUpdate = true;
     });
   }
 }

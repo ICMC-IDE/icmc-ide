@@ -1,11 +1,12 @@
 const FREQUENCIES = ["1 Hz", "10 Hz", "100 Hz", "1 kHz", "10 kHz", "100 kHz", "1 MHz", "10 MHz", "100 MHz", "FAST!"];
 
 class StateEditor extends HTMLElement {
-  #buttons;
   #elements;
-  #registers;
   #running = false;
   #frequency = 6;
+
+  registers;
+  internalRegisters;
 
   constructor() {
     super();
@@ -16,36 +17,34 @@ class StateEditor extends HTMLElement {
 
     const forms = this.querySelectorAll("form");
 
-    this.#buttons = forms[0].elements;
-    this.#elements = forms[1].elements;
+    this.#elements = {
+      buttons: forms[0].elements,
+      registers: forms[1].elements,
+      internalRegisters: forms[2].elements,
+    };
 
-    this.#buttons.frequency.addEventListener("input", ({ target }) => {
+    this.#elements.buttons.frequency.addEventListener("input", ({ target }) => {
       this.dispatchEvent(new CustomEvent("change-frequency", { detail: target.valueAsNumber }));
     });
 
-    this.#buttons.file.addEventListener("input", ({ target }) => {
+    this.#elements.buttons.file.addEventListener("input", ({ target }) => {
       this.dispatchEvent(new CustomEvent("change-file", { detail: target.value }));
     });
   }
 
-  disconnectedCallback() {
-    this.#buttons = null;
-    this.#elements = null;
-    this.#registers = null;
-
-    while (this.lastElementChild) {
-      this.lastElementChild.remove();
-    }
-  }
-
   render() {
-    if (!this.#registers) return;
-
     const elements = this.#elements;
-    const registers = this.#registers;
 
-    for (let i = 0; i < registers.length; i++) {
-      elements[i].value = registers[i].toString(16).padStart(4, "0").toUpperCase();
+    if (this.registers) {
+      for (let i = 0, registers = this.registers; i < registers.length; i++) {
+        elements.registers[i].value = registers[i].toString(16).padStart(4, "0").toUpperCase();
+      }
+    }
+
+    if (this.internalRegisters) {
+      for (let i = 0, registers = this.internalRegisters; i < 4; i++) {
+        elements.internalRegisters[i].value = registers[i].toString(16).padStart(4, "0").toUpperCase();
+      }
     }
   }
 
@@ -56,28 +55,24 @@ class StateEditor extends HTMLElement {
   set frequency(value) {
     this.#frequency = value;
 
-    if (!this.#buttons) return;
+    if (!this.#elements.buttons) return;
 
-    this.#buttons.frequency.nextSibling.innerText = FREQUENCIES[this.#buttons.frequency.valueAsNumber];
+    this.#elements.buttons.frequency.nextSibling.innerText = FREQUENCIES[this.#elements.buttons.frequency.valueAsNumber];
 
-    if (this.#buttons.frequency.valueAsNumber !== value) {
-      this.#buttons.frequency.value = value;
+    if (this.#elements.buttons.frequency.valueAsNumber !== value) {
+      this.#elements.buttons.frequency.value = value;
     }
-  }
-
-  set registers(registers) {
-    this.#registers = registers;
   }
 
   set running(value) {
     this.#running = value;
 
-    this.#buttons.stop.style.display = value ? "" : "none";
-    this.#buttons.play.style.display = value ? "none" : "";
+    this.#elements.buttons.stop.style.display = value ? "" : "none";
+    this.#elements.buttons.play.style.display = value ? "none" : "";
   }
 
   set files(fileNames) {
-    const select = this.#buttons.file;
+    const select = this.#elements.buttons.file;
     const value = select.value;
 
     while (select.lastElementChild) {
@@ -96,7 +91,7 @@ class StateEditor extends HTMLElement {
   }
 
   set entryFile(fileName) {
-    this.#buttons.file.value = fileName;
+    this.#elements.buttons.file.value = fileName;
   }
 }
 

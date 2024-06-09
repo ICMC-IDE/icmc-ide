@@ -4,7 +4,8 @@
   "description": "An Emulator for the CPU developed at ICMC",
   "homepage": "https://github.com/ViniciusGiroto/icmc-emulator",
   "scripts": {
-    "build": "cp -r src dist",
+    "build": "cp -rL src dist",
+    "build-modules": "wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/mif && wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/emulator/backend",
     "clean": "rm -r dist"
   },
   "author": "Vinicius Giroto <viniciusgiroto@usp.br> (https://giroto.dev)",
