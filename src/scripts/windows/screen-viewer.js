@@ -9,6 +9,7 @@ export default class ScreenViewer extends Fenster {
     const body = document.createElement("screen-viewer");
     const title = document.createElement("span");
     const buttonsLeft = [];
+    const buttonsRight = [];
 
     {
       title.innerText = "Screen";
@@ -31,6 +32,18 @@ export default class ScreenViewer extends Fenster {
     }
 
     {
+      const button = document.createElement("button");
+      const icon = document.createElement("img");
+
+      icon.src = "images/erase.png";
+      button.append(icon, "Clear");
+      button.addEventListener("click", () => {
+        body.clear();
+      })
+      buttonsRight.push(button);
+    }
+
+    {
       body.tabIndex = 1;
       body.addEventListener("keydown", ({ keyCode }) => {
         if (this.#internalRegisters) {
@@ -50,6 +63,7 @@ export default class ScreenViewer extends Fenster {
       body,
       style,
       buttonsLeft,
+      buttonsRight
     });
 
     config.screenWidth.subscribe((width) => {
