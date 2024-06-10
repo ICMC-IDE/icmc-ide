@@ -26,21 +26,25 @@ export default class CharMap extends OffscreenCanvas {
       ctx.fillRect(8 * i + x, y, 1, 1);
     }
 
-    return this.emmit({ x, y });
+    return this.emmit();
   }
 
   subscribe(callback) {
     this.#handlers.push(callback);
   }
 
-  emmit(data) {
+  emmit() {
     for (const callback of this.#handlers) {
-      callback(data);
+      callback();
     }
   }
 
   get data() {
     return this.#context.getImageData(0, 0, this.width, this.height);
+  }
+
+  get colorPalette() {
+    return this.#colorPalette;
   }
 
   static fromBytes(data, colorPalette) {

@@ -115,9 +115,10 @@ class ScreenViewer extends HTMLElement {
     this.shouldUpdate = true;
 
     const that = this;
-    value.subscribe((data) => {
+    value.subscribe(() => {
       that.shouldUpdate = true;
-      // update renderer
+      // TODO: Change this
+      that.#renderer.charmap = this.#renderer.charmap;
     });
   }
 }
