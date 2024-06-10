@@ -1,7 +1,8 @@
+import Renderer from "../renderer.js";
+
 class ScreenViewer extends HTMLElement {
   #canvas = document.createElement("canvas");
-  #context = this.#canvas.getContext("2d");
-  #charmap;
+  #renderer;
 
   #width;
   #height;
@@ -51,24 +52,13 @@ class ScreenViewer extends HTMLElement {
     if (!this.shouldUpdate) return;
     this.shouldUpdate = false;
 
-    const charmap = this.#charmap;
-    const context = this.#context;
-    const memory = this.memory;
-    const width = this.#width;
-    const length = width * this.#height;
+    console.log(this.memory.length);
 
-    for (let offset = 0; offset < length; offset++) {
-      const value = memory[offset];
-      const color = (value >> 0x08) & 0xFF;
-      const char = value & 0xFF;
-
-      context.drawImage(charmap, color * 8, char * 8, 8, 8, (offset % width) * 8, Math.floor(offset / width) * 8, 8, 8);
-    }
+    this.#renderer.render(this.memory.slice(0, this.#width * this.#height));
   }
 
   clear() {
-    this.#context.fill = "black";
-    this.#context.fillRect(0, 0, this.#canvas.width, this.#canvas.height);
+    this.#renderer.clear();
   }
 
   #resize() {
@@ -84,11 +74,18 @@ class ScreenViewer extends HTMLElement {
     }
 
     this.memory = newMemory;
-    this.#canvas.width = this.#width * 8;
-    this.#canvas.height = this.#height * 8;
+
+    if (this.#renderer) {
+      this.#renderer.resize(this.#width, this.#height);
+    }
+
     this.style.setProperty("--width", this.#width);
     this.style.setProperty("--height", this.#height);
     this.shouldUpdate = true;
+  }
+
+  get width() {
+    return this.#width;
   }
 
   set width(value) {
@@ -98,8 +95,8 @@ class ScreenViewer extends HTMLElement {
     this.#resize();
   }
 
-  get width() {
-    return this.#width;
+  get height() {
+    return this.#height;
   }
 
   set height(value) {
@@ -109,17 +106,18 @@ class ScreenViewer extends HTMLElement {
     this.#resize();
   }
 
-  get height() {
-    return this.#height;
-  }
-
   set charmap(value) {
-    this.#charmap = value;
+    if (!this.#renderer) {
+      this.#renderer = new Renderer(this.#canvas, value, this.#width, this.#height);
+    } else {
+      this.#renderer.charmap = value;
+    }
     this.shouldUpdate = true;
 
     const that = this;
-    this.#charmap.subscribe(function() {
+    value.subscribe((data) => {
       that.shouldUpdate = true;
+      // update renderer
     });
   }
 }

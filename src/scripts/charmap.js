@@ -3,6 +3,9 @@ export default class CharMap extends OffscreenCanvas {
   #handlers = [];
   #colorPalette;
   #bytes = new Uint8Array(8 * 256);
+  charWidth = 8;
+  charHeight = 8;
+  // TODO: Make charmap relative to charWidth and charHeight
 
   constructor(colorPalette) {
     super(8 * 256, 8 * 256);
@@ -23,17 +26,21 @@ export default class CharMap extends OffscreenCanvas {
       ctx.fillRect(8 * i + x, y, 1, 1);
     }
 
-    return this.emmit();
+    return this.emmit({ x, y });
   }
 
   subscribe(callback) {
     this.#handlers.push(callback);
   }
 
-  emmit() {
+  emmit(data) {
     for (const callback of this.#handlers) {
-      callback();
+      callback(data);
     }
+  }
+
+  get data() {
+    return this.#context.getImageData(0, 0, this.width, this.height);
   }
 
   static fromBytes(data, colorPalette) {
