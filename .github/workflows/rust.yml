@@ -16,6 +16,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: jetli/wasm-pack-action@v0.4.0
+    - name: Setup
+      run: git submodules init && git submodules update
     - name: Build backend
       run: wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/emulator/backend
     - name: Build mif
