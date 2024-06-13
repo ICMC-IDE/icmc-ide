@@ -19,8 +19,8 @@ jobs:
     - name: Setup
       run: git submodule init && git submodule update
     - name: Build backend
-      run: rustup install nightly &&
-           rustup default nightly && 
+      run: rustup default nightly &&
+           rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu &&
            wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/emulator/backend
     - name: Build mif
       run: wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/mif
