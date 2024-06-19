@@ -43,4 +43,6 @@ jobs:
         path: dist/
         if-no-files-found: error
         overwrite: true
+    - name: Deploy
+      run: npx --package=netlify-cli netlify deploy
         
