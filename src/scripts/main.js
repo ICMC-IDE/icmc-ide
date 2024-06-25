@@ -1,7 +1,7 @@
 import * as config from "./config.js";
 import * as events from "./events.js";
 
-import { createWindows, SourceEditor } from "./windows/mod.js";
+import { createWindows, ScreenViewer, SourceEditor } from "./windows/mod.js";
 import CharMap from "./charmap.js";
 
 const { default: initMif, parseMif } = await import("./modules/mif/mif.js");
@@ -12,179 +12,217 @@ async function main(config, events) {
   const assets = await Promise.all((await Promise.all(["charmap.mif", "example.asm"].map((filename) => fetch(`../assets/${filename}`)))).map((data) => data.text()));
   const windows = createWindows(config, events);
 
-  await initMif();
+  const contextMenu = document.createElement("div");
+  contextMenu.style.position = "absolute";
+  contextMenu.style.display = "none";
+  {
+    const openable_windows = { "Screen": ScreenViewer, "DASDASDSA": ScreenViewer }
+    for (let [window_name, window_class] of Object.entries(openable_windows)) {
+      const item = document.createElement("button");
 
-  /*
-  function download(blob, name) {
-    const blobUrl = URL.createObjectURL(blob);
-    const link = document.createElement("a");
+      item.textContent = window_name;
+      item.addEventListener("click", (event) => {
+        window.hideContext();
+        new window_class({
+          style: {
+            left: event.clientX + "px",
+            top: event.clientY + "px",
+            // width: "50ch",
+            // height: "50rem",
+          },
+        }, config, events);
+      });
+      contextMenu.appendChild(item);
+    }
+    document.body.appendChild(contextMenu);
 
-    link.href = blobUrl;
-    link.download = name;
+    await initMif();
 
-    document.body.appendChild(link);
+    /*
+    function download(blob, name) {
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+   
+      link.href = blobUrl;
+      link.download = name;
+   
+      document.body.appendChild(link);
+   
+      link.dispatchEvent(
+        new MouseEvent("click", {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+        })
+      );
+   
+      document.body.removeChild(link);
+    }
+    */
 
-    link.dispatchEvent(
-      new MouseEvent("click", {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-      })
-    );
+    // config.sourceCode.update((value) => value ?? assets[1]);
+    // textEditor.value = localStorage.getItem(`script.${configEditor.language}`) ?? assets[1];
 
-    document.body.removeChild(link);
-  }
-  */
+    const openFiles = {
 
-  // config.sourceCode.update((value) => value ?? assets[1]);
-  // textEditor.value = localStorage.getItem(`script.${configEditor.language}`) ?? assets[1];
+    };
 
-  const openFiles = {
+    events.openFile.subscribe((fileName) => {
+      openFiles[fileName] ??= (() => {
+        const extension = fileName.match(/\.(.*)$/);
+        let language;
 
-  };
+        if (extension) {
+          language = extension[1].toLowerCase();
+        }
 
-  events.openFile.subscribe((fileName) => {
-    openFiles[fileName] ??= (() => {
-      const extension = fileName.match(/\.(.*)$/);
+        return monaco.editor.createModel(config.files.get()[fileName], language);
+      })();
+
+      const editor = new SourceEditor({
+        style: {
+          left: "0.5rem",
+          top: "0.5rem",
+          width: "50ch",
+          height: "50rem",
+        },
+      }, config, events);
+
+      editor.model = openFiles[fileName];
+    });
+
+    config.frequency.subscribe((frequency) => {
+      worker.postMessage(["frequency", frequency]);
+    });
+
+    window.play = function (mode) {
+      return worker.postMessage("play");
+    }
+
+    window.stop = function () {
+      return worker.postMessage("stop");
+    }
+
+    window.build = function () {
+      const entryFile = config.entryFile.get();
+      let source;
+
+      if (openFiles[entryFile]) {
+        source = openFiles[entryFile].getValue();
+      } else {
+        source = config.files.get()[entryFile];
+      }
+
+      const extension = entryFile.match(/\.(.*)$/);
       let language;
 
       if (extension) {
         language = extension[1].toLowerCase();
       }
 
-      return monaco.editor.createModel(config.files.get()[fileName], language);
-    })();
+      return worker.postMessage(["build", {
+        syntax: config.syntax.get(),
+        language,
+        source,
+      }]);
+    };
 
-    const editor = new SourceEditor({
-      style: {
-        left: "0.5rem",
-        top: "0.5rem",
-        width: "50ch",
-        height: "50rem",
-      },
-    }, config, events);
-
-    editor.model = openFiles[fileName];
-  });
-
-  config.frequency.subscribe((frequency) => {
-    worker.postMessage(["frequency", frequency]);
-  });
-
-  window.play = function(mode) {
-    return worker.postMessage("play");
-  }
-
-  window.stop = function() {
-    return worker.postMessage("stop");
-  }
-
-  window.build = function() {
-    const entryFile = config.entryFile.get();
-    let source;
-
-    if (openFiles[entryFile]) {
-      source = openFiles[entryFile].getValue();
-    } else {
-      source = config.files.get()[entryFile];
-    }
-    
-    const extension = entryFile.match(/\.(.*)$/);
-    let language;
-
-    if (extension) {
-      language = extension[1].toLowerCase();
+    window.reset = function () {
+      return worker.postMessage("reset");
     }
 
-    return worker.postMessage(["build", {
-      syntax: config.syntax.get(),
-      language,
-      source,
-    }]);
-  };
+    window.next = function () {
+      return worker.postMessage("next");
+    }
 
-  window.reset = function() {
-    return worker.postMessage("reset");
-  }
+    window.exportMif = function () {
+      /*
+      const ok = emulator.assemble(textEditor.value);
+   
+      if (!ok) return;
+   
+      const blob = new Blob([emulator.exportMif()], { type: "text/x-mif" });
+      download(blob, "program.mif");
+      */
+    }
 
-  window.next = function() {
-    return worker.postMessage("next");
-  }
+    window.downloadAsm = function () {
+      /*
+      const blob = new Blob([textEditor.value], { type: "text/x-asm" });
+      download(blob, "program.asm");
+      */
+    }
 
-  window.exportMif = function() {
-    /*
-    const ok = emulator.assemble(textEditor.value);
+    window.showContext = function (event) {
+      event.preventDefault();
 
-    if (!ok) return;
+      contextMenu.style.left = event.clientX + "px";
+      contextMenu.style.top = event.clientY + "px";
+      contextMenu.style.display = "grid";
+    }
 
-    const blob = new Blob([emulator.exportMif()], { type: "text/x-mif" });
-    download(blob, "program.mif");
-    */
-  }
+    window.hideContext = function () {
+      contextMenu.style.display = "none";
+    }
 
-  window.downloadAsm = function() {
-    /*
-    const blob = new Blob([textEditor.value], { type: "text/x-asm" });
-    download(blob, "program.asm");
-    */
-  }
+    function draw() {
+      events.render.emmit();
+      // windows.screen.render();
+      // windows.charmap.body.render();
+      // windows.state.body.render();
 
-  function draw() {
-    windows.screen.render();
-    windows.charmap.body.render();
-    windows.state.body.render();
+      requestAnimationFrame(draw);
+    }
+
+    {
+      const result = parseMif(assets[0]);
+      const charmap = CharMap.fromBytes(result, colorPalette);
+
+      events.setCharmap.emmit(charmap);
+      // windows.charmap.colorPalette = colorPalette;
+      // windows.screen.body.charmap = charmap;
+      // windows.charmap.body.charmap = charmap;
+    }
 
     requestAnimationFrame(draw);
-  }
 
-  {
-    const result = parseMif(assets[0]);
-    const charmap = CharMap.fromBytes(result, colorPalette);
-
-    windows.charmap.colorPalette = colorPalette;
-
-    windows.screen.body.charmap = charmap;
-    windows.charmap.body.charmap = charmap;
-  }
-
-  requestAnimationFrame(draw);
-
-  worker.addEventListener("message", function({ data }) {
-    if (typeof data === "string") {
-      switch (data) {
-        case "stop":
-          windows.state.body.running = false;
-          break;
-        case "play":
-          windows.state.body.running = true;
-          break;
-        default:
-          console.log(data);
+    worker.addEventListener("message", function ({ data }) {
+      if (typeof data === "string") {
+        switch (data) {
+          case "stop":
+            windows.state.body.running = false;
+            break;
+          case "play":
+            windows.state.body.running = true;
+            break;
+          default:
+            console.log(data);
+        }
+      } else {
+        switch (data[0]) {
+          case "build":
+            events.refresh.emmit(data[1]);
+            break;
+          case "asmsource":
+            // config.sourceCode.set({ ...config.sourceCode.get(), ['asm']: data[1] });
+            break;
+          case "store":
+            windows.memory.body.update(data[1], data[2]);
+            break;
+          default:
+            console.log(data);
+        }
       }
-    } else {
-      switch (data[0]) {
-        case "build":
-          events.refresh.emmit(data[1]);
-          break;
-        case "asmsource":
-          // config.sourceCode.set({ ...config.sourceCode.get(), ['asm']: data[1] });
-          break;
-        case "store":
-          windows.memory.body.update(data[1], data[2]);
-          break;
-        default:
-          console.log(data);
-      }
-    }
-  });
+    });
 
-  worker.addEventListener("messageerror", function(event) {
-    console.error(event);
-  });
+    worker.addEventListener("messageerror", function (event) {
+      console.error(event);
+    });
 
-  worker.addEventListener("error", function(event) {
-    console.error(event);
-  });
+    worker.addEventListener("error", function (event) {
+      console.error(event);
+    });
+  }
 }
 
 main(config, events)

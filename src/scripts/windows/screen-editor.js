@@ -1,7 +1,7 @@
 import Fenster from "../fenster.js";
 
 export default class ScreenEditor extends Fenster {
-  constructor({ style }, config) {
+  constructor({ style }, config, events) {
     const body = document.createElement("screen-editor");
     const title = document.createDocumentFragment();
 
@@ -47,10 +47,14 @@ export default class ScreenEditor extends Fenster {
       body.height = height;
     });
 
-    this.toggleMinimize();
-  }
+    events.render.subscribe(() => {
+      body.render();
+    })
 
-  set colorPalette(palette) {
-    this.body.colorPalette = palette;
+    events.setCharmap.subscribe((charmap) => {
+      this.body.charmap = charmap;
+    })
+
+    this.toggleMinimize();
   }
 }

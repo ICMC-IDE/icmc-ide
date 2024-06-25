@@ -27,7 +27,7 @@ class ScreenEditor extends HTMLElement {
 
     const that = this;
 
-    this.#colors.addEventListener("pointerdown", function(event) {
+    this.#colors.addEventListener("pointerdown", function (event) {
       const rect = this.getBoundingClientRect();
       const x = (event.clientX - rect.left) / 16 | 0;
       const y = (event.clientY - rect.top) / 16 | 0;
@@ -36,7 +36,7 @@ class ScreenEditor extends HTMLElement {
     });
 
     // FIXME
-    this.#coloredChar.addEventListener("pointerdown", function(event) {
+    this.#coloredChar.addEventListener("pointerdown", function (event) {
       const rect = this.getBoundingClientRect();
       const x = (event.clientX - rect.left) / 16 | 0;
       const y = (event.clientY - rect.top) / 16 | 0;
@@ -46,7 +46,7 @@ class ScreenEditor extends HTMLElement {
       charmap.togglePixel(x % 8, 8 * char + y);
     });
 
-    this.#chars.addEventListener("pointerdown", function(event) {
+    this.#chars.addEventListener("pointerdown", function (event) {
       const rect = this.getBoundingClientRect();
       const x = (event.clientX - rect.left) / 16 | 0;
       const y = (event.clientY - rect.top) / 16 | 0;
@@ -54,7 +54,7 @@ class ScreenEditor extends HTMLElement {
       that.pickChar(32 * y + x);
     });
 
-    this.#screen.addEventListener("pointerdown", function(event) {
+    this.#screen.addEventListener("pointerdown", function (event) {
       const rect = this.getBoundingClientRect();
       const x = (event.clientX - rect.left) / 16 | 0;
       const y = (event.clientY - rect.top) / 16 | 0;
@@ -109,11 +109,12 @@ class ScreenEditor extends HTMLElement {
     this.#screen.charmap = value;
     this.#chars.charmap = value;
     this.#coloredChar.charmap = value;
+    this.#generatePalette(value.colorPalette);
   }
 
-  set colorPalette(palette) {
-    this.#generatePalette(palette);
-  }
+  // set colorPalette(palette) {
+  //   this.#generatePalette(palette);
+  // }
 
   set width(value) {
     this.style.setProperty("--width", value);

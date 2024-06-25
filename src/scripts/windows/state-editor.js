@@ -47,5 +47,9 @@ export default class StateEditor extends Fenster {
         this.body.internalRegisters = internalRegisters;
       }
     });
+
+    events.render.subscribe(() => {
+      this.body.render();
+    });
   }
 }

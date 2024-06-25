@@ -65,6 +65,22 @@ export default class Fenster {
       dragger.append(...buttonsRight);
     }
 
+    {
+      const button = document.createElement("button");
+      const icon = document.createElement("img");
+
+      icon.src = "images/close.png";
+      button.append(icon);
+      button.addEventListener("click", () => {
+        this.#body.remove();
+        this.#dragger.remove();
+        this.#wrapper.remove();
+        this.#window.remove();
+      });
+
+      dragger.append(button);
+    }
+
     window.append(dragger, body);
     wrapper.append(window);
 
@@ -74,7 +90,7 @@ export default class Fenster {
     let offsetX, offsetY;
     let originalWidth, originalHeight;
 
-    const resizerPointerMove = function(event) {
+    const resizerPointerMove = function (event) {
       if (event.buttons !== 1) return;
       event.preventDefault();
 
@@ -101,12 +117,12 @@ export default class Fenster {
       }
     };
 
-    wrapper.addEventListener("pointerdown", function() {
+    wrapper.addEventListener("pointerdown", function () {
       if (this.style.zIndex < zIndex)
         this.style.zIndex = ++zIndex;
     });
 
-    const resizerPointerDown = function(event) {
+    const resizerPointerDown = function (event) {
       event.preventDefault();
       this.setPointerCapture(event.pointerId);
 
@@ -123,7 +139,7 @@ export default class Fenster {
       originalHeight = boundsWindow.height;
     };
 
-    const draggerPointerDown = function(event) {
+    const draggerPointerDown = function (event) {
       event.preventDefault();
       this.setPointerCapture(event.pointerId);
 
@@ -136,7 +152,7 @@ export default class Fenster {
       offsetY = y - boundsWindow.top;
     };
 
-    const draggerPointerMove = function(event) {
+    const draggerPointerMove = function (event) {
       if (event.buttons !== 1) return;
       event.preventDefault();
 
@@ -144,7 +160,7 @@ export default class Fenster {
       wrapper.style.top = `${event.y - offsetY}px`;
     };
 
-    const draggerClick = function(event) {
+    const draggerClick = function (event) {
       event.preventDefault();
       return false;
     };

@@ -39,7 +39,7 @@ export default class ScreenViewer extends Fenster {
       button.append(icon, "Clear");
       button.addEventListener("click", () => {
         body.clear();
-      })
+      });
       buttonsRight.push(button);
     }
 
@@ -82,6 +82,14 @@ export default class ScreenViewer extends Fenster {
       if (internalRegisters) {
         this.#internalRegisters = internalRegisters;
       }
+    });
+
+    events.render.subscribe(() => {
+      this.render();
+    });
+
+    events.setCharmap.subscribe((charmap) => {
+      body.charmap = charmap;
     });
   }
 

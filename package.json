@@ -2,27 +2,42 @@
   "name": "icmc-emulator",
   "version": "1.0.0",
   "description": "An Emulator for the CPU developed at ICMC",
-  "homepage": "https://github.com/ViniciusGiroto/icmc-emulator",
+  "homepage": "https://github.com/icmc-ide",
+  "author": "Vinicius Giroto <viniciusgiroto@usp.br> (https://giroto.dev)",
+  "contributors": [
+    "Thiago Tavares <thiptav@gmail.com>"
+  ],
+  "license": "GPL-3.0",
+  "packageManager": "npm@10.8.1",
   "scripts": {
-    "build": "cp -rL src dist",
+    "build": "swc src --out-dir dist --copy-files --strip-leading-paths",
+    "watch-build": "swc src --out-dir dist --copy-files --strip-leading-paths --watch",
+    "start": "serve dist",
+    "dev": "concurrently \"npm:watch-build\" \"npm:start\"",
     "build-modules": "wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/mif && wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/emulator/backend",
     "clean": "rm -r dist"
   },
-  "author": "Vinicius Giroto <viniciusgiroto@usp.br> (https://giroto.dev)",
-  "contributors": [
-    "Thiago"
-  ],
-  "license": "GPL-3.0",
-  "devDependencies": {
-    "@swc/cli": "^0.3.12",
-    "@swc/core": "^1.5.25",
-    "css-loader": "^7.1.2",
-    "style-loader": "^4.0.0",
-    "webpack": "^5.91.0",
-    "webpack-cli": "^5.1.4"
-  },
   "dependencies": {
     "vs": "file:./src/scripts/modules/monaco-editor/esm/vs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.5.0",
+    "@swc/cli": "^0.3.14",
+    "@swc/core": "^1.6.5",
+    "chokidar": "^3.6.0",
+    "concurrently": "^8.2.2",
+    "css-loader": "^7.1.2",
+    "eslint": "^9.5.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "globals": "^15.6.0",
+    "serve": "^14.2.3",
+    "style-loader": "^4.0.0",
+    "typescript": "^5.5.2",
+    "typescript-eslint": "^7.14.1"
+  },
+  "overrides": {
+    "eslint": "^9.5.0"
   },
   "browser": {
     "vs": false
