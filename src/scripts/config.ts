@@ -1,33 +1,37 @@
-class Field {
-  #handlers = [];
-  #value;
-  #name;
+import { EventHandler } from "./types";
 
-  static async async_with(name, defaultValue) {
+class Field<T> {
+  #handlers: EventHandler<T | null>[] = [];
+  #value: T | null = null;
+  #name: string;
+
+  static async async_with<T>(name: string, defaultValue: () => Promise<T>) {
     const storedValue = localStorage.getItem(name);
 
     try {
       if (storedValue !== null) {
         return new this(name, JSON.parse(storedValue));
       }
-    } finally {
+      return new this(name, await defaultValue());
+    } catch(_) {
       return new this(name, await defaultValue());
     }
   }
 
-  static with(name, defaultValue) {
+  static with<T>(name: string, defaultValue: T) {
     const storedValue = localStorage.getItem(name);
 
     try {
       if (storedValue !== null) {
         return new this(name, JSON.parse(storedValue));
       }
-    } finally {
+      return new this(name, defaultValue);
+    } catch(_) {
       return new this(name, defaultValue);
     }
   }
 
-  constructor(name, storedValue) {
+  constructor(name: string, storedValue: T) {
     this.#name = name;
 
     if (storedValue !== null) {
@@ -39,7 +43,7 @@ class Field {
     return this.#value;
   }
 
-  set(value) {
+  set(value: T) {
     this.#value = value;
     this.save();
 
@@ -48,12 +52,12 @@ class Field {
     }
   }
 
-  subscribe(handler) {
+  subscribe(handler: EventHandler<T | null>) {
     this.#handlers.push(handler);
     handler(this.#value);
   }
 
-  update(func) {
+  update(func: (value: T | null) => T){
     this.set(func(this.#value));
   }
 

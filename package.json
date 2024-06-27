@@ -10,15 +10,13 @@
   "license": "GPL-3.0",
   "packageManager": "npm@10.8.1",
   "scripts": {
-    "build": "swc src --out-dir dist --copy-files --strip-leading-paths",
-    "watch-build": "swc src --out-dir dist --copy-files --strip-leading-paths --watch",
-    "start": "serve dist",
+    "build": "npm run copy-public && swc src --out-dir dist --copy-files --strip-leading-paths",
+    "watch-build": "npm run copy-public && swc src --out-dir dist --copy-files --strip-leading-paths --watch",
+    "start": "serve -c serve.json",
     "dev": "concurrently \"npm:watch-build\" \"npm:start\"",
     "build-modules": "wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/mif && wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/emulator/backend",
-    "clean": "rm -r dist"
-  },
-  "dependencies": {
-    "vs": "file:./src/scripts/modules/monaco-editor/esm/vs"
+    "copy-public": "copyfiles -a -F -u 1 \"public/**/*\" dist",
+    "clean": "rimraf dist"
   },
   "devDependencies": {
     "@eslint/js": "^9.5.0",
@@ -26,11 +24,14 @@
     "@swc/core": "^1.6.5",
     "chokidar": "^3.6.0",
     "concurrently": "^8.2.2",
+    "copyfiles": "^2.4.1",
     "css-loader": "^7.1.2",
     "eslint": "^9.5.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
     "globals": "^15.6.0",
+    "prettier": "^3.3.2",
+    "rimraf": "^5.0.7",
     "serve": "^14.2.3",
     "style-loader": "^4.0.0",
     "typescript": "^5.5.2",

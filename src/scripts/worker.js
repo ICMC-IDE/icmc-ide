@@ -1,6 +1,6 @@
 import { setCallback } from "./ide.js";
 
-const { default: initBackend, Emulator, State, Fs, Assembler, Compiler } = await import("./modules/backend/backend.js");
+const { default: initBackend, Emulator, State, Fs, Assembler, Compiler } = await import("../modules/backend/backend.js");
 
 let lastTick;
 
