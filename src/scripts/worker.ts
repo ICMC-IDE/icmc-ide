@@ -2,13 +2,13 @@ import { setCallback } from "./ide.js";
 
 const { default: initBackend, Emulator, State, Fs, Assembler, Compiler } = await import("../modules/backend/backend.js");
 
-let lastTick;
+let lastTick: number;
 
 let ticksHandled = 0;
 let ticksPending = 0;
 
-let lastCheck;
-let playInterval;
+let lastCheck: number;
+let playInterval: NodeJS.Timeout | undefined;
 let frequency = 1e6;
 
 const modules = await Promise.all([initBackend()]);
@@ -72,7 +72,7 @@ self.addEventListener("message", function({ data }) {
   } else {
     switch (data[0]) {
       case "build":
-        return build(data[1], data[2]);
+        return build(data[1]);
         break;
       case "frequency":
         frequency = 10 ** data[1];
@@ -86,7 +86,7 @@ self.addEventListener("message", function({ data }) {
 fs.writeFile("icmc.asm", assets[0]);
 fs.writeFile("giroto.asm", assets[1]);
 
-function build({ language, syntax, source }) {
+function build({ language, syntax, source }: {language: string, syntax: string, source: string}) {
   try {
     let asm = source;
     switch (language) {
@@ -161,13 +161,13 @@ function next() {
   return emulator.tick(1);
 }
 
-setCallback(function(name, ...args) {
+setCallback((name, ...args) => {
   switch (name) {
     case "store":
-      self.postMessage([...arguments]);
+      self.postMessage([...args]);
       break;
     default:
-      console.log("cb", ...arguments);
+      console.log("cb", ...args);
   }
 });
 

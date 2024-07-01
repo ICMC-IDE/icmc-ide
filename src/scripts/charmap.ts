@@ -1,19 +1,21 @@
+import { EventHandler } from "./types";
+
 export default class CharMap extends OffscreenCanvas {
   #context = this.getContext("2d");
-  #handlers = [];
+  #handlers: EventHandler<void>[] = [];
   #colorPalette;
   #bytes = new Uint8Array(8 * 256);
   charWidth = 8;
   charHeight = 8;
   // TODO: Make charmap relative to charWidth and charHeight
 
-  constructor(colorPalette) {
+  constructor(colorPalette: string[]) {
     super(8 * 256, 8 * 256);
     this.#colorPalette = colorPalette;
   }
 
-  togglePixel(x, y) {
-    const ctx = this.#context;
+  togglePixel(x: number, y: number) {
+    const ctx = this.#context!;
     const byte = this.#bytes[y];
     const mask = 0b1 << (7 - x);
     const on = byte & mask;
@@ -29,7 +31,7 @@ export default class CharMap extends OffscreenCanvas {
     return this.emmit();
   }
 
-  subscribe(callback) {
+  subscribe(callback: EventHandler<void>) {
     this.#handlers.push(callback);
   }
 
@@ -40,25 +42,25 @@ export default class CharMap extends OffscreenCanvas {
   }
 
   get data() {
-    return this.#context.getImageData(0, 0, this.width, this.height);
+    return this.#context!.getImageData(0, 0, this.width, this.height);
   }
 
   get colorPalette() {
     return this.#colorPalette;
   }
 
-  static fromBytes(data, colorPalette) {
+  static fromBytes(data: Uint8Array, colorPalette: string[]) {
     const charmap = new CharMap(colorPalette);
     const chars = new OffscreenCanvas(8, 8 * 256);
 
     {
-      const ctx = chars.getContext("2d");
-      const imageData = ctx.createImageData(8, 8 * 256);
+      const ctx = chars.getContext("2d")!;
+      const imageData = ctx!.createImageData(8, 8 * 256);
       const pixels = new Uint32Array(imageData.data.buffer);
       const bytes = charmap.#bytes;
 
       for (let y = 0, i = 0; y < bytes.length; y++) {
-        let bitmask = data[y] ?? bytes[y];
+        const bitmask = data[y] ?? bytes[y];
         bytes[y] = bitmask;
 
         for (let x = 0; x < 8; x++, i++) {
@@ -70,7 +72,7 @@ export default class CharMap extends OffscreenCanvas {
     }
 
     {
-      const ctx = charmap.#context;
+      const ctx = charmap.#context!;
       let x = 0;
 
       ctx.save();

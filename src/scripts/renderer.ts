@@ -1,7 +1,9 @@
+import CharMap from "./charmap";
+
 export default class Renderer {
   #canvas;
   #gl;
-  #charmap;
+  #charmap: CharMap | null = null;
   #cols;
   #lines;
   #quadVao;
@@ -10,12 +12,12 @@ export default class Renderer {
   #charmapTex;
   #shaderProgram;
 
-  constructor(canvas, charmap, cols, lines) {
+  constructor(canvas: HTMLCanvasElement, charmap: CharMap, cols: number, lines: number) {
     this.#canvas = canvas;
     this.#cols = cols;
     this.#lines = lines;
 
-    const gl = canvas.getContext("webgl2");
+    const gl = canvas.getContext("webgl2")!;
     this.#gl = gl;
 
     const vertShaderSrc = `#version 300 es
@@ -48,12 +50,12 @@ export default class Renderer {
         color = texelFetch(tex, ivec2(texel), 0);
       }`;
 
-    const vertShader = this.#shaderCompile(gl.VERTEX_SHADER, vertShaderSrc);
-    const fragShader = this.#shaderCompile(gl.FRAGMENT_SHADER, fragShaderSrc);
+    const vertShader = this.#shaderCompile(gl.VERTEX_SHADER, vertShaderSrc)!;
+    const fragShader = this.#shaderCompile(gl.FRAGMENT_SHADER, fragShaderSrc)!;
     if (!vertShader || !fragShader) { return; }
-    const shaderProgram = this.#shaderLink(vertShader, fragShader);
+    const shaderProgram = this.#shaderLink(vertShader, fragShader)!;
     if (!shaderProgram) { return; }
-    this.#shaderProgram = shaderProgram;
+    this.#shaderProgram = shaderProgram!;
 
     const quadVao = gl.createVertexArray();
     gl.bindVertexArray(quadVao);
@@ -70,7 +72,7 @@ export default class Renderer {
     gl.bindBuffer(gl.ARRAY_BUFFER, charsVbo);
     const charAttrib = gl.getAttribLocation(shaderProgram, "char");
     gl.enableVertexAttribArray(charAttrib);
-    gl.vertexAttribIPointer(charAttrib, 2, gl.UNSIGNED_BYTE, false, 0, 0);
+    gl.vertexAttribIPointer(charAttrib, 2, gl.UNSIGNED_BYTE, 0, 0);
     gl.vertexAttribDivisor(charAttrib, 1);
     this.#charsVbo = charsVbo;
 
@@ -85,22 +87,22 @@ export default class Renderer {
     this.#setCharmap(charmap);
   }
 
-  render(memory) {
+  render(memory: Uint8Array) {
     const gl = this.#gl;
 
-    gl.useProgram(this.#shaderProgram);
-    gl.bindTexture(gl.TEXTURE_2D, this.#charmapTex);
+    gl.useProgram(this.#shaderProgram!);
+    gl.bindTexture(gl.TEXTURE_2D, this.#charmapTex!);
     gl.uniform1i(
-      gl.getUniformLocation(this.#shaderProgram, "tex"),
+      gl.getUniformLocation(this.#shaderProgram!, "tex"),
       0
     );
     gl.uniform1ui(
-      gl.getUniformLocation(this.#shaderProgram, "line_cells"),
+      gl.getUniformLocation(this.#shaderProgram!, "line_cells"),
       this.#cols
     );
 
-    gl.bindVertexArray(this.#quadVao);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.#charsVbo);
+    gl.bindVertexArray(this.#quadVao!);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.#charsVbo!);
     gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(memory.buffer), gl.STATIC_DRAW);
 
     gl.drawArraysInstanced(gl.TRIANGLES, 0, 6, this.#cols * this.#lines);
@@ -113,14 +115,14 @@ export default class Renderer {
     gl.clear(gl.COLOR_BUFFER_BIT);
   }
 
-  resize(cols, lines) {
+  resize(cols: number, lines: number) {
     this.#cols = cols;
     this.#lines = lines;
 
     const gl = this.#gl;
 
-    const width = cols * this.#charmap.charWidth;
-    const height = lines * this.#charmap.charHeight;
+    const width = cols * this.#charmap!.charWidth;
+    const height = lines * this.#charmap!.charHeight;
 
     gl.viewport(0, 0, width, height);
     this.#canvas.width = width;
@@ -129,18 +131,18 @@ export default class Renderer {
   }
 
   get charmap() {
-    return this.#charmap;
+    return this.#charmap!;
   }
 
-  set charmap(value) {
+  set charmap(value: CharMap) {
     this.#setCharmap(value);
   }
 
-  #setCharmap(charmap) {
+  #setCharmap(charmap: CharMap) {
     console.log(charmap.data);
     const gl = this.#gl;
 
-    gl.bindTexture(gl.TEXTURE_2D, this.#charmapTex);
+    gl.bindTexture(gl.TEXTURE_2D, this.#charmapTex!);
     gl.texImage2D(
       gl.TEXTURE_2D,
       0,
@@ -165,12 +167,12 @@ export default class Renderer {
     this.#charmap = charmap;
   }
 
-  #setOrtho(width, height) {
+  #setOrtho(width: number, height: number) {
     const gl = this.#gl;
 
-    gl.useProgram(this.#shaderProgram);
+    gl.useProgram(this.#shaderProgram!);
     gl.uniformMatrix4fv(
-      gl.getUniformLocation(this.#shaderProgram, "projection"),
+      gl.getUniformLocation(this.#shaderProgram!, "projection"),
       false,
       [
         2 / width, 0, 0, 0,
@@ -181,11 +183,11 @@ export default class Renderer {
     );
   }
 
-  #setQuad(width, height) {
+  #setQuad(width: number, height: number) {
     const gl = this.#gl;
 
-    gl.bindVertexArray(this.#quadVao);
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.#quadVbo);
+    gl.bindVertexArray(this.#quadVao!);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.#quadVbo!);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
       0, height, 0, 1,
       0, 0, 0, 0,
@@ -195,17 +197,17 @@ export default class Renderer {
       width, height, 1, 1,
     ]), gl.STATIC_DRAW);
 
-    gl.useProgram(this.#shaderProgram);
+    gl.useProgram(this.#shaderProgram!);
     gl.uniform2ui(
-      gl.getUniformLocation(this.#shaderProgram, "char_res"),
+      gl.getUniformLocation(this.#shaderProgram!, "char_res"),
       width, height
     );
   }
 
-  #shaderLink(vertShader, fragShader) {
+  #shaderLink(vertShader: WebGLShader, fragShader: WebGLShader) {
     const gl = this.#gl;
 
-    const program = gl.createProgram();
+    const program = gl.createProgram()!;
     gl.attachShader(program, vertShader);
     gl.attachShader(program, fragShader);
     gl.linkProgram(program);
@@ -217,10 +219,10 @@ export default class Renderer {
     return program;
   }
 
-  #shaderCompile(type, source) {
+  #shaderCompile(type: number, source: string) {
     const gl = this.#gl;
 
-    const shader = gl.createShader(type);
+    const shader = gl.createShader(type)!;
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
 
