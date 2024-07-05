@@ -1,5 +1,5 @@
-import Charmap from './charmap'
-import { File, EventHandler } from './types';
+import Charmap from "./charmap";
+import { File, EventHandler } from "./types";
 
 export type Unsubscriber = () => void;
 
@@ -14,9 +14,9 @@ class EventEmitter<T> {
 
   subscribe(handler: EventHandler<T>): Unsubscriber {
     this.#handlers.push(handler);
-    return (() => {
-      this.#handlers = this.#handlers.filter(h => h !== handler);
-    });
+    return () => {
+      this.#handlers = this.#handlers.filter((h) => h !== handler);
+    };
   }
 }
 

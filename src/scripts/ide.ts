@@ -1,6 +1,9 @@
 type Callback = (name: string, ...args: number[]) => void;
 let callback: Callback = () => {};
-const wrapper = (name: string) => function(...args: number[]) { return callback(name, ...args); };
+const wrapper = (name: string) =>
+  function (...args: number[]) {
+    return callback(name, ...args);
+  };
 
 export const store = wrapper("store");
 

@@ -1,9 +1,9 @@
-class LogViewer extends HTMLElement {
+export default class LogViewerElement extends HTMLElement {
   constructor() {
     super();
   }
 
-  write(error) {
+  write(error: Error) {
     // Code copied from https://github.com/hlorenzi/customasm/blob/b6978f90891915f1e4844d498a179249819406bd/web/main.js
     let output = error.toString();
 
@@ -28,4 +28,4 @@ class LogViewer extends HTMLElement {
   }
 }
 
-customElements.define("log-viewer", LogViewer);
+customElements.define("log-viewer", LogViewerElement);

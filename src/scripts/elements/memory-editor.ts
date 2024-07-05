@@ -1,13 +1,13 @@
-class MemoryEditor extends HTMLElement {
-  #memory;
-  #symbols;
+export default class MemoryEditorElement extends HTMLElement {
+  #memory: Uint16Array = new Uint16Array(0x10000);
+  #symbols: [string, number][] = [];
 
   #hexCells = new Array(0x10000);
   #asciiCells = new Array(0x10000);
 
-  #hovering;
+  #hovering: number | null = null;
   #pc = 0x0000;
-  #sp = 0xFFFF;
+  #sp = 0xffff;
 
   constructor() {
     super();
@@ -15,46 +15,42 @@ class MemoryEditor extends HTMLElement {
 
   connectedCallback() {
     for (let i = 0; i < 0x10000; i++) {
-      this.#hexCells[i] = this.#createHexCell(i);
-      this.#asciiCells[i] = this.#createAsciiCell(i);
+      this.#hexCells[i] = this.#createHexCell(i.toString(16));
+      this.#asciiCells[i] = this.#createAsciiCell(i.toString(16));
     }
 
     this.addEventListener("pointermove", (event) => {
       if (this.#hovering) {
-        this.#hexCells[this.#hovering]
-          .classList.toggle("hover", false);
-        this.#asciiCells[this.#hovering]
-          .classList.toggle("hover", false);
+        this.#hexCells[this.#hovering].classList.toggle("hover", false);
+        this.#asciiCells[this.#hovering].classList.toggle("hover", false);
       }
 
-      if (event.target.dataset.address === undefined) {
+      const that = event.target as HTMLSpanElement;
+      if (that.dataset.address === undefined) {
         this.#hovering = null;
         return;
       }
 
-      const address = event.target.dataset.address;
+      const address = parseInt(that.dataset.address, 16);
 
-      this.#hexCells[address]
-        .classList.toggle("hover", true);
-      this.#asciiCells[address]
-        .classList.toggle("hover", true);
+      this.#hexCells[address].classList.toggle("hover", true);
+      this.#asciiCells[address].classList.toggle("hover", true);
 
       this.#hovering = address;
     });
   }
 
-  load(memory, symbols) {
+  load(memory: Uint16Array, symbols: string) {
     this.#memory = memory;
 
     if (typeof symbols === "string") {
-      const labels = symbols
+      const labels: [string, number][] = symbols
         .split("\n")
         .filter((line) => line.includes("="))
         .map((line) => {
           const [name, address] = line.split(" = ");
           return [name, parseInt(address)];
         });
-
 
       if (labels.length == 0 || labels[0][1] > 0) {
         labels.splice(0, 0, ["...", 0]);
@@ -66,17 +62,16 @@ class MemoryEditor extends HTMLElement {
     this.#renderMemory();
   }
 
-  update(offset, value) {
+  update(offset: number, value: number) {
     const hex = this.#hexCells[offset];
     const ascii = this.#asciiCells[offset];
 
     hex.innerText = value.toString(16).padStart(4, "0").toUpperCase();
-    ascii.innerText = (value >= 32 & value <= 126)
-      ? String.fromCharCode(value)
-      : ".";
+    ascii.innerText =
+      value >= 32 && value <= 126 ? String.fromCharCode(value) : ".";
   }
 
-  #createHexCell(address, value = 0x0000) {
+  #createHexCell(address: string, value = 0x0000) {
     const span = document.createElement("span");
 
     span.dataset.address = address;
@@ -85,18 +80,23 @@ class MemoryEditor extends HTMLElement {
     return span;
   }
 
-  #createAsciiCell(address, value = 0x0000) {
+  #createAsciiCell(address: string, value = 0x0000) {
     const span = document.createElement("span");
 
     span.dataset.address = address;
-    span.innerText = (value >= 32 & value <= 126)
-      ? String.fromCharCode(value)
-      : ".";
+    span.innerText =
+      value >= 32 && value <= 126 ? String.fromCharCode(value) : ".";
 
     return span;
   }
 
-  #renderMemoryBlock(data, region_name, offset, length, originOffset = 0) {
+  #renderMemoryBlock(
+    data: Uint16Array,
+    region_name: string,
+    offset: number,
+    length: number,
+    // originOffset = 0,
+  ) {
     const rows = length / 16;
 
     const region = document.createElement("details");
@@ -126,7 +126,7 @@ class MemoryEditor extends HTMLElement {
 
       span0.innerText = value.toString(16).padStart(4, "0").toUpperCase();
 
-      if (value >= 32 & value <= 126) {
+      if (value >= 32 && value <= 126) {
         span1.innerText = String.fromCharCode(value);
       } else {
         span1.innerText = ".";
@@ -139,7 +139,10 @@ class MemoryEditor extends HTMLElement {
 
     for (let i = 0; i < rows; i++) {
       const span = document.createElement("span");
-      span.innerText = (offset + 16 * i).toString(16).padStart(4, "0").toUpperCase();
+      span.innerText = (offset + 16 * i)
+        .toString(16)
+        .padStart(4, "0")
+        .toUpperCase();
       address.appendChild(span);
     }
 
@@ -154,7 +157,7 @@ class MemoryEditor extends HTMLElement {
   }
 
   #renderMemory() {
-    let memory = this.#memory;
+    const memory = this.#memory;
     let end = memory.length;
 
     while (this.lastElementChild) {
@@ -165,14 +168,20 @@ class MemoryEditor extends HTMLElement {
 
     for (let i = this.#symbols.length - 1; i >= 0; i--) {
       const [name, offset] = symbols[i];
-      const result = this.#renderMemoryBlock(memory, name, offset, end - offset, memory.byteOffset);
-      end = offset;
+      const result = this.#renderMemoryBlock(
+        memory,
+        name,
+        offset,
+        end - offset,
+        // memory.byteOffset,
+      );
+      end = offset as number;
 
       this.insertBefore(result, this.firstElementChild);
     }
   }
 
-  set pc(offset) {
+  set pc(offset: number) {
     if (offset === this.#pc) return;
 
     {
@@ -194,7 +203,7 @@ class MemoryEditor extends HTMLElement {
     this.#pc = offset;
   }
 
-  set sp(offset) {
+  set sp(offset: number) {
     if (offset === this.#sp) return;
 
     {
@@ -217,4 +226,4 @@ class MemoryEditor extends HTMLElement {
   }
 }
 
-customElements.define("memory-editor", MemoryEditor);
+customElements.define("memory-editor", MemoryEditorElement);

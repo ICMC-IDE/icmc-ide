@@ -39,6 +39,7 @@ export default class StateEditor extends Fenster {
     });
 
     events.refresh.subscribe(({ registers, internalRegisters }) => {
+      console.log(registers, internalRegisters);
       if (registers) {
         this.body.registers = registers;
       }

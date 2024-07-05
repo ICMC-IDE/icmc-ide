@@ -1,6 +1,17 @@
-const FREQUENCIES = ["1 Hz", "10 Hz", "100 Hz", "1 kHz", "10 kHz", "100 kHz", "1 MHz", "10 MHz", "100 MHz", "FAST!"];
+const FREQUENCIES = [
+  "1 Hz",
+  "10 Hz",
+  "100 Hz",
+  "1 kHz",
+  "10 kHz",
+  "100 kHz",
+  "1 MHz",
+  "10 MHz",
+  "100 MHz",
+  "FAST!",
+];
 
-class StateEditor extends HTMLElement {
+export default class StateEditorElement extends HTMLElement {
   #elements;
   #running = false;
   #frequency = 6;
@@ -24,11 +35,15 @@ class StateEditor extends HTMLElement {
     };
 
     this.#elements.buttons.frequency.addEventListener("input", ({ target }) => {
-      this.dispatchEvent(new CustomEvent("change-frequency", { detail: target.valueAsNumber }));
+      this.dispatchEvent(
+        new CustomEvent("change-frequency", { detail: target.valueAsNumber }),
+      );
     });
 
     this.#elements.buttons.file.addEventListener("input", ({ target }) => {
-      this.dispatchEvent(new CustomEvent("change-file", { detail: target.value }));
+      this.dispatchEvent(
+        new CustomEvent("change-file", { detail: target.value }),
+      );
     });
   }
 
@@ -37,13 +52,19 @@ class StateEditor extends HTMLElement {
 
     if (this.registers) {
       for (let i = 0, registers = this.registers; i < registers.length; i++) {
-        elements.registers[i].value = registers[i].toString(16).padStart(4, "0").toUpperCase();
+        elements.registers[i].value = registers[i]
+          .toString(16)
+          .padStart(4, "0")
+          .toUpperCase();
       }
     }
 
     if (this.internalRegisters) {
       for (let i = 0, registers = this.internalRegisters; i < 4; i++) {
-        elements.internalRegisters[i].value = registers[i].toString(16).padStart(4, "0").toUpperCase();
+        elements.internalRegisters[i].value = registers[i]
+          .toString(16)
+          .padStart(4, "0")
+          .toUpperCase();
       }
     }
   }
@@ -57,7 +78,8 @@ class StateEditor extends HTMLElement {
 
     if (!this.#elements.buttons) return;
 
-    this.#elements.buttons.frequency.nextSibling.innerText = FREQUENCIES[this.#elements.buttons.frequency.valueAsNumber];
+    this.#elements.buttons.frequency.nextSibling.innerText =
+      FREQUENCIES[this.#elements.buttons.frequency.valueAsNumber];
 
     if (this.#elements.buttons.frequency.valueAsNumber !== value) {
       this.#elements.buttons.frequency.value = value;
@@ -95,4 +117,4 @@ class StateEditor extends HTMLElement {
   }
 }
 
-customElements.define("state-editor", StateEditor);
+customElements.define("state-editor", StateEditorElement);

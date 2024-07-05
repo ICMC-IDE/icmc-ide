@@ -1,9 +1,9 @@
-class FilePicker extends HTMLElement {
+export default class FilePickerElement extends HTMLElement {
   constructor() {
     super();
   }
 
-  #generateFile(fileName) {
+  #generateFile(fileName: string) {
     const div = document.createElement("div");
 
     {
@@ -39,7 +39,9 @@ class FilePicker extends HTMLElement {
       icon.src = "images/remove.png";
       button.append(icon);
       button.addEventListener("click", () => {
-        this.dispatchEvent(new CustomEvent("delete-file", { detail: fileName }));
+        this.dispatchEvent(
+          new CustomEvent("delete-file", { detail: fileName }),
+        );
       });
       button.title = "Delete";
 
@@ -49,7 +51,7 @@ class FilePicker extends HTMLElement {
     return div;
   }
 
-  set files(fileNames) {
+  set files(fileNames: string[]) {
     while (this.lastElementChild) {
       this.lastElementChild.remove();
     }
@@ -60,4 +62,4 @@ class FilePicker extends HTMLElement {
   }
 }
 
-customElements.define("file-picker", FilePicker);
+customElements.define("file-picker", FilePickerElement);

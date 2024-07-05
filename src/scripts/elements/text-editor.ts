@@ -1,7 +1,7 @@
-class TextEditor extends HTMLElement {
-  #editor;
-  #observer;
-  #model = null;
+class TextEditorElement extends HTMLElement {
+  #editor: monaco.editor.IStandaloneCodeEditor | null = null;
+  #observer: ResizeObserver | null = null;
+  #model: monaco.editor.ITextModel | null = null;
 
   constructor() {
     super();
@@ -15,13 +15,13 @@ class TextEditor extends HTMLElement {
     });
 
     this.#observer = new ResizeObserver(() => {
-      this.#editor.layout();
+      this.#editor!.layout();
     });
 
     this.#observer.observe(this);
   }
 
-  set model(model) {
+  set model(model: monaco.editor.ITextModel) {
     if (this.#editor) {
       this.#editor.setModel(model);
     } else {
@@ -30,4 +30,4 @@ class TextEditor extends HTMLElement {
   }
 }
 
-customElements.define("text-editor", TextEditor);
+customElements.define("text-editor", TextEditorElement);

@@ -1,4 +1,4 @@
-class DocumentationViewer extends HTMLElement {
+export default class DocumentationViewerElement extends HTMLElement {
   constructor() {
     super();
   }
@@ -9,22 +9,27 @@ class DocumentationViewer extends HTMLElement {
     }
   }
 
-  set syntax(value) {
+  set syntax(value: string) {
     while (this.lastElementChild) {
       this.lastElementChild.remove();
     }
+
+    const documentationGirotoTemplate = document.getElementById(
+      "documentationGirotoTemplate",
+    ) as HTMLTemplateElement;
+    const documentationIcmcTemplate = document.getElementById(
+      "documentationIcmcTemplate",
+    ) as HTMLTemplateElement;
 
     switch (value) {
       case "giroto":
         this.appendChild(documentationGirotoTemplate.content.cloneNode(true));
         break;
-
       case "icmc":
         this.appendChild(documentationIcmcTemplate.content.cloneNode(true));
         break;
     }
-
   }
 }
 
-customElements.define("documentation-viewer", DocumentationViewer);
+customElements.define("documentation-viewer", DocumentationViewerElement);

@@ -1,11 +1,12 @@
+import CharMap from "../charmap.js";
 import Renderer from "../renderer.js";
 
-class ScreenViewer extends HTMLElement {
+export default class ScreenViewerElement extends HTMLElement {
   #canvas = document.createElement("canvas");
-  #renderer;
+  #renderer: Renderer | undefined;
 
-  #width;
-  #height;
+  #width: number = 0;
+  #height: number = 0;
   shouldUpdate = false;
 
   memory = new Uint16Array(0x10000);
@@ -16,14 +17,14 @@ class ScreenViewer extends HTMLElement {
 
   connectedCallback() {
     const div = document.createElement("div");
-    if (this.attributes.width) {
-      this.width = this.attributes.width.value * 1;
+    if (this.attributes.getNamedItem("width")) {
+      this.width = parseInt(this.attributes.getNamedItem("width")!.value);
     } else {
       this.width = 40;
     }
 
-    if (this.attributes.height) {
-      this.height = this.attributes.height.value * 1;
+    if (this.attributes.getNamedItem("height")) {
+      this.height = parseInt(this.attributes.getNamedItem("height")!.value);
     } else {
       this.height = 30;
     }
@@ -40,10 +41,11 @@ class ScreenViewer extends HTMLElement {
   }
 
   attributeChangedCallback() {
-    console.log("ScreenViewer::attributeChangedCallback", ...arguments);
+    // ...args
+    console.log("ScreenViewer::attributeChangedCallback"); // ...args
   }
 
-  updateCell(offset, value) {
+  updateCell(offset: number, value: number) {
     this.memory[offset] = value;
     this.shouldUpdate = true;
   }
@@ -54,11 +56,11 @@ class ScreenViewer extends HTMLElement {
 
     console.log(this.memory.length);
 
-    this.#renderer.render(this.memory.slice(0, this.#width * this.#height));
+    this.#renderer!.render(this.memory.slice(0, this.#width * this.#height));
   }
 
   clear() {
-    this.#renderer.clear();
+    this.#renderer!.clear();
   }
 
   #resize() {
@@ -79,8 +81,8 @@ class ScreenViewer extends HTMLElement {
       this.#renderer.resize(this.#width, this.#height);
     }
 
-    this.style.setProperty("--width", this.#width);
-    this.style.setProperty("--height", this.#height);
+    this.style.setProperty("--width", this.#width.toString());
+    this.style.setProperty("--height", this.#height.toString());
     this.shouldUpdate = true;
   }
 
@@ -106,21 +108,25 @@ class ScreenViewer extends HTMLElement {
     this.#resize();
   }
 
-  set charmap(value) {
+  set charmap(value: CharMap) {
     if (!this.#renderer) {
-      this.#renderer = new Renderer(this.#canvas, value, this.#width, this.#height);
+      this.#renderer = new Renderer(
+        this.#canvas,
+        value,
+        this.#width,
+        this.#height,
+      );
     } else {
       this.#renderer.charmap = value;
     }
     this.shouldUpdate = true;
 
-    const that = this;
     value.subscribe(() => {
-      that.shouldUpdate = true;
+      this.shouldUpdate = true;
       // TODO: Change this
-      that.#renderer.charmap = this.#renderer.charmap;
+      this.#renderer!.charmap = this.#renderer!.charmap;
     });
   }
 }
 
-customElements.define("screen-viewer", ScreenViewer);
+customElements.define("screen-viewer", ScreenViewerElement);

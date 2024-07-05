@@ -13,7 +13,7 @@ class Field<T> {
         return new this(name, JSON.parse(storedValue));
       }
       return new this(name, await defaultValue());
-    } catch(_) {
+    } catch (_) {
       return new this(name, await defaultValue());
     }
   }
@@ -26,7 +26,7 @@ class Field<T> {
         return new this(name, JSON.parse(storedValue));
       }
       return new this(name, defaultValue);
-    } catch(_) {
+    } catch (_) {
       return new this(name, defaultValue);
     }
   }
@@ -57,7 +57,7 @@ class Field<T> {
     handler(this.#value);
   }
 
-  update(func: (value: T | null) => T){
+  update(func: (value: T | null) => T) {
     this.set(func(this.#value));
   }
 
@@ -67,8 +67,14 @@ class Field<T> {
 }
 
 const assets = (async () => {
-  const responses = await Promise.all(["example.c", "example.asm"].map((filename) => fetch(`../assets/${filename}`)));
-  const [c, asm] = await Promise.all(responses.map((response) => response.text()));
+  const responses = await Promise.all(
+    ["example.c", "example.asm"].map((filename) =>
+      fetch(`../assets/${filename}`),
+    ),
+  );
+  const [c, asm] = await Promise.all(
+    responses.map((response) => response.text()),
+  );
   return { "example.c": c, "example.asm": asm };
 })();
 

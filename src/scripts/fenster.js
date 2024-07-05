@@ -10,9 +10,9 @@ export default class Fenster {
   #window;
 
   constructor({ body, title, style, open, buttonsLeft, buttonsRight }) {
-    const wrapper = this.#wrapper = document.createElement("div");
-    const dragger = this.#dragger = document.createElement("summary");
-    const window = this.#window = document.createElement("details");
+    const wrapper = (this.#wrapper = document.createElement("div"));
+    const dragger = (this.#dragger = document.createElement("summary"));
+    const window = (this.#window = document.createElement("details"));
 
     const { left, top, ...others } = style;
 
@@ -49,7 +49,9 @@ export default class Fenster {
       });
 
       window.addEventListener("toggle", () => {
-        icon.src = window.open ? "images/minimize.png" : "images/unminimize.png";
+        icon.src = window.open
+          ? "images/minimize.png"
+          : "images/unminimize.png";
       });
 
       dragger.append(button);
@@ -102,24 +104,41 @@ export default class Fenster {
       for (const char of dir) {
         switch (char) {
           case "w":
-            that.resizeInline(originalWidth + (x - event.x) - (boundsWindow.width - boundsBody.width), event.x - offsetX);
+            that.resizeInline(
+              originalWidth +
+                (x - event.x) -
+                (boundsWindow.width - boundsBody.width),
+              event.x - offsetX,
+            );
             break;
           case "s":
-            that.resizeBlock(originalHeight + (event.y - y) - (boundsWindow.height - boundsBody.height));
+            that.resizeBlock(
+              originalHeight +
+                (event.y - y) -
+                (boundsWindow.height - boundsBody.height),
+            );
             break;
           case "e":
-            that.resizeInline(originalWidth + (event.x - x) - (boundsWindow.width - boundsBody.width));
+            that.resizeInline(
+              originalWidth +
+                (event.x - x) -
+                (boundsWindow.width - boundsBody.width),
+            );
             break;
           case "n":
-            that.resizeBlock(originalHeight + (y - event.y) - (boundsWindow.height - boundsBody.height), event.y - offsetY);
+            that.resizeBlock(
+              originalHeight +
+                (y - event.y) -
+                (boundsWindow.height - boundsBody.height),
+              event.y - offsetY,
+            );
             break;
         }
       }
     };
 
     wrapper.addEventListener("pointerdown", function () {
-      if (this.style.zIndex < zIndex)
-        this.style.zIndex = ++zIndex;
+      if (this.style.zIndex < zIndex) this.style.zIndex = ++zIndex;
     });
 
     const resizerPointerDown = function (event) {
