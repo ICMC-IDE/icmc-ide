@@ -3,7 +3,7 @@ import { IREG_KB, IREG_WC } from "../enums.js";
 import Fenster from "../fenster.js";
 import { WindowProps } from "./types";
 
-export default class ScreenViewer extends Fenster<ScreenViewerElement> {
+export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
   #internalRegisters: Uint16Array | null = null;
   #wc = 0;
 

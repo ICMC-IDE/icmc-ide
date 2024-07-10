@@ -33,3 +33,9 @@ export default class DocumentationViewerElement extends HTMLElement {
 }
 
 customElements.define("documentation-viewer", DocumentationViewerElement);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "documentation-viewer": DocumentationViewerElement;
+  }
+}

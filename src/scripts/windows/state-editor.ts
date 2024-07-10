@@ -1,7 +1,9 @@
+import StateEditorElement from "../elements/state-editor.js";
 import Fenster from "../fenster.js";
+import { WindowProps } from "./types.js";
 
-export default class StateEditor extends Fenster {
-  constructor({ style, config, events }) {
+export default class StateEditorWindow extends Fenster<StateEditorElement> {
+  constructor({ style, config, events }: WindowProps) {
     const body = document.createElement("state-editor");
     const title = document.createElement("span");
 

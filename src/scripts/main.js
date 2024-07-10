@@ -1,7 +1,11 @@
-import config from "./config.js";
-import events from "./events.js";
+import config, { ConfigField } from "./config.js";
+import events, { EventEmitter } from "./events.js";
 
-import { createWindows, ScreenViewer, SourceEditor } from "./windows/mod.js";
+import {
+  createWindows,
+  ScreenViewerWindow,
+  SourceEditorWindow,
+} from "./windows/mod.js";
 import CharMap from "./charmap.js";
 
 const { default: initMif, parseMif } = await import("../modules/mif/mif.js");
@@ -281,25 +285,28 @@ async function main(config, events) {
   contextMenu.style.position = "absolute";
   contextMenu.style.display = "none";
   {
-    const openable_windows = { Screen: ScreenViewer, DASDASDSA: ScreenViewer };
-    for (let [window_name, window_class] of Object.entries(openable_windows)) {
+    const openable_windows = {
+      Screen: ScreenViewerWindow,
+      DASDASDSA: ScreenViewerWindow,
+    };
+    for (const [window_name, window_class] of Object.entries(
+      openable_windows,
+    )) {
       const item = document.createElement("button");
 
       item.textContent = window_name;
       item.addEventListener("click", (event) => {
         window.hideContext();
-        new window_class(
-          {
-            style: {
-              left: event.clientX + "px",
-              top: event.clientY + "px",
-              // width: "50ch",
-              // height: "50rem",
-            },
+        new window_class({
+          style: {
+            left: event.clientX + "px",
+            top: event.clientY + "px",
+            // width: "50ch",
+            // height: "50rem",
           },
           config,
           events,
-        );
+        });
       });
       contextMenu.appendChild(item);
     }
@@ -349,7 +356,7 @@ async function main(config, events) {
         );
       })();
 
-      const editor = new SourceEditor(
+      const editor = new SourceEditorWindow(
         {
           style: {
             left: "0.5rem",
@@ -369,7 +376,7 @@ async function main(config, events) {
       worker.postMessage(["frequency", frequency]);
     });
 
-    window.play = function (mode) {
+    window.play = function () {
       return worker.postMessage("play");
     };
 

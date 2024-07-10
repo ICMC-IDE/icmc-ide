@@ -1,8 +1,8 @@
-export interface OpenFileEvent {
+interface OpenFileEvent {
   detail: string;
 }
 
-export interface DeleteFileEvent {
+interface DeleteFileEvent {
   detail: string;
 }
 
@@ -71,3 +71,13 @@ export default class FilePickerElement extends HTMLElement {
 }
 
 customElements.define("file-picker", FilePickerElement);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "file-picker": FilePickerElement;
+  }
+  interface HTMLElementEventMap {
+    "open-file": OpenFileEvent;
+    "delete-file": DeleteFileEvent;
+  }
+}

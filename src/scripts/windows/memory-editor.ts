@@ -2,7 +2,7 @@ import MemoryEditorElement from "../elements/memory-editor.js";
 import Fenster from "../fenster.js";
 import { WindowProps } from "./types";
 
-export default class MemoryEditor extends Fenster<MemoryEditorElement> {
+export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
   constructor({ style, events }: WindowProps) {
     const body = document.createElement("memory-editor");
     const title = document.createElement("span");

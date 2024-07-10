@@ -227,3 +227,9 @@ export default class MemoryEditorElement extends HTMLElement {
 }
 
 customElements.define("memory-editor", MemoryEditorElement);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "memory-editor": MemoryEditorElement;
+  }
+}

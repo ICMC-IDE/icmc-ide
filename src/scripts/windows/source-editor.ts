@@ -1,7 +1,8 @@
+import TextEditorElement from "../elements/text-editor.js";
 import Fenster from "../fenster.js";
 import { WindowProps } from "./types.js";
 
-export default class SourceEditor extends Fenster<TextEditorElement> {
+export default class SourceEditorWindow extends Fenster<TextEditorElement> {
   constructor({ style }: WindowProps) {
     const body = document.createElement("text-editor");
     const title = document.createElement("span");

@@ -29,3 +29,9 @@ export default class LogViewerElement extends HTMLElement {
 }
 
 customElements.define("log-viewer", LogViewerElement);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "log-viewer": LogViewerElement;
+  }
+}

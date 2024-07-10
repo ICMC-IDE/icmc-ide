@@ -2,7 +2,7 @@ import FilePickerElement from "../elements/file-picker.js";
 import Fenster from "../fenster.js";
 import { WindowProps } from "./types.js";
 
-export default class StateEditor extends Fenster<FilePickerElement> {
+export default class StateEditorWindow extends Fenster<FilePickerElement> {
   constructor({ style, config, events }: WindowProps) {
     const body = document.createElement("file-picker");
     const title = document.createElement("span");

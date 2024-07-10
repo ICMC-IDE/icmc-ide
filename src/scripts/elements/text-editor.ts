@@ -1,4 +1,4 @@
-class TextEditorElement extends HTMLElement {
+export default class TextEditorElement extends HTMLElement {
   #editor: monaco.editor.IStandaloneCodeEditor | null = null;
   #observer: ResizeObserver | null = null;
   #model: monaco.editor.ITextModel | null = null;
@@ -31,3 +31,9 @@ class TextEditorElement extends HTMLElement {
 }
 
 customElements.define("text-editor", TextEditorElement);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "text-editor": TextEditorElement;
+  }
+}

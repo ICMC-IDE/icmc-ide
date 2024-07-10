@@ -130,3 +130,9 @@ export default class ScreenViewerElement extends HTMLElement {
 }
 
 customElements.define("screen-viewer", ScreenViewerElement);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "screen-viewer": ScreenViewerElement;
+  }
+}

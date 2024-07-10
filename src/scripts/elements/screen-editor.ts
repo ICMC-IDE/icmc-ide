@@ -156,3 +156,9 @@ export default class ScreenEditorElement extends HTMLElement {
 }
 
 customElements.define("screen-editor", ScreenEditorElement);
+
+declare global {
+  interface HTMLElementTagNameMap {
+    "screen-editor": ScreenEditorElement;
+  }
+}

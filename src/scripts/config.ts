@@ -10,11 +10,11 @@ export class ConfigField<T> {
 
     try {
       if (storedValue !== null) {
-        return new this(name, JSON.parse(storedValue));
+        return new this<T>(name, JSON.parse(storedValue));
       }
-      return new this(name, await defaultValue());
+      return new this<T>(name, await defaultValue());
     } catch (_) {
-      return new this(name, await defaultValue());
+      return new this<T>(name, await defaultValue());
     }
   }
 
@@ -23,11 +23,11 @@ export class ConfigField<T> {
 
     try {
       if (storedValue !== null) {
-        return new this(name, JSON.parse(storedValue));
+        return new this<T>(name, JSON.parse(storedValue));
       }
-      return new this(name, defaultValue);
+      return new this<T>(name, defaultValue);
     } catch (_) {
-      return new this(name, defaultValue);
+      return new this<T>(name, defaultValue);
     }
   }
 

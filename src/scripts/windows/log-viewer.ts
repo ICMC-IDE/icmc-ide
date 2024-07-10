@@ -2,7 +2,7 @@ import LogViewerElement from "../elements/log-viewer.js";
 import Fenster from "../fenster.js";
 import { WindowProps } from "./types.js";
 
-export default class LogViewer extends Fenster<LogViewerElement> {
+export default class LogViewerWindow extends Fenster<LogViewerElement> {
   constructor({ style }: WindowProps) {
     const body = document.createElement("log-viewer");
     const title = document.createDocumentFragment();

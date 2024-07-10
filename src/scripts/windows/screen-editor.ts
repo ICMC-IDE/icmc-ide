@@ -2,7 +2,7 @@ import ScreenEditorElement from "../elements/screen-editor.js";
 import Fenster from "../fenster.js";
 import { WindowProps } from "./types.js";
 
-export default class ScreenEditor extends Fenster<ScreenEditorElement> {
+export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
   constructor({ style, config, events }: WindowProps) {
     const body = document.createElement("screen-editor");
     const title = document.createDocumentFragment();
