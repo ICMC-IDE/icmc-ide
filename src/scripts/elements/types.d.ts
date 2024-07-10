@@ -1,6 +1,9 @@
-import ConfigEditorElement from "./config-editor";
+import ConfigEditorElement, { ChangeConfigEvent } from "./config-editor";
 import DocumentationViewerElement from "./documentation-viewer";
-import FilePickerElement from "./file-picker";
+import FilePickerElement, {
+  DeleteFileEvent,
+  OpenFileEvent,
+} from "./file-picker";
 import LogViewerElement from "./log-viewer";
 import MemoryEditorElement from "./memory-editor";
 import ScreenEditorElement from "./screen-editor";
@@ -19,5 +22,10 @@ declare global {
     "screen-viewer": ScreenViewerElement;
     "state-editor": StateEditorElement;
     "text-editor": TextEditorElement;
+  }
+  interface HTMLElementEventMap {
+    "change-config": ChangeConfigEvent;
+    "delete-file": DeleteFileEvent;
+    "open-file": OpenFileEvent;
   }
 }

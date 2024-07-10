@@ -16,7 +16,9 @@ export function createWindows(config, events) {
       left: `calc(50ch + 1rem + 0.5rem)`,
       top: "0.5rem",
     },
-  }, config, events);
+    config,
+    events,
+  });
 
   const stateBounds = result.state.getClientRect();
 
@@ -26,7 +28,9 @@ export function createWindows(config, events) {
       top: `calc(${stateBounds.bottom}px + 0.5rem)`,
       height: "20rem",
     },
-  }, config, events);
+    config,
+    events,
+  });
 
   const memoryBounds = result.memory.getClientRect();
 
@@ -38,14 +42,18 @@ export function createWindows(config, events) {
       height: "480px",
       // filter: "url(/#crt)",
     },
-  }, config, events);
+    config,
+    events,
+  });
 
   result.log = new LogViewer({
     style: {
       left: `calc(50ch + 1rem + 0.5rem)`,
       top: `calc(${memoryBounds.bottom}px + 0.5rem)`,
     },
-  }, config, events);
+    config,
+    events,
+  });
 
   result.charmap = new ScreenEditor({
     open: false,
@@ -55,7 +63,9 @@ export function createWindows(config, events) {
       width: "640px",
       height: "480px",
     },
-  }, config, events);
+    config,
+    events,
+  });
 
   result.config = new ConfigEditor({
     open: false,
@@ -65,7 +75,9 @@ export function createWindows(config, events) {
       width: "640px",
       height: "480px",
     },
-  }, config, events);
+    config,
+    events,
+  });
 
   result.documentation = new DocumentationViewer({
     open: false,
@@ -75,7 +87,9 @@ export function createWindows(config, events) {
       width: "640px",
       height: "480px",
     },
-  }, config, events);
+    config,
+    events,
+  });
 
   result.files = new FilePicker({
     open: true,
@@ -85,10 +99,12 @@ export function createWindows(config, events) {
       width: "30ch",
       height: "480px",
     },
-  }, config, events);
+    config,
+    events,
+  });
 
   return result;
-};
+}
 
 export {
   ScreenEditor,
@@ -100,4 +116,4 @@ export {
   SourceEditor,
   DocumentationViewer,
   FilePicker,
-}
+};

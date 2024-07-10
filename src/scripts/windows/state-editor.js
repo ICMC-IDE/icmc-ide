@@ -1,7 +1,7 @@
 import Fenster from "../fenster.js";
 
 export default class StateEditor extends Fenster {
-  constructor({ style }, config, events) {
+  constructor({ style, config, events }) {
     const body = document.createElement("state-editor");
     const title = document.createElement("span");
 

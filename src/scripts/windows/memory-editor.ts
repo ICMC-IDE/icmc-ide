@@ -1,13 +1,15 @@
+import MemoryEditorElement from "../elements/memory-editor.js";
 import Fenster from "../fenster.js";
+import { WindowProps } from "./types";
 
-export default class SourceEditor extends Fenster {
-  constructor({ style }, config) {
-    const body = document.createElement("text-editor");
+export default class MemoryEditor extends Fenster<MemoryEditorElement> {
+  constructor({ style, events }: WindowProps) {
+    const body = document.createElement("memory-editor");
     const title = document.createElement("span");
     const buttonsRight = [];
 
     {
-      title.innerText = "Source Editor";
+      title.innerText = "Memory Editor";
       title.classList.add("title");
     }
 
@@ -35,9 +37,11 @@ export default class SourceEditor extends Fenster {
       style,
       buttonsRight,
     });
-  }
 
-  set model(model) {
-    this.body.model = model;
+    events.refresh.subscribe(({ ram, symbols }) => {
+      if (ram) {
+        body.load(ram, symbols);
+      }
+    });
   }
 }

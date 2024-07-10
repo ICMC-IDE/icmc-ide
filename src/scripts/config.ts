@@ -1,6 +1,6 @@
 import { EventHandler } from "./types";
 
-class Field<T> {
+export class ConfigField<T> {
   #handlers: EventHandler<T | null>[] = [];
   #value: T | null = null;
   #name: string;
@@ -78,13 +78,13 @@ const assets = (async () => {
   return { "example.c": c, "example.asm": asm };
 })();
 
-export const version = Field.with("version", 1);
-export const syntax = Field.with("syntax", "icmc");
-export const screenWidth = Field.with("screenWidth", 40);
-export const screenHeight = Field.with("screenHeight", 30);
-export const frequency = Field.with("frequency", 6);
-export const files = await Field.async_with("files", async () => await assets);
-export const entryFile = Field.with("entryFile", "example.asm");
+const version = ConfigField.with("version", 1);
+const syntax = ConfigField.with("syntax", "icmc");
+const screenWidth = ConfigField.with("screenWidth", 40);
+const screenHeight = ConfigField.with("screenHeight", 30);
+const frequency = ConfigField.with("frequency", 6);
+const files = await ConfigField.async_with("files", async () => await assets);
+const entryFile = ConfigField.with("entryFile", "example.asm");
 
 localStorage.clear();
 
@@ -95,3 +95,13 @@ screenHeight.save();
 frequency.save();
 files.save();
 entryFile.save();
+
+export default {
+  version,
+  syntax,
+  screenWidth,
+  screenHeight,
+  frequency,
+  files,
+  entryFile,
+};

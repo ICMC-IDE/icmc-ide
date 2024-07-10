@@ -1,7 +1,9 @@
+import ConfigEditorElement from "../elements/config-editor.js";
 import Fenster from "../fenster.js";
+import { WindowProps } from "./types.js";
 
-export default class ConfigEditor extends Fenster {
-  constructor({ style }, config) {
+export default class ConfigEditor extends Fenster<ConfigEditorElement> {
+  constructor({ style, config }: WindowProps) {
     const body = document.createElement("config-editor");
     const title = document.createElement("span");
 

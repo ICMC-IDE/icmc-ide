@@ -1,5 +1,5 @@
-import * as config from "./config.js";
-import * as events from "./events.js";
+import config from "./config.js";
+import events from "./events.js";
 
 import { createWindows, ScreenViewer, SourceEditor } from "./windows/mod.js";
 import CharMap from "./charmap.js";

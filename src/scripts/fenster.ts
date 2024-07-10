@@ -3,13 +3,29 @@ const CORNERS = ["ne", "se", "sw", "nw"];
 
 let zIndex = 100;
 
-export default class Fenster {
+interface FensterProps<T extends HTMLElement> {
+  body: T;
+  title: HTMLElement | DocumentFragment;
+  style: Record<string, string>;
+  open?: boolean;
+  buttonsLeft?: HTMLElement[];
+  buttonsRight?: HTMLElement[];
+}
+
+export default class Fenster<T extends HTMLElement> {
   #body;
   #dragger;
   #wrapper;
   #window;
 
-  constructor({ body, title, style, open, buttonsLeft, buttonsRight }) {
+  constructor({
+    body,
+    title,
+    style,
+    open,
+    buttonsLeft,
+    buttonsRight,
+  }: FensterProps<T>) {
     const wrapper = (this.#wrapper = document.createElement("div"));
     const dragger = (this.#dragger = document.createElement("summary"));
     const window = (this.#window = document.createElement("details"));
@@ -17,7 +33,7 @@ export default class Fenster {
     const { left, top, ...others } = style;
 
     for (const name in others) {
-      body.style[name] = style[name];
+      body.style.setProperty(name, style[name]);
     }
 
     if (left) {
@@ -86,25 +102,24 @@ export default class Fenster {
     window.append(dragger, body);
     wrapper.append(window);
 
-    const that = this;
+    let x: number, y: number;
+    let offsetX: number, offsetY: number;
+    let originalWidth: number, originalHeight: number;
 
-    let x, y;
-    let offsetX, offsetY;
-    let originalWidth, originalHeight;
-
-    const resizerPointerMove = function (event) {
+    const resizerPointerMove = (event: PointerEvent) => {
       if (event.buttons !== 1) return;
       event.preventDefault();
+      const target = event.target as HTMLElement;
 
-      const dir = this.dataset.resizeDir;
+      const dir = target.dataset.resizeDir;
 
       const boundsWindow = window.getBoundingClientRect();
       const boundsBody = body.getBoundingClientRect();
 
-      for (const char of dir) {
+      for (const char of dir!) {
         switch (char) {
           case "w":
-            that.resizeInline(
+            this.resizeInline(
               originalWidth +
                 (x - event.x) -
                 (boundsWindow.width - boundsBody.width),
@@ -112,21 +127,21 @@ export default class Fenster {
             );
             break;
           case "s":
-            that.resizeBlock(
+            this.resizeBlock(
               originalHeight +
                 (event.y - y) -
                 (boundsWindow.height - boundsBody.height),
             );
             break;
           case "e":
-            that.resizeInline(
+            this.resizeInline(
               originalWidth +
                 (event.x - x) -
                 (boundsWindow.width - boundsBody.width),
             );
             break;
           case "n":
-            that.resizeBlock(
+            this.resizeBlock(
               originalHeight +
                 (y - event.y) -
                 (boundsWindow.height - boundsBody.height),
@@ -138,12 +153,16 @@ export default class Fenster {
     };
 
     wrapper.addEventListener("pointerdown", function () {
-      if (this.style.zIndex < zIndex) this.style.zIndex = ++zIndex;
+      if (+this.style.zIndex < zIndex) {
+        this.style.zIndex = (++zIndex).toString();
+      }
     });
 
-    const resizerPointerDown = function (event) {
+    const resizerPointerDown = function (event: PointerEvent) {
       event.preventDefault();
-      this.setPointerCapture(event.pointerId);
+      const target = event.target as HTMLElement;
+
+      target.setPointerCapture(event.pointerId);
 
       const boundsWindow = window.getBoundingClientRect();
       const boundsBody = body.getBoundingClientRect();
@@ -158,9 +177,11 @@ export default class Fenster {
       originalHeight = boundsWindow.height;
     };
 
-    const draggerPointerDown = function (event) {
+    const draggerPointerDown = function (event: PointerEvent) {
       event.preventDefault();
-      this.setPointerCapture(event.pointerId);
+      const target = event.target as HTMLElement;
+
+      target.setPointerCapture(event.pointerId);
 
       const boundsWindow = window.getBoundingClientRect();
 
@@ -171,7 +192,7 @@ export default class Fenster {
       offsetY = y - boundsWindow.top;
     };
 
-    const draggerPointerMove = function (event) {
+    const draggerPointerMove = function (event: PointerEvent) {
       if (event.buttons !== 1) return;
       event.preventDefault();
 
@@ -179,7 +200,7 @@ export default class Fenster {
       wrapper.style.top = `${event.y - offsetY}px`;
     };
 
-    const draggerClick = function (event) {
+    const draggerClick = function (event: MouseEvent) {
       event.preventDefault();
       return false;
     };
@@ -211,7 +232,7 @@ export default class Fenster {
     document.body.appendChild(wrapper);
   }
 
-  resizeInline(targetWidth, left) {
+  resizeInline(targetWidth: number, left: number | null = null) {
     const originalBcr = this.#body.getBoundingClientRect();
 
     this.#body.style.width = `${targetWidth}px`;
@@ -232,7 +253,7 @@ export default class Fenster {
     this.#wrapper.style.left = `${left}px`;
   }
 
-  resizeBlock(targetHeight, top) {
+  resizeBlock(targetHeight: number, top: number | null = null) {
     const originalBcr = this.#body.getBoundingClientRect();
 
     this.#body.style.height = `${targetHeight}px`;
@@ -262,7 +283,7 @@ export default class Fenster {
   }
 
   toggleMinimize() {
-    this.#window.open ^= true;
+    this.#window.open = !this.#window.open;
     return this.#window.open;
   }
 }

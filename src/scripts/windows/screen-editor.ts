@@ -1,7 +1,9 @@
+import ScreenEditorElement from "../elements/screen-editor.js";
 import Fenster from "../fenster.js";
+import { WindowProps } from "./types.js";
 
-export default class ScreenEditor extends Fenster {
-  constructor({ style }, config, events) {
+export default class ScreenEditor extends Fenster<ScreenEditorElement> {
+  constructor({ style, config, events }: WindowProps) {
     const body = document.createElement("screen-editor");
     const title = document.createDocumentFragment();
 
@@ -49,11 +51,11 @@ export default class ScreenEditor extends Fenster {
 
     events.render.subscribe(() => {
       body.render();
-    })
+    });
 
     events.setCharmap.subscribe((charmap) => {
       this.body.charmap = charmap;
-    })
+    });
 
     this.toggleMinimize();
   }

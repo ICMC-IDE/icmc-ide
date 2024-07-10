@@ -1,13 +1,14 @@
 import Fenster from "../fenster.js";
+import { WindowProps } from "./types.js";
 
-export default class MemoryEditor extends Fenster {
-  constructor({ style }, _config, events) {
-    const body = document.createElement("memory-editor");
+export default class SourceEditor extends Fenster<TextEditorElement> {
+  constructor({ style }: WindowProps) {
+    const body = document.createElement("text-editor");
     const title = document.createElement("span");
     const buttonsRight = [];
 
     {
-      title.innerText = "Memory Editor";
+      title.innerText = "Source Editor";
       title.classList.add("title");
     }
 
@@ -17,7 +18,7 @@ export default class MemoryEditor extends Fenster {
 
       icon.src = "images/export.png";
       button.append(icon, "Export");
-      buttonsRight.push(button)
+      buttonsRight.push(button);
     }
 
     {
@@ -35,11 +36,9 @@ export default class MemoryEditor extends Fenster {
       style,
       buttonsRight,
     });
+  }
 
-    events.refresh.subscribe(({ ram, symbols }) => {
-      if (ram) {
-        body.load(ram, symbols);
-      }
-    });
+  set model(model: monaco.editor.ITextModel) {
+    this.body.model = model;
   }
 }

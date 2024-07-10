@@ -3,7 +3,7 @@ import { File, EventHandler } from "./types";
 
 export type Unsubscriber = () => void;
 
-class EventEmitter<T> {
+export class EventEmitter<T> {
   #handlers: EventHandler<T>[] = [];
 
   emmit(value: T) {
@@ -20,8 +20,10 @@ class EventEmitter<T> {
   }
 }
 
-export const deleteFile = new EventEmitter<File>();
-export const openFile = new EventEmitter<File>();
-export const refresh = new EventEmitter<void>();
-export const render = new EventEmitter<void>();
-export const setCharmap = new EventEmitter<Charmap>();
+export default {
+  deleteFile: new EventEmitter<File>(),
+  openFile: new EventEmitter<File>(),
+  refresh: new EventEmitter<void>(),
+  render: new EventEmitter<void>(),
+  setCharmap: new EventEmitter<Charmap>(),
+};

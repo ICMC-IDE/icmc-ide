@@ -13,6 +13,13 @@ const FREQUENCIES = [
 ];
 */
 
+export interface ChangeConfigEvent extends CustomEvent {
+  detail: {
+    name: string;
+    value: string | number | undefined;
+  };
+}
+
 export default class ConfigEditorElement extends HTMLElement {
   // #elements;
 

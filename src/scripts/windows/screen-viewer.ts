@@ -1,11 +1,13 @@
+import ScreenViewerElement from "../elements/screen-viewer.js";
 import { IREG_KB, IREG_WC } from "../enums.js";
 import Fenster from "../fenster.js";
+import { WindowProps } from "./types";
 
-export default class ScreenViewer extends Fenster {
-  #internalRegisters;
+export default class ScreenViewer extends Fenster<ScreenViewerElement> {
+  #internalRegisters: Uint16Array | null = null;
   #wc = 0;
 
-  constructor({ style }, config, events) {
+  constructor({ style, config, events }: WindowProps) {
     const body = document.createElement("screen-viewer");
     const title = document.createElement("span");
     const buttonsLeft = [];
@@ -51,9 +53,9 @@ export default class ScreenViewer extends Fenster {
         }
       });
 
-      body.addEventListener("keyup", ({ keyCode }) => {
+      body.addEventListener("keyup", () => {
         if (this.#internalRegisters) {
-          this.#internalRegisters[IREG_KB] = 0xFF;
+          this.#internalRegisters[IREG_KB] = 0xff;
         }
       });
     }
@@ -63,7 +65,7 @@ export default class ScreenViewer extends Fenster {
       body,
       style,
       buttonsLeft,
-      buttonsRight
+      buttonsRight,
     });
 
     config.screenWidth.subscribe((width) => {

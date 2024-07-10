@@ -1,3 +1,11 @@
+export interface OpenFileEvent {
+  detail: string;
+}
+
+export interface DeleteFileEvent {
+  detail: string;
+}
+
 export default class FilePickerElement extends HTMLElement {
   constructor() {
     super();
