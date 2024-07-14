@@ -16,6 +16,10 @@
     },
     "transform": {},
     "target": "es2022",
+    "baseUrl": "./src/scripts",
+    "paths": {
+      "*": ["types/*.d.ts"]
+    },
     "loose": false,
     "externalHelpers": false,
     // Requires v1.2.50 or upper and requires target to be es2016 or upper.

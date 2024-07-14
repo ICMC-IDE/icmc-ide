@@ -1,9 +1,9 @@
 import DocumentationViewerElement from "../elements/documentation-viewer.js";
 import Fenster from "../fenster.js";
-import { WindowProps } from "./types.js";
+import { WindowConstructor } from "windows";
 
 export default class DocumentationViewerWindow extends Fenster<DocumentationViewerElement> {
-  constructor({ style, config }: WindowProps) {
+  constructor({ style, globalState: { configManager } }: WindowConstructor) {
     const title = document.createDocumentFragment();
     const body = document.createElement("documentation-viewer");
 
@@ -14,10 +14,10 @@ export default class DocumentationViewerWindow extends Fenster<DocumentationView
       title.appendChild(span);
     }
 
-    body.syntax = config.syntax.get();
+    body.syntax = configManager.get("syntax")!;
 
-    config.syntax.subscribe((value) => {
-      body.syntax = value;
+    configManager.subscribe("syntax", (value) => {
+      body.syntax = value!;
     });
 
     super({

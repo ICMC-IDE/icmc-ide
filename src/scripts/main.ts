@@ -1,12 +1,37 @@
-import config, { ConfigField } from "./config.js";
-import events, { EventEmitter } from "./events.js";
-
 import {
   createWindows,
   ScreenViewerWindow,
   SourceEditorWindow,
 } from "./windows/mod.js";
 import CharMap from "./charmap.js";
+import fs from "./fs.js";
+import EventManager from "state/event";
+import ConfigManager from "state/config";
+import GlobalState from "state";
+
+declare global {
+  interface ConfigMap {
+    syntax: string;
+    screenWidth: number;
+    screenHeight: number;
+    frequency: number;
+    entryFile: string;
+    files: Record<string, string>;
+  }
+  interface EventMap {
+    deleteFile: FileManagerFile;
+    openFile: FileManagerFile;
+    refresh: {
+      registers: Uint16Array;
+      internalRegisters: Uint16Array;
+      ram: Uint16Array;
+      vram: Uint16Array;
+      symbols: string;
+    };
+    setCharmap: CharMap;
+    render: void;
+  }
+}
 
 const { default: initMif, parseMif } = await import("../modules/mif/mif.js");
 const colorPalette = [
@@ -268,7 +293,14 @@ const colorPalette = [
   "#000000",
 ];
 
-async function main(config, events) {
+async function main() {
+  const eventManager = new EventManager();
+  const configManager = new ConfigManager();
+  const globalState: GlobalState = {
+    eventManager,
+    configManager,
+  };
+
   const worker = new Worker("./scripts/worker.js", { type: "module" });
   const assets = await Promise.all(
     (
@@ -279,7 +311,7 @@ async function main(config, events) {
       )
     ).map((data) => data.text()),
   );
-  const windows = createWindows(config, events);
+  const windows = createWindows(globalState);
 
   const contextMenu = document.createElement("div");
   contextMenu.style.position = "absolute";
@@ -304,8 +336,7 @@ async function main(config, events) {
             // width: "50ch",
             // height: "50rem",
           },
-          config,
-          events,
+          globalState,
         });
       });
       contextMenu.appendChild(item);
@@ -339,9 +370,9 @@ async function main(config, events) {
     // config.sourceCode.update((value) => value ?? assets[1]);
     // textEditor.value = localStorage.getItem(`script.${configEditor.language}`) ?? assets[1];
 
-    const openFiles = {};
+    const openFiles: Record<string, monaco.editor.ITextModel> = {};
 
-    events.openFile.subscribe((fileName) => {
+    eventManager.subscribe("openFile", (fileName) => {
       openFiles[fileName] ??= (() => {
         const extension = fileName.match(/\.(.*)$/);
         let language;
@@ -351,28 +382,25 @@ async function main(config, events) {
         }
 
         return monaco.editor.createModel(
-          config.files.get()[fileName],
+          configManager.get("files")![fileName], // configManager.get("filesystem", fileName),
           language,
         );
       })();
 
-      const editor = new SourceEditorWindow(
-        {
-          style: {
-            left: "0.5rem",
-            top: "0.5rem",
-            width: "50ch",
-            height: "50rem",
-          },
+      const editor = new SourceEditorWindow({
+        style: {
+          left: "0.5rem",
+          top: "0.5rem",
+          width: "50ch",
+          height: "50rem",
         },
-        config,
-        events,
-      );
+        globalState,
+      });
 
       editor.model = openFiles[fileName];
     });
 
-    config.frequency.subscribe((frequency) => {
+    configManager.subscribe("frequency", (frequency) => {
       worker.postMessage(["frequency", frequency]);
     });
 
@@ -385,13 +413,13 @@ async function main(config, events) {
     };
 
     window.build = function () {
-      const entryFile = config.entryFile.get();
+      const entryFile = configManager.get("entryFile")!;
       let source;
 
       if (openFiles[entryFile]) {
         source = openFiles[entryFile].getValue();
       } else {
-        source = config.files.get()[entryFile];
+        source = configManager.get("files")![entryFile];
       }
 
       const extension = entryFile.match(/\.(.*)$/);
@@ -404,7 +432,7 @@ async function main(config, events) {
       return worker.postMessage([
         "build",
         {
-          syntax: config.syntax.get(),
+          syntax: configManager.get("syntax"),
           language,
           source,
         },
@@ -450,7 +478,7 @@ async function main(config, events) {
     };
 
     function draw() {
-      events.render.emmit();
+      eventManager.emmit("render", undefined);
       // windows.screen.render();
       // windows.charmap.body.render();
       // windows.state.body.render();
@@ -462,7 +490,7 @@ async function main(config, events) {
       const result = parseMif(assets[0]);
       const charmap = CharMap.fromBytes(result, colorPalette);
 
-      events.setCharmap.emmit(charmap);
+      eventManager.emmit("setCharmap", charmap);
       // windows.charmap.colorPalette = colorPalette;
       // windows.screen.body.charmap = charmap;
       // windows.charmap.body.charmap = charmap;
@@ -485,7 +513,7 @@ async function main(config, events) {
       } else {
         switch (data[0]) {
           case "build":
-            events.refresh.emmit(data[1]);
+            eventManager.emmit("refresh", data[1]);
             break;
           case "asmsource":
             // config.sourceCode.set({ ...config.sourceCode.get(), ['asm']: data[1] });
@@ -509,4 +537,4 @@ async function main(config, events) {
   }
 }
 
-main(config, events).catch((error) => console.error(error));
+main().catch((error) => console.error(error));

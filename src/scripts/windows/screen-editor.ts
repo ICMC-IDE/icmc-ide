@@ -1,9 +1,12 @@
+import { WindowConstructor } from "windows";
 import ScreenEditorElement from "../elements/screen-editor.js";
 import Fenster from "../fenster.js";
-import { WindowProps } from "./types.js";
 
 export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
-  constructor({ style, config, events }: WindowProps) {
+  constructor({
+    style,
+    globalState: { configManager, eventManager },
+  }: WindowConstructor) {
     const body = document.createElement("screen-editor");
     const title = document.createDocumentFragment();
 
@@ -41,19 +44,19 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
       buttonsRight,
     });
 
-    config.screenWidth.subscribe((width) => {
-      body.width = width;
+    configManager.subscribe("screenWidth", (width) => {
+      body.width = width!;
     });
 
-    config.screenHeight.subscribe((height) => {
-      body.height = height;
+    configManager.subscribe("screenHeight", (height) => {
+      body.height = height!;
     });
 
-    events.render.subscribe(() => {
+    eventManager.subscribe("render", () => {
       body.render();
     });
 
-    events.setCharmap.subscribe((charmap) => {
+    eventManager.subscribe("setCharmap", (charmap) => {
       this.body.charmap = charmap;
     });
 

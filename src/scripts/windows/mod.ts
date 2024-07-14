@@ -7,8 +7,7 @@ import ConfigEditorWindow from "./config-editor.js";
 import SourceEditorWindow from "./source-editor.js";
 import DocumentationViewerWindow from "./documentation-viewer.js";
 import FilePickerWindow from "./file-picker.js";
-import { ConfigField } from "../config.js";
-import { EventEmitter } from "../events.js";
+import GlobalState from "state";
 
 interface Windows {
   state: StateEditorWindow;
@@ -21,10 +20,7 @@ interface Windows {
   files: FilePickerWindow;
 }
 
-export function createWindows(
-  config: Record<string, ConfigField<unknown>>,
-  events: Record<string, EventEmitter<unknown>>,
-) {
+export function createWindows(globalState: GlobalState) {
   const result: Windows = {} as Windows;
 
   result.state = new StateEditorWindow({
@@ -32,8 +28,7 @@ export function createWindows(
       left: `calc(50ch + 1rem + 0.5rem)`,
       top: "0.5rem",
     },
-    config,
-    events,
+    globalState,
   });
 
   const stateBounds = result.state.getClientRect();
@@ -44,8 +39,7 @@ export function createWindows(
       top: `calc(${stateBounds.bottom}px + 0.5rem)`,
       height: "20rem",
     },
-    config,
-    events,
+    globalState,
   });
 
   const memoryBounds = result.memory.getClientRect();
@@ -58,8 +52,7 @@ export function createWindows(
       height: "480px",
       // filter: "url(/#crt)",
     },
-    config,
-    events,
+    globalState,
   });
 
   result.log = new LogViewerWindow({
@@ -67,8 +60,7 @@ export function createWindows(
       left: `calc(50ch + 1rem + 0.5rem)`,
       top: `calc(${memoryBounds.bottom}px + 0.5rem)`,
     },
-    config,
-    events,
+    globalState,
   });
 
   result.charmap = new ScreenEditorWindow({
@@ -78,8 +70,7 @@ export function createWindows(
       width: "640px",
       height: "480px",
     },
-    config,
-    events,
+    globalState,
   });
 
   result.config = new ConfigEditorWindow({
@@ -89,8 +80,7 @@ export function createWindows(
       width: "640px",
       height: "480px",
     },
-    config,
-    events,
+    globalState,
   });
 
   result.documentation = new DocumentationViewerWindow({
@@ -100,8 +90,7 @@ export function createWindows(
       width: "640px",
       height: "480px",
     },
-    config,
-    events,
+    globalState,
   });
 
   result.files = new FilePickerWindow({
@@ -111,8 +100,7 @@ export function createWindows(
       width: "30ch",
       height: "480px",
     },
-    config,
-    events,
+    globalState,
   });
 
   return result;

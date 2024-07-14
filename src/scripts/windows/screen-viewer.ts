@@ -1,13 +1,16 @@
 import ScreenViewerElement from "../elements/screen-viewer.js";
 import { IREG_KB, IREG_WC } from "../enums.js";
 import Fenster from "../fenster.js";
-import { WindowProps } from "./types";
+import { WindowConstructor } from "windows";
 
 export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
   #internalRegisters: Uint16Array | null = null;
   #wc = 0;
 
-  constructor({ style, config, events }: WindowProps) {
+  constructor({
+    style,
+    globalState: { configManager, eventManager },
+  }: WindowConstructor) {
     const body = document.createElement("screen-viewer");
     const title = document.createElement("span");
     const buttonsLeft = [];
@@ -68,15 +71,15 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
       buttonsRight,
     });
 
-    config.screenWidth.subscribe((width) => {
-      body.width = width;
+    configManager.subscribe("screenWidth", (width) => {
+      body.width = width!;
     });
 
-    config.screenHeight.subscribe((height) => {
-      body.height = height;
+    configManager.subscribe("screenHeight", (height) => {
+      body.height = height!;
     });
 
-    events.refresh.subscribe(({ vram, internalRegisters }) => {
+    eventManager.subscribe("refresh", ({ vram, internalRegisters }) => {
       if (vram) {
         body.memory = vram;
       }
@@ -86,11 +89,11 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
       }
     });
 
-    events.render.subscribe(() => {
+    eventManager.subscribe("render", () => {
       this.render();
     });
 
-    events.setCharmap.subscribe((charmap) => {
+    eventManager.subscribe("setCharmap", (charmap) => {
       body.charmap = charmap;
     });
   }

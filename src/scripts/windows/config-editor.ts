@@ -1,9 +1,9 @@
 import ConfigEditorElement from "../elements/config-editor.js";
 import Fenster from "../fenster.js";
-import { WindowProps } from "./types.js";
+import { WindowConstructor } from "windows";
 
 export default class ConfigEditorWindow extends Fenster<ConfigEditorElement> {
-  constructor({ style, config }: WindowProps) {
+  constructor({ style, globalState: { configManager } }: WindowConstructor) {
     const body = document.createElement("config-editor");
     const title = document.createElement("span");
 
@@ -14,7 +14,7 @@ export default class ConfigEditorWindow extends Fenster<ConfigEditorElement> {
 
     {
       body.addEventListener("change-config", ({ detail: { name, value } }) => {
-        config[name].set(value);
+        configManager.set(name, value);
       });
     }
 

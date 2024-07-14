@@ -1,9 +1,12 @@
 import StateEditorElement from "../elements/state-editor.js";
 import Fenster from "../fenster.js";
-import { WindowProps } from "./types.js";
+import { WindowConstructor } from "windows";
 
 export default class StateEditorWindow extends Fenster<StateEditorElement> {
-  constructor({ style, config, events }: WindowProps) {
+  constructor({
+    style,
+    globalState: { configManager, eventManager },
+  }: WindowConstructor) {
     const body = document.createElement("state-editor");
     const title = document.createElement("span");
 
@@ -14,11 +17,11 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
 
     {
       body.addEventListener("change-frequency", ({ detail: frequency }) => {
-        config.frequency.set(frequency);
+        configManager.set("frequency", frequency);
       });
 
       body.addEventListener("change-file", ({ detail: fileName }) => {
-        config.entryFile.set(fileName);
+        configManager.set("entryFile", fileName);
       });
     }
 
@@ -28,19 +31,20 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       style,
     });
 
-    config.frequency.subscribe((frequency) => {
-      body.frequency = frequency;
+    configManager.subscribe("frequency", (frequency) => {
+      body.frequency = frequency!;
     });
 
-    config.files.subscribe((files) => {
-      body.files = Object.keys(files);
+    // configManager.subscribe("filesystem", (fs) => {
+    //   console.log(fs);
+    //   body.files = Object.keys(fs.files());
+    // });
+
+    configManager.subscribe("entryFile", (fileName) => {
+      body.entryFile = fileName!;
     });
 
-    config.entryFile.subscribe((fileName) => {
-      body.entryFile = fileName;
-    });
-
-    events.refresh.subscribe(({ registers, internalRegisters }) => {
+    eventManager.subscribe("refresh", ({ registers, internalRegisters }) => {
       console.log(registers, internalRegisters);
       if (registers) {
         this.body.registers = registers;
@@ -51,7 +55,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       }
     });
 
-    events.render.subscribe(() => {
+    eventManager.subscribe("render", () => {
       this.body.render();
     });
   }

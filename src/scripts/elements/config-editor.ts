@@ -14,10 +14,7 @@ const FREQUENCIES = [
 */
 
 interface ChangeConfigEvent {
-  detail: {
-    name: string;
-    value: string | number | undefined;
-  };
+  detail: Config;
 }
 
 export default class ConfigEditorElement extends HTMLElement {
