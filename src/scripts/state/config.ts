@@ -1,70 +1,33 @@
+import EventManager from "./event.js";
+
+export interface ConfigMap {
+  syntax: string;
+  "screen-width": number;
+  "screen-height": number;
+  frequency: number;
+  "entry-file": string;
+}
+
 const CONFIG_STORAGE_PREFIX = "config:";
 
-export default class ConfigManager {
-  #configs: Partial<
-    Record<
-      keyof ConfigMap,
-      {
-        value: ConfigMap[keyof ConfigMap] | undefined;
-        handlers: EventHandler<ConfigMap[keyof ConfigMap] | undefined>[];
-      }
-    >
-  > = {};
+export default class ConfigManager extends EventManager<ConfigMap> {
+  #configs: Partial<ConfigMap> = {};
 
   get<K extends keyof ConfigMap>(config: K) {
-    return this.#configs[config]?.value as ConfigMap[K] | undefined;
+    return this.#configs[config] as ConfigMap[K];
   }
 
-  set<K extends keyof ConfigMap>(config: K, value: ConfigMap[K] | undefined) {
-    if (!this.#configs[config]) {
-      this.#configs[config] = {
-        value,
-        handlers: [],
-      };
-    }
-
-    this.#configs[config].value = value;
+  set<K extends keyof ConfigMap>(config: K, value: ConfigMap[K]) {
+    this.#configs[config] = value;
     // this.save(config);
 
-    for (const handler of this.#configs[config].handlers) {
-      handler(value);
-    }
-  }
-
-  subscribe<K extends keyof ConfigMap>(
-    config: K,
-    handler: EventHandler<ConfigMap[K] | undefined>,
-  ) {
-    if (!this.#configs[config]) {
-      this.#configs[config] = {
-        value: undefined,
-        handlers: [],
-      };
-    }
-
-    this.#configs[config].handlers.push(
-      handler as EventHandler<ConfigMap[keyof ConfigMap] | undefined>,
-    );
-    handler(this.#configs[config].value as ConfigMap[K] | undefined);
-  }
-
-  unsubscribe<K extends keyof ConfigMap>(
-    config: K,
-    handler: EventHandler<ConfigMap[K] | undefined>,
-  ) {
-    if (!this.#configs[config]) {
-      return;
-    }
-
-    this.#configs[config].handlers = this.#configs[config].handlers.filter(
-      (h) => h !== handler,
-    );
+    this.emmit(config, value);
   }
 
   save<K extends keyof ConfigMap>(config: K) {
     localStorage.setItem(
       CONFIG_STORAGE_PREFIX + (config as string),
-      JSON.stringify(this.#configs[config]?.value),
+      JSON.stringify(this.#configs[config]),
     );
   }
 
@@ -97,7 +60,7 @@ export default class ConfigManager {
   // add delete mothod to delete a config (from storage and/or memory)
 }
 
-/* 
+/*
 export class ConfigField<T> {
   #handlers: EventHandler<T | null>[] = [];
   #value: T | null = null;

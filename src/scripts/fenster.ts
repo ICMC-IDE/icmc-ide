@@ -6,7 +6,7 @@ let zIndex = 100;
 interface FensterProps<T extends HTMLElement> {
   body: T;
   title: HTMLElement | DocumentFragment;
-  style: Record<string, string>;
+  style?: Record<string, string>;
   open?: boolean;
   buttonsLeft?: HTMLElement[];
   buttonsRight?: HTMLElement[];
@@ -30,10 +30,10 @@ export default class Fenster<T extends HTMLElement> {
     const dragger = (this.#dragger = document.createElement("summary"));
     const window = (this.#window = document.createElement("details"));
 
-    const { left, top, ...others } = style;
+    const { left, top, ...others } = style ?? {};
 
     for (const name in others) {
-      body.style.setProperty(name, style[name]);
+      body.style.setProperty(name, others[name]);
     }
 
     if (left) {
@@ -54,9 +54,9 @@ export default class Fenster<T extends HTMLElement> {
 
     {
       const button = document.createElement("button");
-      const icon = document.createElement("img");
+      const icon = document.createElement("svg-icon");
 
-      icon.src = "images/minimize.png";
+      icon.name = "minimize";
       button.append(icon);
       title.appendChild(button);
 
@@ -65,9 +65,7 @@ export default class Fenster<T extends HTMLElement> {
       });
 
       window.addEventListener("toggle", () => {
-        icon.src = window.open
-          ? "images/minimize.png"
-          : "images/unminimize.png";
+        icon.name = window.open ? "minimize" : "unminimize";
       });
 
       dragger.append(button);
@@ -85,9 +83,9 @@ export default class Fenster<T extends HTMLElement> {
 
     {
       const button = document.createElement("button");
-      const icon = document.createElement("img");
+      const icon = document.createElement("svg-icon");
 
-      icon.src = "images/close.png";
+      icon.name = "close";
       button.append(icon);
       button.addEventListener("click", () => {
         this.#body.remove();
@@ -229,6 +227,7 @@ export default class Fenster<T extends HTMLElement> {
     dragger.addEventListener("pointermove", draggerPointerMove);
     dragger.addEventListener("click", draggerClick);
 
+    // document.getElementById("root")!.appendChild(wrapper);
     document.body.appendChild(wrapper);
   }
 
@@ -282,8 +281,9 @@ export default class Fenster<T extends HTMLElement> {
     return this.#body;
   }
 
-  toggleMinimize() {
-    this.#window.open = !this.#window.open;
+  toggleMinimize(force?: boolean) {
+    const value = force ?? this.#window.open;
+    this.#window.open = !value;
     return this.#window.open;
   }
 }

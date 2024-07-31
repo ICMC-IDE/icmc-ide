@@ -7,3 +7,5 @@ import "./memory-editor.js";
 import "./state-editor.js";
 import "./text-editor.js";
 import "./file-picker.js";
+import "./svg-icon.js";
+import "./dock.js";

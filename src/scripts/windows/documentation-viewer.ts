@@ -16,8 +16,8 @@ export default class DocumentationViewerWindow extends Fenster<DocumentationView
 
     body.syntax = configManager.get("syntax")!;
 
-    configManager.subscribe("syntax", (value) => {
-      body.syntax = value!;
+    configManager.subscribe("syntax", (value: string) => {
+      body.syntax = value;
     });
 
     super({

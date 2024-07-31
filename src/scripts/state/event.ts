@@ -1,4 +1,6 @@
-export default class EventManager {
+export type EventHandler<T> = (value: T) => void;
+
+export default class EventManager<EventMap> {
   #events: Partial<
     Record<keyof EventMap, EventHandler<EventMap[keyof EventMap]>[]>
   > = {};
@@ -35,15 +37,5 @@ export default class EventManager {
     }
   }
 
-  // add delete mothod to delete an event
+  // add method to delete an event
 }
-
-/*
-export {
-  deleteFile: new EventEmitter<File>(),
-  openFile: new EventEmitter<File>(),
-  refresh: new EventEmitter<void>(),
-  render: new EventEmitter<void>(),
-  setCharmap: new EventEmitter<Charmap>(),
-};
-*/

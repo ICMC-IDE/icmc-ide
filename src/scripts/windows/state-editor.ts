@@ -5,7 +5,7 @@ import { WindowConstructor } from "windows";
 export default class StateEditorWindow extends Fenster<StateEditorElement> {
   constructor({
     style,
-    globalState: { configManager, eventManager },
+    globalState: { configManager, eventManager, resources },
   }: WindowConstructor) {
     const body = document.createElement("state-editor");
     const title = document.createElement("span");
@@ -21,8 +21,44 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       });
 
       body.addEventListener("change-file", ({ detail: fileName }) => {
-        configManager.set("entryFile", fileName);
+        configManager.set("entry-file", fileName);
       });
+
+      body.addEventListener("build", () => {
+        const fs = resources.get("fs");
+
+        resources
+          .get("main-worker")
+          .request("build", {
+            files: fs.all(),
+            entry: configManager.get("entry-file"),
+            syntax: configManager.get("syntax"),
+          })
+          .then(() => {})
+          .catch(() => {})
+          .finally(() => {});
+      });
+
+      body.addEventListener("play", () => {
+        //
+      });
+
+      body.addEventListener("stop", () => {
+        //
+      });
+
+      body.addEventListener("next", () => {
+        //
+      });
+
+      body.addEventListener("reset", () => {
+        //
+      });
+
+      body.files = resources
+        .get("fs")
+        .files()
+        .filter((filename) => /\.(asm|c)$/i.test(filename));
     }
 
     super({
@@ -31,32 +67,40 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       style,
     });
 
-    configManager.subscribe("frequency", (frequency) => {
-      body.frequency = frequency!;
+    configManager.subscribe("frequency", (frequency: number) => {
+      body.frequency = frequency;
     });
 
-    // configManager.subscribe("filesystem", (fs) => {
-    //   console.log(fs);
-    //   body.files = Object.keys(fs.files());
-    // });
-
-    configManager.subscribe("entryFile", (fileName) => {
-      body.entryFile = fileName!;
-    });
-
-    eventManager.subscribe("refresh", ({ registers, internalRegisters }) => {
-      console.log(registers, internalRegisters);
-      if (registers) {
-        this.body.registers = registers;
-      }
-
-      if (internalRegisters) {
-        this.body.internalRegisters = internalRegisters;
-      }
+    configManager.subscribe("entry-file", (fileName: string) => {
+      body.entryFile = fileName;
     });
 
     eventManager.subscribe("render", () => {
-      this.body.render();
+      body.render();
+    });
+
+    resources.subscribe("fs", (fs) => {
+      fs.subscribe("create", () => {
+        body.files = resources
+          .get("fs")
+          .files()
+          .filter((filename) => /\.(asm|c)$/i.test(filename));
+      });
+
+      fs.subscribe("delete", () => {
+        body.files = resources
+          .get("fs")
+          .files()
+          .filter((filename) => /\.(asm|c)$/i.test(filename));
+      });
+    });
+
+    resources.subscribe("registers", (registers) => {
+      body.registers = registers;
+    });
+
+    resources.subscribe("internalRegisters", (registers) => {
+      body.internalRegisters = registers;
     });
   }
 }

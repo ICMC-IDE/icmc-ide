@@ -1,4 +1,4 @@
-import CharMap from "./charmap";
+import CharMap from "./resources/charmap.js";
 
 export default class Renderer {
   #canvas;

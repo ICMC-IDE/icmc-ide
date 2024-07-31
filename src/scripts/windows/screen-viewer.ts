@@ -9,7 +9,7 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
 
   constructor({
     style,
-    globalState: { configManager, eventManager },
+    globalState: { configManager, eventManager, resources },
   }: WindowConstructor) {
     const body = document.createElement("screen-viewer");
     const title = document.createElement("span");
@@ -23,9 +23,9 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
 
     {
       const button = document.createElement("button");
-      const icon = document.createElement("img");
+      const icon = document.createElement("svg-icon");
 
-      icon.src = "images/toggle-full-screen.png";
+      icon.name = "toggle-full-screen";
       button.append(icon);
       button.addEventListener("click", () => {
         body.requestFullscreen().catch((error) => {
@@ -38,9 +38,9 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
 
     {
       const button = document.createElement("button");
-      const icon = document.createElement("img");
+      const icon = document.createElement("svg-icon");
 
-      icon.src = "images/erase.png";
+      icon.name = "erase";
       button.append(icon, "Clear");
       button.addEventListener("click", () => {
         body.clear();
@@ -63,6 +63,8 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
       });
     }
 
+    body.charmap = resources.get("charmap");
+
     super({
       title,
       body,
@@ -71,30 +73,28 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
       buttonsRight,
     });
 
-    configManager.subscribe("screenWidth", (width) => {
-      body.width = width!;
+    configManager.subscribe("screen-width", (width: number) => {
+      body.width = width;
     });
 
-    configManager.subscribe("screenHeight", (height) => {
-      body.height = height!;
+    configManager.subscribe("screen-height", (height: number) => {
+      body.height = height;
     });
 
-    eventManager.subscribe("refresh", ({ vram, internalRegisters }) => {
-      if (vram) {
-        body.memory = vram;
-      }
+    resources.subscribe("vram", (vram) => {
+      body.memory = vram;
+    });
 
-      if (internalRegisters) {
-        this.#internalRegisters = internalRegisters;
-      }
+    resources.subscribe("internalRegisters", (internalRegisters) => {
+      this.#internalRegisters = internalRegisters;
+    });
+
+    resources.subscribe("charmap", (charmap) => {
+      body.charmap = charmap;
     });
 
     eventManager.subscribe("render", () => {
       this.render();
-    });
-
-    eventManager.subscribe("setCharmap", (charmap) => {
-      body.charmap = charmap;
     });
   }
 

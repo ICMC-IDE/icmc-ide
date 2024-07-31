@@ -15,18 +15,18 @@ export default class SourceEditorWindow extends Fenster<TextEditorElement> {
 
     {
       const button = document.createElement("button");
-      const icon = document.createElement("img");
+      const icon = document.createElement("svg-icon");
 
-      icon.src = "images/export.png";
+      icon.name = "export";
       button.append(icon, "Export");
       buttonsRight.push(button);
     }
 
     {
       const button = document.createElement("button");
-      const icon = document.createElement("img");
+      const icon = document.createElement("svg-icon");
 
-      icon.src = "images/import.png";
+      icon.name = "import";
       button.append(icon, "Import");
       buttonsRight.push(button);
     }

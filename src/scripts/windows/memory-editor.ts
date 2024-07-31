@@ -3,7 +3,10 @@ import Fenster from "../fenster.js";
 import { WindowConstructor } from "windows";
 
 export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
-  constructor({ style, globalState: { eventManager } }: WindowConstructor) {
+  constructor({
+    style,
+    globalState: { eventManager, resources },
+  }: WindowConstructor) {
     const body = document.createElement("memory-editor");
     const title = document.createElement("span");
     const buttonsRight = [];
@@ -15,18 +18,18 @@ export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
 
     {
       const button = document.createElement("button");
-      const icon = document.createElement("img");
+      const icon = document.createElement("svg-icon");
 
-      icon.src = "images/export.png";
+      icon.name = "export";
       button.append(icon, "Export");
       buttonsRight.push(button);
     }
 
     {
       const button = document.createElement("button");
-      const icon = document.createElement("img");
+      const icon = document.createElement("svg-icon");
 
-      icon.src = "images/import.png";
+      icon.name = "import";
       button.append(icon, "Import");
       buttonsRight.push(button);
     }
@@ -38,10 +41,12 @@ export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
       buttonsRight,
     });
 
-    eventManager.subscribe("refresh", ({ ram, symbols }) => {
-      if (ram) {
-        body.load(ram, symbols);
-      }
+    resources.subscribe("ram", (ram) => {
+      body.ram = ram;
+    });
+
+    resources.subscribe("symbols", (symbols) => {
+      body.symbols = symbols;
     });
   }
 }

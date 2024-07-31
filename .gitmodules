@@ -1,6 +1,16 @@
-[submodule "modules/emulator"]
-	path = modules/emulator
-	url = https://github.com/ICMC-IDE/icmc-emulator
 [submodule "modules/mif"]
 	path = modules/mif
-	url = https://github.com/ViniciusGiroto/mif
+	url = https://github.com/ICMC-IDE/mif
+	branch = main
+[submodule "modules/icmc-emulator"]
+	path = modules/icmc-emulator
+	url = https://github.com/ICMC-IDE/icmc-emulator
+	branch = main
+[submodule "modules/assembler"]
+	path = modules/assembler
+	url = https://github.com/ICMC-IDE/assembler
+	branch = main
+[submodule "modules/icmc-cc"]
+	path = modules/icmc-cc
+	url = https://github.com/ICMC-IDE/icmc-cc
+	branch = main

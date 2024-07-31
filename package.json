@@ -10,35 +10,33 @@
   "license": "GPL-3.0",
   "packageManager": "npm@10.8.1",
   "scripts": {
-    "build": "npm run copy-public && swc src --out-dir dist --copy-files --strip-leading-paths",
-    "watch-build": "npm run copy-public && swc src --out-dir dist --copy-files --strip-leading-paths --watch",
+    "build": "npm run copy-public && tsc -p tsconfig.json && lightningcss --minify --bundle --targets '>= 0.25%' src/styles/main.css -o dist/styles/main.css",
+    "watch-build": "npm run copy-public && ln -frs src/styles/main.css dist/styles/main.css && tsc -p tsconfig.json -w",
     "start": "serve -c serve.json",
     "dev": "concurrently \"npm:watch-build\" \"npm:start\"",
-    "build-modules": "wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/mif && wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/emulator/backend",
+    "build-modules": "for module in mif assembler icmc-cc icmc-emulator; do wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/$module ; done",
     "copy-public": "copyfiles -a -F -u 1 \"public/**/*\" dist",
     "clean": "rimraf dist",
     "lint": "eslint ./src"
   },
   "devDependencies": {
     "@eslint/js": "^9.5.0",
-    "@swc/cli": "^0.3.14",
-    "@swc/core": "^1.6.5",
     "chokidar": "^3.6.0",
     "concurrently": "^8.2.2",
     "copyfiles": "^2.4.1",
-    "css-loader": "^7.1.2",
-    "eslint": "^9.6.0",
+    "eslint": "^9.7.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "globals": "^15.6.0",
-    "prettier": "^3.3.2",
-    "rimraf": "^5.0.7",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.8.0",
+    "lightningcss-cli": "^1.25.1",
+    "prettier": "^3.3.3",
+    "rimraf": "^5.0.9",
     "serve": "^14.2.3",
     "style-loader": "^4.0.0",
-    "typescript": "^5.5.2",
-    "typescript-eslint": "^7.14.1"
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^7.17.0"
   },
   "overrides": {
-    "eslint": "^9.6.0"
+    "eslint": "^9.7.0"
   }
 }

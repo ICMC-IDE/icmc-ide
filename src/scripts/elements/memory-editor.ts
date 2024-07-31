@@ -40,28 +40,6 @@ export default class MemoryEditorElement extends HTMLElement {
     });
   }
 
-  load(memory: Uint16Array, symbols: string) {
-    this.#memory = memory;
-
-    if (typeof symbols === "string") {
-      const labels: [string, number][] = symbols
-        .split("\n")
-        .filter((line) => line.includes("="))
-        .map((line) => {
-          const [name, address] = line.split(" = ");
-          return [name, parseInt(address)];
-        });
-
-      if (labels.length == 0 || labels[0][1] > 0) {
-        labels.splice(0, 0, ["...", 0]);
-      }
-
-      this.#symbols = labels;
-    }
-
-    this.#renderMemory();
-  }
-
   update(offset: number, value: number) {
     const hex = this.#hexCells[offset];
     const ascii = this.#asciiCells[offset];
@@ -223,6 +201,27 @@ export default class MemoryEditorElement extends HTMLElement {
     }
 
     this.#sp = offset;
+  }
+
+  set ram(memory: Uint16Array) {
+    this.#memory = memory;
+  }
+
+  set symbols(symbols: string) {
+    const labels: [string, number][] = symbols
+      .split("\n")
+      .filter((line) => line.includes("="))
+      .map((line) => {
+        const [name, address] = line.split(" = ");
+        return [name, parseInt(address)];
+      });
+
+    if (labels.length == 0 || labels[0][1] > 0) {
+      labels.splice(0, 0, ["...", 0]);
+    }
+
+    this.#symbols = labels;
+    this.#renderMemory();
   }
 }
 

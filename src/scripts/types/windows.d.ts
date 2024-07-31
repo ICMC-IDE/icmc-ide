@@ -1,6 +1,6 @@
-import GlobalState from "state";
+import { GlobalState } from "../state/global.js";
 
 export interface WindowConstructor {
   globalState: GlobalState;
-  style: Record<string, string>;
+  style?: Record<string, string>;
 }

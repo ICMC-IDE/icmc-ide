@@ -14,7 +14,10 @@ const FREQUENCIES = [
 */
 
 interface ChangeConfigEvent {
-  detail: Config;
+  detail: {
+    name: string;
+    value: any;
+  };
 }
 
 export default class ConfigEditorElement extends HTMLElement {
@@ -62,14 +65,6 @@ export default class ConfigEditorElement extends HTMLElement {
       );
     });
   }
-
-  disconnectedCallback() {
-    // this.#elements = null;
-
-    while (this.lastElementChild) {
-      this.lastElementChild.remove();
-    }
-  }
 }
 
 customElements.define("config-editor", ConfigEditorElement);
@@ -78,6 +73,7 @@ declare global {
   interface HTMLElementTagNameMap {
     "config-editor": ConfigEditorElement;
   }
+
   interface HTMLElementEventMap {
     "change-config": ChangeConfigEvent;
   }

@@ -23,6 +23,9 @@ interface StateEditorElements {
   buttons: {
     stop: HTMLButtonElement;
     play: HTMLButtonElement;
+    next: HTMLButtonElement;
+    reset: HTMLButtonElement;
+    build: HTMLButtonElement;
     file: HTMLSelectElement;
     frequency: HTMLInputElement;
   };
@@ -31,24 +34,25 @@ interface StateEditorElements {
 }
 
 export default class StateEditorElement extends HTMLElement {
-  #elements: StateEditorElements | null = null;
+  #elements: StateEditorElements;
   // #running = false;
   #frequency = 6;
+  #fragment: DocumentFragment;
 
   registers: Uint16Array | null = null;
   internalRegisters: Uint16Array | null = null;
 
   constructor() {
     super();
-  }
 
-  connectedCallback() {
     const stateViewTemplate = document.getElementById(
       "stateViewTemplate",
     ) as HTMLTemplateElement;
-    this.appendChild(stateViewTemplate.content.cloneNode(true));
+    const fragment = (this.#fragment = stateViewTemplate.content.cloneNode(
+      true,
+    ) as DocumentFragment);
 
-    const forms = this.querySelectorAll("form");
+    const forms = fragment.querySelectorAll("form");
 
     this.#elements = {
       buttons: forms[0].elements as unknown as StateEditorElements["buttons"],
@@ -58,24 +62,45 @@ export default class StateEditorElement extends HTMLElement {
         .elements as unknown as StateEditorElements["internalRegisters"],
     };
 
-    this.#elements!.buttons.frequency.addEventListener(
-      "input",
-      ({ target }) => {
-        this.dispatchEvent(
-          new CustomEvent("change-frequency", {
-            detail: (target! as HTMLInputElement).valueAsNumber,
-          }),
-        );
-      },
-    );
+    this.#elements.buttons.frequency.addEventListener("input", ({ target }) => {
+      this.dispatchEvent(
+        new CustomEvent("change-frequency", {
+          detail: (target! as HTMLInputElement).valueAsNumber,
+        }),
+      );
+    });
 
-    this.#elements!.buttons.file.addEventListener("input", ({ target }) => {
+    this.#elements.buttons.file.addEventListener("input", ({ target }) => {
       this.dispatchEvent(
         new CustomEvent("change-file", {
           detail: (target! as HTMLSelectElement).value,
         }),
       );
     });
+
+    this.#elements.buttons.play.addEventListener("click", () => {
+      this.dispatchEvent(new CustomEvent("play", {}));
+    });
+
+    this.#elements.buttons.stop.addEventListener("click", () => {
+      this.dispatchEvent(new CustomEvent("stop", {}));
+    });
+
+    this.#elements.buttons.next.addEventListener("click", () => {
+      this.dispatchEvent(new CustomEvent("next", {}));
+    });
+
+    this.#elements.buttons.build.addEventListener("click", () => {
+      this.dispatchEvent(new CustomEvent("build", {}));
+    });
+
+    this.#elements.buttons.reset.addEventListener("click", () => {
+      this.dispatchEvent(new CustomEvent("reset", {}));
+    });
+  }
+
+  connectedCallback() {
+    this.appendChild(this.#fragment);
   }
 
   render() {
@@ -83,7 +108,7 @@ export default class StateEditorElement extends HTMLElement {
 
     if (this.registers) {
       for (let i = 0, registers = this.registers; i < registers.length; i++) {
-        elements!.registers[i].value = registers[i]
+        elements.registers[i].value = registers[i]
           .toString(16)
           .padStart(4, "0")
           .toUpperCase();
@@ -92,7 +117,7 @@ export default class StateEditorElement extends HTMLElement {
 
     if (this.internalRegisters) {
       for (let i = 0, registers = this.internalRegisters; i < 4; i++) {
-        elements!.internalRegisters[i].value = registers[i]
+        elements.internalRegisters[i].value = registers[i]
           .toString(16)
           .padStart(4, "0")
           .toUpperCase();
@@ -107,26 +132,26 @@ export default class StateEditorElement extends HTMLElement {
   set frequency(value) {
     this.#frequency = value;
 
-    if (!this.#elements!.buttons) return;
+    if (!this.#elements.buttons) return;
 
     (
-      this.#elements!.buttons.frequency.nextSibling! as HTMLInputElement
-    ).innerText = FREQUENCIES[this.#elements!.buttons.frequency.valueAsNumber];
+      this.#elements.buttons.frequency.nextSibling! as HTMLInputElement
+    ).innerText = FREQUENCIES[this.#elements.buttons.frequency.valueAsNumber];
 
-    if (this.#elements!.buttons.frequency.valueAsNumber !== value) {
-      this.#elements!.buttons.frequency.value = value.toString();
+    if (this.#elements.buttons.frequency.valueAsNumber !== value) {
+      this.#elements.buttons.frequency.value = value.toString();
     }
   }
 
   set running(value: boolean) {
     // this.#running = value;
 
-    this.#elements!.buttons.stop.style.display = value ? "" : "none";
-    this.#elements!.buttons.play.style.display = value ? "none" : "";
+    this.#elements.buttons.stop.style.display = value ? "" : "none";
+    this.#elements.buttons.play.style.display = value ? "none" : "";
   }
 
   set files(fileNames: string[]) {
-    const select = this.#elements!.buttons.file;
+    const select = this.#elements.buttons.file;
     const value = select.value;
 
     while (select.lastElementChild) {
@@ -145,7 +170,7 @@ export default class StateEditorElement extends HTMLElement {
   }
 
   set entryFile(fileName: string) {
-    this.#elements!.buttons.file.value = fileName;
+    this.#elements.buttons.file.value = fileName;
   }
 }
 
@@ -155,8 +180,14 @@ declare global {
   interface HTMLElementTagNameMap {
     "state-editor": StateEditorElement;
   }
+
   interface HTMLElementEventMap {
     "change-frequency": ChangeFrequencyEvent;
     "change-file": ChangeFileEvent;
+    build: { detail: void };
+    next: { detail: void };
+    play: { detail: void };
+    stop: { detail: void };
+    reset: { detail: void };
   }
 }

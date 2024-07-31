@@ -7,8 +7,14 @@ interface DeleteFileEvent {
 }
 
 export default class FilePickerElement extends HTMLElement {
+  #filenames: string[] = [];
+
   constructor() {
     super();
+  }
+
+  connectedCallback() {
+    this.#update();
   }
 
   #generateFile(fileName: string) {
@@ -42,9 +48,9 @@ export default class FilePickerElement extends HTMLElement {
 
     {
       const button = document.createElement("button");
-      const icon = document.createElement("img");
+      const icon = document.createElement("svg-icon");
 
-      icon.src = "images/remove.png";
+      icon.name = "remove";
       button.append(icon);
       button.addEventListener("click", () => {
         this.dispatchEvent(
@@ -59,13 +65,21 @@ export default class FilePickerElement extends HTMLElement {
     return div;
   }
 
-  set files(fileNames: string[]) {
+  #update() {
     while (this.lastElementChild) {
       this.lastElementChild.remove();
     }
 
-    for (const fileName of fileNames) {
+    for (const fileName of this.#filenames) {
       this.appendChild(this.#generateFile(fileName));
+    }
+  }
+
+  set files(filenames: string[]) {
+    this.#filenames = filenames;
+
+    if (this.isConnected) {
+      this.#update();
     }
   }
 }
@@ -76,6 +90,7 @@ declare global {
   interface HTMLElementTagNameMap {
     "file-picker": FilePickerElement;
   }
+
   interface HTMLElementEventMap {
     "open-file": OpenFileEvent;
     "delete-file": DeleteFileEvent;

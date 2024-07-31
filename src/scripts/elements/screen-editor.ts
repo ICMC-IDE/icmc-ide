@@ -1,39 +1,38 @@
-import CharMap from "../charmap";
+import CharMap from "../resources/charmap";
 import ScreenViewerElement from "./screen-viewer";
 
 export default class ScreenEditorElement extends HTMLElement {
-  #chars: ScreenViewerElement | undefined;
-  #screen: ScreenViewerElement | undefined;
-  #colors: HTMLCanvasElement | undefined;
-  #coloredChar: ScreenViewerElement | undefined;
-  #color: number | undefined;
+  #chars: ScreenViewerElement;
+  #screen: ScreenViewerElement;
+  #colors: HTMLCanvasElement;
+  #coloredChar: ScreenViewerElement;
   #charmap: CharMap | undefined;
   #char = 65;
+  #color = 0;
+  #fragment: DocumentFragment;
 
   constructor() {
     super();
-  }
 
-  connectedCallback() {
     const screenEditorTemplate = document.getElementById(
       "screenEditorTemplate",
     )! as HTMLTemplateElement;
-    this.appendChild(screenEditorTemplate.content.cloneNode(true));
 
-    const viewers = this.querySelectorAll("screen-viewer");
+    const fragment = (this.#fragment = screenEditorTemplate.content.cloneNode(
+      true,
+    ) as DocumentFragment);
+
+    const viewers = fragment.querySelectorAll("screen-viewer");
 
     this.#chars = viewers[0] as ScreenViewerElement;
     this.#coloredChar = viewers[1] as ScreenViewerElement;
     this.#screen = viewers[2] as ScreenViewerElement;
-    this.#colors = this.querySelector("&>canvas")! as HTMLCanvasElement;
-
-    this.pickColor(0);
-    this.pickChar(65);
+    this.#colors = fragment.querySelector("canvas")! as HTMLCanvasElement;
 
     this.#colors.addEventListener("pointerdown", (event: PointerEvent) => {
-      const that = event.currentTarget as HTMLCanvasElement;
+      const canvas = event.currentTarget as HTMLCanvasElement;
 
-      const rect = that.getBoundingClientRect();
+      const rect = canvas.getBoundingClientRect();
       const x = ((event.clientX - rect.left) / 16) | 0;
       const y = ((event.clientY - rect.top) / 16) | 0;
 
@@ -42,21 +41,19 @@ export default class ScreenEditorElement extends HTMLElement {
 
     // FIXME
     this.#coloredChar.addEventListener("pointerdown", (event: PointerEvent) => {
-      const that = event.currentTarget as HTMLCanvasElement;
+      const canvas = event.currentTarget as HTMLCanvasElement;
 
-      const rect = that.getBoundingClientRect();
+      const rect = canvas.getBoundingClientRect();
       const x = ((event.clientX - rect.left) / 16) | 0;
       const y = ((event.clientY - rect.top) / 16) | 0;
-      const char = this.#char;
-      const charmap = this.#charmap;
 
-      charmap!.togglePixel(x % 8, 8 * char + y);
+      this.#charmap!.togglePixel(x % 8, 8 * this.#char + y);
     });
 
     this.#chars.addEventListener("pointerdown", (event: PointerEvent) => {
-      const that = event.currentTarget as HTMLCanvasElement;
+      const canvas = event.currentTarget as HTMLCanvasElement;
 
-      const rect = that.getBoundingClientRect();
+      const rect = canvas.getBoundingClientRect();
       const x = ((event.clientX - rect.left) / 16) | 0;
       const y = ((event.clientY - rect.top) / 16) | 0;
 
@@ -64,51 +61,48 @@ export default class ScreenEditorElement extends HTMLElement {
     });
 
     this.#screen.addEventListener("pointerdown", (event: PointerEvent) => {
-      const that = event.currentTarget as HTMLCanvasElement;
+      const canvas = event.currentTarget as HTMLCanvasElement;
 
-      const rect = that.getBoundingClientRect();
+      const rect = canvas.getBoundingClientRect();
       const x = ((event.clientX - rect.left) / 16) | 0;
       const y = ((event.clientY - rect.top) / 16) | 0;
 
-      this.#screen!.updateCell(
-        that.width * y + x,
-        this.#char | (this.#color! << 8),
+      this.#screen.updateCell(
+        canvas.width * y + x,
+        this.#char | (this.#color << 8),
       );
     });
   }
 
-  disconnectedCallback() {
-    this.#screen = undefined;
-    this.#chars = undefined;
-
-    while (this.lastElementChild) {
-      this.lastElementChild.remove();
-    }
+  connectedCallback() {
+    this.appendChild(this.#fragment); // this.#fragment becomes an empty array after being appended. so there is no problem doing it multiple times
   }
 
   render() {
-    this.#chars!.render();
-    this.#screen!.render();
-    this.#coloredChar!.render();
+    if (!this.isConnected) return;
+
+    this.#chars.render();
+    this.#screen.render();
+    this.#coloredChar.render();
   }
 
   pickColor(color: number) {
     this.#color = color;
 
     for (let byte = 0; byte < 0x100; byte++) {
-      this.#chars!.updateCell(byte, (color << 8) | byte);
+      this.#chars.updateCell(byte, (color << 8) | byte);
     }
 
-    this.#coloredChar!.updateCell(0, (color << 8) | this.#char);
+    this.#coloredChar.updateCell(0, (color << 8) | this.#char);
   }
 
   pickChar(char: number) {
     this.#char = char;
-    this.#coloredChar!.updateCell(0, (this.#color! << 8) | char);
+    this.#coloredChar.updateCell(0, (this.#color << 8) | char);
   }
 
   #generatePalette(palette: string[]) {
-    const ctx = this.#colors!.getContext("2d")!;
+    const ctx = this.#colors.getContext("2d")!;
 
     for (let y = 0, i = 0; i < palette.length; y++) {
       for (let x = 0; x < 8; x++, i++) {
@@ -120,9 +114,9 @@ export default class ScreenEditorElement extends HTMLElement {
 
   set charmap(value: CharMap) {
     this.#charmap = value;
-    this.#screen!.charmap = value;
-    this.#chars!.charmap = value;
-    this.#coloredChar!.charmap = value;
+    this.#screen.charmap = value;
+    this.#chars.charmap = value;
+    this.#coloredChar.charmap = value;
     this.#generatePalette(value.colorPalette);
   }
 
@@ -139,7 +133,7 @@ export default class ScreenEditorElement extends HTMLElement {
   }
 
   get width() {
-    return this.#screen!.width;
+    return this.#screen.width;
   }
 
   set height(value) {
@@ -151,7 +145,7 @@ export default class ScreenEditorElement extends HTMLElement {
   }
 
   get height() {
-    return this.#screen!.height;
+    return this.#screen.height;
   }
 }
 

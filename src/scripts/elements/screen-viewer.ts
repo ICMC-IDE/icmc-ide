@@ -1,12 +1,12 @@
-import CharMap from "../charmap.js";
+import CharMap from "../resources/charmap.js";
 import Renderer from "../renderer.js";
 
 export default class ScreenViewerElement extends HTMLElement {
   #canvas = document.createElement("canvas");
   #renderer: Renderer | undefined;
 
-  #width: number = 0;
-  #height: number = 0;
+  #width: number = 1;
+  #height: number = 1;
   shouldUpdate = false;
 
   memory = new Uint16Array(0x10000);
@@ -34,12 +34,6 @@ export default class ScreenViewerElement extends HTMLElement {
     this.appendChild(div);
   }
 
-  disconnectedCallback() {
-    while (this.lastElementChild) {
-      this.lastElementChild.remove();
-    }
-  }
-
   attributeChangedCallback() {
     // ...args
     console.log("ScreenViewer::attributeChangedCallback"); // ...args
@@ -51,12 +45,16 @@ export default class ScreenViewerElement extends HTMLElement {
   }
 
   render() {
-    if (!this.shouldUpdate) return;
-    this.shouldUpdate = false;
+    if (!this.shouldUpdate || !this.isConnected) return;
 
-    console.log(this.memory.length);
-
-    this.#renderer!.render(this.memory.slice(0, this.#width * this.#height));
+    if (this.#renderer) {
+      this.shouldUpdate = false;
+      this.#renderer.render(
+        this.memory.subarray(0, this.#width * this.#height),
+      );
+    } else {
+      console.log("fuck");
+    }
   }
 
   clear() {
@@ -64,19 +62,6 @@ export default class ScreenViewerElement extends HTMLElement {
   }
 
   #resize() {
-    const newMemory = new Uint16Array(this.#width * this.#height);
-
-    if (this.memory) {
-      const memory = this.memory;
-      const length = Math.min(newMemory.length, memory.length);
-
-      for (let i = 0; i < length; i++) {
-        newMemory[i] = memory[i];
-      }
-    }
-
-    this.memory = newMemory;
-
     if (this.#renderer) {
       this.#renderer.resize(this.#width, this.#height);
     }
@@ -119,6 +104,7 @@ export default class ScreenViewerElement extends HTMLElement {
     } else {
       this.#renderer.charmap = value;
     }
+
     this.shouldUpdate = true;
 
     value.subscribe(() => {

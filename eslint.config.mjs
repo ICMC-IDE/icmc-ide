@@ -14,6 +14,7 @@ export default [
       prettier: prettierPlugin,
     },
     rules: {
+      "@typescript-eslint/no-explicit-any": "off",
       ...prettierPlugin.configs.recommended.rules,
       ...eslintConfigPrettier.rules,
     },
