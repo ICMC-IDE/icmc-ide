@@ -1,9 +1,12 @@
+import Fs from "resources/fs.js";
 import TextEditorElement from "../elements/text-editor.js";
 import Fenster from "../fenster.js";
 import { WindowConstructor } from "windows";
 
 export default class SourceEditorWindow extends Fenster<TextEditorElement> {
-  constructor({ style }: WindowConstructor) {
+  #fs: Fs;
+
+  constructor({ style, globalState }: WindowConstructor) {
     const body = document.createElement("text-editor");
     const title = document.createElement("span");
     const buttonsRight = [];
@@ -37,9 +40,14 @@ export default class SourceEditorWindow extends Fenster<TextEditorElement> {
       style,
       buttonsRight,
     });
+
+    this.#fs = globalState.resources.get("fs");
   }
 
-  set model(model: monaco.editor.ITextModel) {
+  setModel(model: monaco.editor.ITextModel, filename: string) {
+    model.onDidChangeContent(() => {
+      this.#fs.write(filename, model.getValue());
+    });
     this.body.model = model;
   }
 }

@@ -97,7 +97,7 @@ setInterval(function () {
 interface Message {
   id: number;
   error?: string;
-  content?: any;
+  content?: ReturnType<(typeof actions)[keyof typeof actions]>;
 }
 
 const fs = {
@@ -167,7 +167,11 @@ self.addEventListener(
   function ({
     data: { type, id, content },
   }: {
-    data: { type: keyof typeof actions; id: number; content: any };
+    data: {
+      type: keyof typeof actions;
+      id: number;
+      content: Parameters<(typeof actions)[keyof typeof actions]>;
+    };
   }) {
     const message: Message = { id };
 
@@ -179,8 +183,8 @@ self.addEventListener(
       } else {
         message.error = `Unknown request type '${type}' with id ${id}`;
       }
-    } catch (error: any) {
-      message.error = error.toString();
+    } catch (error: unknown) {
+      message.error = error!.toString();
     }
 
     self.postMessage({

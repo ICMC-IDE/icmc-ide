@@ -60,7 +60,7 @@ function openFile(filename: string) {
     globalState,
   });
 
-  editor.model = modelCache[filename];
+  editor.setModel(modelCache[filename], filename);
 }
 
 async function createCharmap() {

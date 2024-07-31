@@ -111,7 +111,7 @@ export default class Renderer {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.#charsVbo!);
     gl.bufferData(
       gl.ARRAY_BUFFER,
-      new Uint8Array(memory.buffer),
+      new Uint8Array(memory.buffer, memory.byteOffset),
       gl.STATIC_DRAW,
     );
 

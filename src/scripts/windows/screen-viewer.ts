@@ -54,8 +54,8 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
         "screen-height",
       );
 
-      body.width = width;
-      body.height = height;
+      body.width = width!;
+      body.height = height!;
 
       body.charmap = resources.get("charmap");
 

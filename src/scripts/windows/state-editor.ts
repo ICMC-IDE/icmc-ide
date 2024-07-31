@@ -54,10 +54,10 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
               resources.set("internal-registers", internalRegisters);
               resources.set("symbols", symbols);
 
-              fs.write(entry.replace(/\.[^.]+$/, ".mif"), mif);
+              fs.write(entry!.replace(/\.[^.]+$/, ".mif"), mif);
 
               if (asm) {
-                fs.write(entry.replace(/\.[^.]+$/, ".asm"), asm);
+                fs.write(entry!.replace(/\.[^.]+$/, ".asm"), asm);
               }
             },
           )
