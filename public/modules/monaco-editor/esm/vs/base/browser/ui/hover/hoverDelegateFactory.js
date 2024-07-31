@@ -11,15 +11,18 @@ const nullHoverDelegateFactory = () => ({
 let hoverDelegateFactory = nullHoverDelegateFactory;
 const defaultHoverDelegateMouse = new Lazy(() => hoverDelegateFactory('mouse', false));
 const defaultHoverDelegateElement = new Lazy(() => hoverDelegateFactory('element', false));
+// TODO: Remove when getDefaultHoverDelegate is no longer used
 export function setHoverDelegateFactory(hoverDelegateProvider) {
     hoverDelegateFactory = hoverDelegateProvider;
 }
+// TODO: Refine type for use in new IHoverService interface
 export function getDefaultHoverDelegate(placement) {
     if (placement === 'element') {
         return defaultHoverDelegateElement.value;
     }
     return defaultHoverDelegateMouse.value;
 }
+// TODO: Create equivalent in IHoverService
 export function createInstantHoverDelegate() {
     // Creates a hover delegate with instant hover enabled.
     // This hover belongs to the consumer and requires the them to dispose it.

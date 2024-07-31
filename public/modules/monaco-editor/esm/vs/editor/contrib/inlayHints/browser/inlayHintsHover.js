@@ -18,7 +18,7 @@ import { ModelDecorationInjectedTextOptions } from '../../../common/model/textMo
 import { HoverForeignElementAnchor } from '../../hover/browser/hoverTypes.js';
 import { ILanguageService } from '../../../common/languages/language.js';
 import { ITextModelService } from '../../../common/services/resolverService.js';
-import { getHover } from '../../hover/browser/getHover.js';
+import { getHoverProviderResultsAsAsyncIterable } from '../../hover/browser/getHover.js';
 import { MarkdownHover, MarkdownHoverParticipant } from '../../hover/browser/markdownHoverParticipant.js';
 import { RenderedInlayHintLabelPart, InlayHintsController } from './inlayHintsController.js';
 import { IConfigurationService } from '../../../../platform/configuration/common/configuration.js';
@@ -28,6 +28,8 @@ import { localize } from '../../../../nls.js';
 import * as platform from '../../../../base/common/platform.js';
 import { asCommandLink } from './inlayHints.js';
 import { isNonEmptyArray } from '../../../../base/common/arrays.js';
+import { IKeybindingService } from '../../../../platform/keybinding/common/keybinding.js';
+import { IHoverService } from '../../../../platform/hover/browser/hover.js';
 class InlayHintsHoverAnchor extends HoverForeignElementAnchor {
     constructor(part, owner, initialMousePosX, initialMousePosY) {
         super(10, owner, part.item.anchor.range, initialMousePosX, initialMousePosY, true);
@@ -35,8 +37,8 @@ class InlayHintsHoverAnchor extends HoverForeignElementAnchor {
     }
 }
 let InlayHintsHover = class InlayHintsHover extends MarkdownHoverParticipant {
-    constructor(editor, languageService, openerService, configurationService, _resolverService, languageFeaturesService) {
-        super(editor, languageService, openerService, configurationService, languageFeaturesService);
+    constructor(editor, languageService, openerService, keybindingService, hoverService, configurationService, _resolverService, languageFeaturesService) {
+        super(editor, languageService, openerService, configurationService, languageFeaturesService, keybindingService, hoverService);
         this._resolverService = _resolverService;
         this.hoverOrdinal = 6;
     }
@@ -136,7 +138,7 @@ let InlayHintsHover = class InlayHintsHover extends MarkdownHoverParticipant {
             if (!this._languageFeaturesService.hoverProvider.has(model)) {
                 return AsyncIterableObject.EMPTY;
             }
-            return getHover(this._languageFeaturesService.hoverProvider, model, new Position(range.startLineNumber, range.startColumn), token)
+            return getHoverProviderResultsAsAsyncIterable(this._languageFeaturesService.hoverProvider, model, new Position(range.startLineNumber, range.startColumn), token)
                 .filter(item => !isEmptyMarkdownString(item.hover.contents))
                 .map(item => new MarkdownHover(this, part.item.anchor.range, item.hover.contents, false, 2 + item.ordinal));
         }
@@ -148,8 +150,10 @@ let InlayHintsHover = class InlayHintsHover extends MarkdownHoverParticipant {
 InlayHintsHover = __decorate([
     __param(1, ILanguageService),
     __param(2, IOpenerService),
-    __param(3, IConfigurationService),
-    __param(4, ITextModelService),
-    __param(5, ILanguageFeaturesService)
+    __param(3, IKeybindingService),
+    __param(4, IHoverService),
+    __param(5, IConfigurationService),
+    __param(6, ITextModelService),
+    __param(7, ILanguageFeaturesService)
 ], InlayHintsHover);
 export { InlayHintsHover };

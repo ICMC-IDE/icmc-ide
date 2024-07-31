@@ -3,8 +3,8 @@ import { BaseActionViewItem } from '../actionbar/actionViewItems.js';
 import { DropdownMenu } from './dropdown.js';
 import { Emitter } from '../../../common/event.js';
 import './dropdown.css';
-import { setupCustomHover } from '../hover/updatableHoverWidget.js';
 import { getDefaultHoverDelegate } from '../hover/hoverDelegateFactory.js';
+import { getBaseLayerHoverDelegate } from '../hover/hoverDelegate2.js';
 export class DropdownMenuActionViewItem extends BaseActionViewItem {
     constructor(action, menuActionsOrProvider, contextMenuProvider, options = Object.create(null)) {
         super(null, action, options);
@@ -39,7 +39,7 @@ export class DropdownMenuActionViewItem extends BaseActionViewItem {
             this.element.setAttribute('aria-haspopup', 'true');
             this.element.setAttribute('aria-expanded', 'false');
             if (this._action.label) {
-                this._register(setupCustomHover((_a = this.options.hoverDelegate) !== null && _a !== void 0 ? _a : getDefaultHoverDelegate('mouse'), this.element, this._action.label));
+                this._register(getBaseLayerHoverDelegate().setupUpdatableHover((_a = this.options.hoverDelegate) !== null && _a !== void 0 ? _a : getDefaultHoverDelegate('mouse'), this.element, this._action.label));
             }
             this.element.ariaLabel = this._action.label || '';
             return null;

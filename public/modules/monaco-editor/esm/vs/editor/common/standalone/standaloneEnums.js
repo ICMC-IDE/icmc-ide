@@ -363,6 +363,17 @@ export var GlyphMarginLane;
     GlyphMarginLane[GlyphMarginLane["Center"] = 2] = "Center";
     GlyphMarginLane[GlyphMarginLane["Right"] = 3] = "Right";
 })(GlyphMarginLane || (GlyphMarginLane = {}));
+export var HoverVerbosityAction;
+(function (HoverVerbosityAction) {
+    /**
+     * Increase the verbosity of the hover
+     */
+    HoverVerbosityAction[HoverVerbosityAction["Increase"] = 0] = "Increase";
+    /**
+     * Decrease the verbosity of the hover
+     */
+    HoverVerbosityAction[HoverVerbosityAction["Decrease"] = 1] = "Decrease";
+})(HoverVerbosityAction || (HoverVerbosityAction = {}));
 /**
  * Describes what to do with the indentation when pressing Enter.
  */
@@ -719,6 +730,11 @@ export var NewSymbolNameTag;
 (function (NewSymbolNameTag) {
     NewSymbolNameTag[NewSymbolNameTag["AIGenerated"] = 1] = "AIGenerated";
 })(NewSymbolNameTag || (NewSymbolNameTag = {}));
+export var NewSymbolNameTriggerKind;
+(function (NewSymbolNameTriggerKind) {
+    NewSymbolNameTriggerKind[NewSymbolNameTriggerKind["Invoke"] = 0] = "Invoke";
+    NewSymbolNameTriggerKind[NewSymbolNameTriggerKind["Automatic"] = 1] = "Automatic";
+})(NewSymbolNameTriggerKind || (NewSymbolNameTriggerKind = {}));
 /**
  * A positioning preference for rendering overlay widgets.
  */

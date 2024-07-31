@@ -26,33 +26,89 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
 
       body.addEventListener("build", () => {
         const fs = resources.get("fs");
+        const files = fs.all();
+        const [entry, syntax] = configManager.getMany("entry-file", "syntax");
 
         resources
           .get("main-worker")
           .request("build", {
-            files: fs.all(),
-            entry: configManager.get("entry-file"),
-            syntax: configManager.get("syntax"),
+            files,
+            entry,
+            syntax,
           })
-          .then(() => {})
-          .catch(() => {})
+          .then(
+            ({
+              ram,
+              vram,
+              symbols,
+              registers,
+              internalRegisters,
+              asm,
+              mif,
+            }) => {
+              const fs = resources.get("fs");
+
+              resources.set("ram", ram);
+              resources.set("vram", vram);
+              resources.set("registers", registers);
+              resources.set("internal-registers", internalRegisters);
+              resources.set("symbols", symbols);
+
+              fs.write(entry.replace(/\.[^.]+$/, ".mif"), mif);
+
+              if (asm) {
+                fs.write(entry.replace(/\.[^.]+$/, ".asm"), asm);
+              }
+            },
+          )
+          .catch((error) => {
+            eventManager.emmit("error", error);
+          })
           .finally(() => {});
       });
 
       body.addEventListener("play", () => {
-        //
+        resources
+          .get("main-worker")
+          .request("play", undefined)
+          .then(() => {})
+          .catch((error) => {
+            eventManager.emmit("error", error);
+          })
+          .finally(() => {});
       });
 
       body.addEventListener("stop", () => {
-        //
+        resources
+          .get("main-worker")
+          .request("stop", undefined)
+          .then(() => {})
+          .catch((error) => {
+            eventManager.emmit("error", error);
+          })
+          .finally(() => {});
       });
 
       body.addEventListener("next", () => {
-        //
+        resources
+          .get("main-worker")
+          .request("next", undefined)
+          .then(() => {})
+          .catch((error) => {
+            eventManager.emmit("error", error);
+          })
+          .finally(() => {});
       });
 
       body.addEventListener("reset", () => {
-        //
+        resources
+          .get("main-worker")
+          .request("reset", undefined)
+          .then(() => {})
+          .catch((error) => {
+            eventManager.emmit("error", error);
+          })
+          .finally(() => {});
       });
 
       body.files = resources
@@ -99,7 +155,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       body.registers = registers;
     });
 
-    resources.subscribe("internalRegisters", (registers) => {
+    resources.subscribe("internal-registers", (registers) => {
       body.internalRegisters = registers;
     });
   }

@@ -6,21 +6,25 @@
 
     --hue: 230;
 
-    --source-color: oklch(21.5% 0 230 / 1);
+    --source-color: oklch(21.5% 0 280 / 1);
 
-    --black: oklch(15% 0 230 / 1);
+    --black: oklch(from var(--source-color) 15% c h);
 
-    --gray-3: oklch(from var(--source-color) calc(l / 1.2 / 1.2 / 1.2) c h);
-    --gray-2: oklch(from var(--source-color) calc(l / 1.2 / 1.2) c h);
-    --gray-1: oklch(from var(--source-color) calc(l / 1.2) c h);
+    --gray-5: oklch(from var(--gray-4) calc(l / 1.2) c h);
+    --gray-4: oklch(from var(--gray-3) calc(l / 1.2) c h);
+    --gray-3: oklch(from var(--gray-2) calc(l / 1.2) c h);
+    --gray-2: oklch(from var(--gray-1) calc(l / 1.2) c h);
+    --gray-1: oklch(from var(--gray0) calc(l / 1.2) c h);
 
     --gray0: oklch(from var(--source-color) l c h);
 
-    --gray1: oklch(from var(--source-color) calc(l * 1.2) c h);
-    --gray2: oklch(from var(--source-color) calc(l * 1.2 * 1.2) c h);
-    --gray3: oklch(from var(--source-color) calc(l * 1.2 * 1.2 * 1.2) c h);
+    --gray1: oklch(from var(--gray0) calc(l * 1.2) c h);
+    --gray2: oklch(from var(--gray1) calc(l * 1.2) c h);
+    --gray3: oklch(from var(--gray2) calc(l * 1.2) c h);
+    --gray4: oklch(from var(--gray3) calc(l * 1.2) c h);
+    --gray5: oklch(from var(--gray4) calc(l * 1.2) c h);
 
-    --white: oklch(87.5% 0 230 / 1);
+    --white: oklch(from var(--source-color) 87.5% c h);
 
     /* font-size: 12px; */
   }
@@ -28,9 +32,11 @@
   * {
     box-sizing: border-box;
     font-size: inherit;
+    color: inherit;
   }
 
   body {
+    color: oklch(from var(--source-color) 100% c h / 0.95);
     background-color: var(--gray-1);
 
     inset: 0;
@@ -67,6 +73,31 @@
     border: solid 1px var(--gray3);
   }
 
+  input:focus {
+    outline: 0.125em solid var(--gray5);
+    outline-offset: 0.125em;
+  }
+
+  fieldset {
+    margin-inline: -0.5em;
+    padding: 0.5em;
+    border: solid 1px var(--gray1);
+    background-color: var(--gray-1);
+
+    & select,
+    & input,
+    & button {
+      background-color: var(--gray0);
+      border-color: var(--gray1);
+    }
+
+    & legend {
+      background-color: inherit;
+      border: inherit;
+      padding: 0.25em;
+    }
+  }
+
   input[type="text"] {
     width: calc(4ch + 0.5em + 0.125em);
   }
@@ -81,6 +112,67 @@
     & img {
       aspect-ratio: 1;
       height: 1em;
+    }
+  }
+
+  input[type="range"] {
+    border: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+
+    /*
+    &::-webkit-slider-runnable-track {
+      background-color: var(--gray2);
+      border: solid 1px var(--gray3);
+      height: 0.25em;
+    }
+    */
+
+    /*
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      margin-top: -1em;
+
+      background-color: var(--gray4);
+      border: solid 1px var(--gray5);
+      border-radius: 0.5em;
+      height: 1em;
+      width: 1em;
+    }
+    */
+
+    &::-moz-range-track {
+      background-color: var(--gray2);
+      border: solid 1px var(--gray3);
+      height: 0.125em;
+    }
+
+    &::-moz-range-thumb {
+      background-color: var(--gray4);
+      border: solid 1px var(--gray5);
+      border-radius: 100%;
+      height: 1em;
+      width: 1em;
+    }
+
+    &:focus {
+      outline: none;
+
+      /*
+      &::-webkit-slider-thumb {
+        outline: 3px solid #808080;
+        outline-offset: 0.125rem;
+      }
+      */
+
+      &::-moz-range-thumb {
+        outline: 0.125em solid var(--gray5);
+        outline-offset: 0.125em;
+      }
     }
   }
 }
@@ -99,12 +191,9 @@
 */
 
 @layer elements {
-  memory-editor {
-    overflow: auto;
-  }
-
   log-viewer {
     overflow: auto;
+    padding: 0.25em;
   }
 
   screen-editor {
@@ -179,22 +268,41 @@
   }
 
   state-editor {
+    min-width: fit-content;
+    max-width: fit-content;
+
+    min-height: fit-content;
+    max-height: fit-content;
+
     display: inline-flex;
     flex-direction: column;
     align-items: start;
     gap: 0.25em;
     padding: 0.25em;
 
+    & label span {
+      display: inline-block;
+
+      width: 4ch;
+    }
+
     & form {
       display: flex;
       flex-direction: column;
       gap: 0.25em;
+      width: 100%;
     }
 
     & div {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       flex-direction: row;
       gap: 0.25em;
+
+      & select,
+      & input[type="range"] {
+        grid-column-end: span 3;
+      }
     }
   }
 
@@ -218,10 +326,13 @@
   }
 
   memory-editor {
+    overflow: auto;
     flex-grow: 1;
     contain: strict;
 
-    min-width: calc(17 * (5ch + 1em) - 1ch);
+    min-width: calc(9 * (5ch + 1em) - 1ch);
+    max-width: calc(17 * (5ch + 1em) - 1ch);
+
     min-height: 10em;
 
     & .memory {
@@ -242,6 +353,8 @@
         background-color: var(--gray-1);
         overflow: hidden;
         gap: 0.25em;
+        container-type: inline-size;
+        container-name: region;
       }
 
       & .address {
@@ -256,7 +369,7 @@
 
       & .hex {
         position: relative;
-        grid-template-columns: repeat(16, calc(4ch + 0.5em));
+        grid-template-columns: repeat(8, calc(4ch + 0.5em));
 
         & span {
           &:nth-of-type(2n) {
@@ -282,10 +395,24 @@
       }
 
       & .ascii {
-        grid-template-columns: repeat(16, 1fr);
+        grid-template-columns: repeat(8, calc(1ch + 0.5em));
 
         & span {
           width: calc(1ch + 0.5em);
+        }
+      }
+
+      @container region (width >= calc((5ch + 1em) * 17 - 1ch)) {
+        .hex {
+          grid-template-columns: repeat(16, calc(4ch + 0.5em));
+        }
+
+        .ascii {
+          grid-template-columns: repeat(16, calc(1ch + 0.5em));
+        }
+
+        .address span:nth-child(2n) {
+          display: none;
         }
       }
 
@@ -325,14 +452,6 @@
 
     min-width: 30ch;
     min-height: 20em;
-  }
-
-  state-editor {
-    min-width: fit-content;
-    max-width: fit-content;
-
-    min-height: fit-content;
-    max-height: fit-content;
   }
 
   log-viewer {
@@ -423,11 +542,6 @@
     aspect-ratio: 1;
     fill: currentColor;
   }
-}
-
-.frequency {
-  display: flex;
-  align-items: center;
 }
 
 @layer fenster {

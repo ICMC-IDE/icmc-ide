@@ -80,8 +80,10 @@ export function prependRemoveOnDispose(parent, child) {
 export class ObservableElementSizeObserver extends Disposable {
     get width() { return this._width; }
     get height() { return this._height; }
+    get automaticLayout() { return this._automaticLayout; }
     constructor(element, dimension) {
         super();
+        this._automaticLayout = false;
         this.elementSizeObserver = this._register(new ElementSizeObserver(element, dimension));
         this._width = observableValue(this, this.elementSizeObserver.getWidth());
         this._height = observableValue(this, this.elementSizeObserver.getHeight());
@@ -95,6 +97,7 @@ export class ObservableElementSizeObserver extends Disposable {
         this.elementSizeObserver.observe(dimension);
     }
     setAutomaticLayout(automaticLayout) {
+        this._automaticLayout = automaticLayout;
         if (automaticLayout) {
             this.elementSizeObserver.startObserving();
         }
@@ -343,12 +346,6 @@ function lengthBetweenPositions(position1, position2) {
     else {
         return new TextLength(position2.lineNumber - position1.lineNumber, position2.column - 1);
     }
-}
-export function bindContextKey(key, service, computeValue) {
-    const boundKey = key.bindTo(service);
-    return autorunOpts({ debugName: () => `Set Context Key "${key.key}"` }, reader => {
-        boundKey.set(computeValue(reader));
-    });
 }
 export function filterWithPrevious(arr, filter) {
     let prev;

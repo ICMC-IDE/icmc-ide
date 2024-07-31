@@ -5,11 +5,13 @@
 import './iconlabel.css';
 import * as dom from '../../dom.js';
 import { HighlightedLabel } from '../highlightedlabel/highlightedLabel.js';
-import { setupCustomHover, setupNativeHover } from '../hover/updatableHoverWidget.js';
 import { Disposable } from '../../../common/lifecycle.js';
 import { equals } from '../../../common/objects.js';
 import { Range } from '../../../common/range.js';
 import { getDefaultHoverDelegate } from '../hover/hoverDelegateFactory.js';
+import { getBaseLayerHoverDelegate } from '../hover/hoverDelegate2.js';
+import { isString } from '../../../common/types.js';
+import { stripIcons } from '../../../common/iconLabels.js';
 class FastLabelNode {
     constructor(_element) {
         this._element = _element;
@@ -89,6 +91,21 @@ export class IconLabel extends Disposable {
                 }
             }
         }
+        const existingIconNode = this.domNode.element.querySelector('.monaco-icon-label-iconpath');
+        if (options === null || options === void 0 ? void 0 : options.iconPath) {
+            let iconNode;
+            if (!existingIconNode || !(dom.isHTMLElement(existingIconNode))) {
+                iconNode = dom.$('.monaco-icon-label-iconpath');
+                this.domNode.element.prepend(iconNode);
+            }
+            else {
+                iconNode = existingIconNode;
+            }
+            iconNode.style.backgroundImage = dom.asCSSUrl(options === null || options === void 0 ? void 0 : options.iconPath);
+        }
+        else if (existingIconNode) {
+            existingIconNode.remove();
+        }
         this.domNode.className = labelClasses.join(' ');
         this.domNode.element.setAttribute('aria-label', ariaLabel);
         this.labelContainer.className = containerClasses.join(' ');
@@ -122,10 +139,22 @@ export class IconLabel extends Disposable {
             return;
         }
         if (this.hoverDelegate.showNativeHover) {
+            function setupNativeHover(htmlElement, tooltip) {
+                if (isString(tooltip)) {
+                    // Icons don't render in the native hover so we strip them out
+                    htmlElement.title = stripIcons(tooltip);
+                }
+                else if (tooltip === null || tooltip === void 0 ? void 0 : tooltip.markdownNotSupportedFallback) {
+                    htmlElement.title = tooltip.markdownNotSupportedFallback;
+                }
+                else {
+                    htmlElement.removeAttribute('title');
+                }
+            }
             setupNativeHover(htmlElement, tooltip);
         }
         else {
-            const hoverDisposable = setupCustomHover(this.hoverDelegate, htmlElement, tooltip);
+            const hoverDisposable = getBaseLayerHoverDelegate().setupUpdatableHover(this.hoverDelegate, htmlElement, tooltip);
             if (hoverDisposable) {
                 this.customHovers.set(htmlElement, hoverDisposable);
             }

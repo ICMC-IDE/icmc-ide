@@ -889,6 +889,9 @@ export class ViewModel extends Disposable {
             this._eventDispatcher.endEmitViewEvents();
         }
     }
+    batchEvents(callback) {
+        this._withViewEventsCollector(() => { callback(); });
+    }
     normalizePosition(position, affinity) {
         return this._lines.normalizePosition(position, affinity);
     }

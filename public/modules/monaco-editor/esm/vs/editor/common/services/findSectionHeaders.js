@@ -2,7 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-const markRegex = /\bMARK:\s*(.*)$/d;
+const markRegex = new RegExp('\\bMARK:\\s*(.*)$', 'd');
 const trimDashesRegex = /^-+|-+$/g;
 /**
  * Find section headers in the model.

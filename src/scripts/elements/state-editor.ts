@@ -39,8 +39,8 @@ export default class StateEditorElement extends HTMLElement {
   #frequency = 6;
   #fragment: DocumentFragment;
 
-  registers: Uint16Array | null = null;
-  internalRegisters: Uint16Array | null = null;
+  registers: Uint16Array = new Uint16Array(8);
+  internalRegisters: Uint16Array = new Uint16Array(64);
 
   constructor() {
     super();
@@ -104,20 +104,26 @@ export default class StateEditorElement extends HTMLElement {
   }
 
   render() {
-    const elements = this.#elements;
+    {
+      const elements = this.#elements.registers;
 
-    if (this.registers) {
-      for (let i = 0, registers = this.registers; i < registers.length; i++) {
-        elements.registers[i].value = registers[i]
+      for (let i = 0, registers = this.registers; i < elements.length; i++) {
+        elements[i].value = registers[i]
           .toString(16)
           .padStart(4, "0")
           .toUpperCase();
       }
     }
 
-    if (this.internalRegisters) {
-      for (let i = 0, registers = this.internalRegisters; i < 4; i++) {
-        elements.internalRegisters[i].value = registers[i]
+    {
+      const elements = this.#elements.internalRegisters;
+
+      for (
+        let i = 0, registers = this.internalRegisters;
+        i < elements.length;
+        i++
+      ) {
+        elements[i].value = registers[i]
           .toString(16)
           .padStart(4, "0")
           .toUpperCase();

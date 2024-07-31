@@ -11,27 +11,20 @@ export default class ScreenViewerElement extends HTMLElement {
 
   memory = new Uint16Array(0x10000);
 
+  #fragment = new DocumentFragment();
+
   constructor() {
     super();
+
+    const fragment = this.#fragment;
+    const div = document.createElement("div");
+
+    div.appendChild(this.#canvas);
+    fragment.appendChild(div);
   }
 
   connectedCallback() {
-    const div = document.createElement("div");
-    if (this.attributes.getNamedItem("width")) {
-      this.width = parseInt(this.attributes.getNamedItem("width")!.value);
-    } else {
-      this.width = 40;
-    }
-
-    if (this.attributes.getNamedItem("height")) {
-      this.height = parseInt(this.attributes.getNamedItem("height")!.value);
-    } else {
-      this.height = 30;
-    }
-
-    this.#resize();
-    div.appendChild(this.#canvas);
-    this.appendChild(div);
+    this.appendChild(this.#fragment);
   }
 
   attributeChangedCallback() {
@@ -53,7 +46,7 @@ export default class ScreenViewerElement extends HTMLElement {
         this.memory.subarray(0, this.#width * this.#height),
       );
     } else {
-      console.log("fuck");
+      // unreachable (in theory)
     }
   }
 

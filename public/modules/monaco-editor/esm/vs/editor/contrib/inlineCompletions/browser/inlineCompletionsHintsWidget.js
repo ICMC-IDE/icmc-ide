@@ -20,7 +20,8 @@ import { equals } from '../../../../base/common/arrays.js';
 import { RunOnceScheduler } from '../../../../base/common/async.js';
 import { Codicon } from '../../../../base/common/codicons.js';
 import { Disposable, toDisposable } from '../../../../base/common/lifecycle.js';
-import { autorun, autorunWithStore, derived, observableFromEvent } from '../../../../base/common/observable.js';
+import { autorun, autorunWithStore, derived, derivedObservableWithCache, observableFromEvent } from '../../../../base/common/observable.js';
+import { derivedWithStore } from '../../../../base/common/observableInternal/derived.js';
 import { OS } from '../../../../base/common/platform.js';
 import { ThemeIcon } from '../../../../base/common/themables.js';
 import './inlineCompletionsHintsWidget.css';
@@ -67,17 +68,26 @@ let InlineCompletionsHintsWidget = class InlineCompletionsHintsWidget extends Di
             if (!model || !this.alwaysShowToolbar.read(reader)) {
                 return;
             }
-            const contentWidget = store.add(this.instantiationService.createInstance(InlineSuggestionHintsContentWidget, this.editor, true, this.position, model.selectedInlineCompletionIndex, model.inlineCompletionsCount, model.selectedInlineCompletion.map(v => /** @description commands */ { var _a; /** @description commands */ return (_a = v === null || v === void 0 ? void 0 : v.inlineCompletion.source.inlineCompletions.commands) !== null && _a !== void 0 ? _a : []; })));
-            editor.addContentWidget(contentWidget);
-            store.add(toDisposable(() => editor.removeContentWidget(contentWidget)));
+            const contentWidgetValue = derivedWithStore((reader, store) => {
+                const contentWidget = store.add(this.instantiationService.createInstance(InlineSuggestionHintsContentWidget, this.editor, true, this.position, model.selectedInlineCompletionIndex, model.inlineCompletionsCount, model.activeCommands));
+                editor.addContentWidget(contentWidget);
+                store.add(toDisposable(() => editor.removeContentWidget(contentWidget)));
+                store.add(autorun(reader => {
+                    /** @description request explicit */
+                    const position = this.position.read(reader);
+                    if (!position) {
+                        return;
+                    }
+                    if (model.lastTriggerKind.read(reader) !== InlineCompletionTriggerKind.Explicit) {
+                        model.triggerExplicitly();
+                    }
+                }));
+                return contentWidget;
+            });
+            const hadPosition = derivedObservableWithCache(this, (reader, lastValue) => !!this.position.read(reader) || !!lastValue);
             store.add(autorun(reader => {
-                /** @description request explicit */
-                const position = this.position.read(reader);
-                if (!position) {
-                    return;
-                }
-                if (model.lastTriggerKind.read(reader) !== InlineCompletionTriggerKind.Explicit) {
-                    model.triggerExplicitly();
+                if (hadPosition.read(reader)) {
+                    contentWidgetValue.read(reader);
                 }
             }));
         }));
@@ -130,7 +140,6 @@ let InlineSuggestionHintsContentWidget = InlineSuggestionHintsContentWidget_1 = 
         this.disableButtonsDebounced = this._register(new RunOnceScheduler(() => {
             this.previousAction.enabled = this.nextAction.enabled = false;
         }, 100));
-        this.lastCommands = [];
         this.toolBar = this._register(instantiationService.createInstance(CustomizedMenuWorkbenchToolBar, this.nodes.toolBar, MenuId.InlineSuggestionToolbar, {
             menuOptions: { renderShortTitle: true },
             toolbarOptions: { primaryGroup: g => g.startsWith('primary') },
@@ -182,11 +191,6 @@ let InlineSuggestionHintsContentWidget = InlineSuggestionHintsContentWidget_1 = 
         this._register(autorun(reader => {
             /** @description extra commands */
             const extraCommands = this._extraCommands.read(reader);
-            if (equals(this.lastCommands, extraCommands)) {
-                // nothing to update
-                return;
-            }
-            this.lastCommands = extraCommands;
             const extraActions = extraCommands.map(c => ({
                 class: undefined,
                 id: c.id,
@@ -270,8 +274,8 @@ class StatusBarViewItem extends MenuEntryActionViewItem {
     }
 }
 let CustomizedMenuWorkbenchToolBar = class CustomizedMenuWorkbenchToolBar extends WorkbenchToolBar {
-    constructor(container, menuId, options2, menuService, contextKeyService, contextMenuService, keybindingService, telemetryService) {
-        super(container, { resetMenu: menuId, ...options2 }, menuService, contextKeyService, contextMenuService, keybindingService, telemetryService);
+    constructor(container, menuId, options2, menuService, contextKeyService, contextMenuService, keybindingService, commandService, telemetryService) {
+        super(container, { resetMenu: menuId, ...options2 }, menuService, contextKeyService, contextMenuService, keybindingService, commandService, telemetryService);
         this.menuId = menuId;
         this.options2 = options2;
         this.menuService = menuService;
@@ -311,6 +315,7 @@ CustomizedMenuWorkbenchToolBar = __decorate([
     __param(4, IContextKeyService),
     __param(5, IContextMenuService),
     __param(6, IKeybindingService),
-    __param(7, ITelemetryService)
+    __param(7, ICommandService),
+    __param(8, ITelemetryService)
 ], CustomizedMenuWorkbenchToolBar);
 export { CustomizedMenuWorkbenchToolBar };

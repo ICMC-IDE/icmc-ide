@@ -28,13 +28,17 @@ export default class EventManager<EventMap> {
   }
 
   emmit<K extends keyof EventMap>(event: K, value: EventMap[K]) {
-    if (!this.#events[event]) {
+    const events = this.#events[event];
+
+    if (!events) {
       return;
     }
 
-    for (const handler of this.#events[event]) {
-      handler(value);
-    }
+    queueMicrotask(() => {
+      for (const handler of events) {
+        handler(value);
+      }
+    });
   }
 
   // add method to delete an event

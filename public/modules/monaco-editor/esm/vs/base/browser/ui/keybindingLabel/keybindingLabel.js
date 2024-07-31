@@ -3,8 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 import * as dom from '../../dom.js';
+import { getBaseLayerHoverDelegate } from '../hover/hoverDelegate2.js';
 import { getDefaultHoverDelegate } from '../hover/hoverDelegateFactory.js';
-import { setupCustomHover } from '../hover/updatableHoverWidget.js';
 import { UILabelProvider } from '../../../common/keybindingLabels.js';
 import { Disposable } from '../../../common/lifecycle.js';
 import { equals } from '../../../common/objects.js';
@@ -29,7 +29,7 @@ export class KeybindingLabel extends Disposable {
         if (labelForeground) {
             this.domNode.style.color = labelForeground;
         }
-        this.hover = this._register(setupCustomHover(getDefaultHoverDelegate('mouse'), this.domNode, ''));
+        this.hover = this._register(getBaseLayerHoverDelegate().setupUpdatableHover(getDefaultHoverDelegate('mouse'), this.domNode, ''));
         this.didEverRender = false;
         container.appendChild(this.domNode);
     }

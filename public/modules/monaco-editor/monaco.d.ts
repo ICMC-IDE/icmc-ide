@@ -4323,6 +4323,10 @@ declare namespace monaco.editor {
          * Font size of section headers. Defaults to 9.
          */
         sectionHeaderFontSize?: number;
+        /**
+         * Spacing between the section header characters (in CSS px). Defaults to 1.
+         */
+        sectionHeaderLetterSpacing?: number;
     }
 
     /**
@@ -5392,12 +5396,21 @@ declare namespace monaco.editor {
          * The position preference for the overlay widget.
          */
         preference: OverlayWidgetPositionPreference | IOverlayWidgetPositionCoordinates | null;
+        /**
+         * When set, stacks with other overlay widgets with the same preference,
+         * in an order determined by the ordinal value.
+         */
+        stackOridinal?: number;
     }
 
     /**
      * An overlay widgets renders on top of the text.
      */
     export interface IOverlayWidget {
+        /**
+         * Event fired when the widget layout changes.
+         */
+        onDidLayout?: IEvent<void>;
         /**
          * Render this overlay widget in a location where it could overflow the editor's view dom node.
          */
@@ -5823,6 +5836,18 @@ declare namespace monaco.editor {
          * @event
          */
         readonly onDidChangeHiddenAreas: IEvent<void>;
+        /**
+         * Some editor operations fire multiple events at once.
+         * To allow users to react to multiple events fired by a single operation,
+         * the editor fires a begin update before the operation and an end update after the operation.
+         * Whenever the editor fires `onBeginUpdate`, it will also fire `onEndUpdate` once the operation finishes.
+         * Note that not all operations are bracketed by `onBeginUpdate` and `onEndUpdate`.
+        */
+        readonly onBeginUpdate: IEvent<void>;
+        /**
+         * Fires after the editor completes the operation it fired `onBeginUpdate` for.
+        */
+        readonly onEndUpdate: IEvent<void>;
         /**
          * Saves current view state of the editor in a serializable object.
          */
@@ -6837,19 +6862,56 @@ declare namespace monaco.languages {
          * current position itself.
          */
         range?: IRange;
+        /**
+         * Can increase the verbosity of the hover
+         */
+        canIncreaseVerbosity?: boolean;
+        /**
+         * Can decrease the verbosity of the hover
+         */
+        canDecreaseVerbosity?: boolean;
     }
 
     /**
      * The hover provider interface defines the contract between extensions and
      * the [hover](https://code.visualstudio.com/docs/editor/intellisense)-feature.
      */
-    export interface HoverProvider {
+    export interface HoverProvider<THover = Hover> {
         /**
-         * Provide a hover for the given position and document. Multiple hovers at the same
+         * Provide a hover for the given position, context and document. Multiple hovers at the same
          * position will be merged by the editor. A hover can have a range which defaults
          * to the word range at the position when omitted.
          */
-        provideHover(model: editor.ITextModel, position: Position, token: CancellationToken): ProviderResult<Hover>;
+        provideHover(model: editor.ITextModel, position: Position, token: CancellationToken, context?: HoverContext<THover>): ProviderResult<THover>;
+    }
+
+    export interface HoverContext<THover = Hover> {
+        /**
+         * Hover verbosity request
+         */
+        verbosityRequest?: HoverVerbosityRequest<THover>;
+    }
+
+    export interface HoverVerbosityRequest<THover = Hover> {
+        /**
+         * The delta by which to increase/decrease the hover verbosity level
+         */
+        verbosityDelta: number;
+        /**
+         * The previous hover for the same position
+         */
+        previousHover: THover;
+    }
+
+    export enum HoverVerbosityAction {
+        /**
+         * Increase the verbosity of the hover
+         */
+        Increase = 0,
+        /**
+         * Decrease the verbosity of the hover
+         */
+        Decrease = 1
     }
 
     export enum CompletionItemKind {
@@ -7363,7 +7425,7 @@ declare namespace monaco.languages {
      * A provider that can provide document highlights across multiple documents.
      */
     export interface MultiDocumentHighlightProvider {
-        selector: LanguageFilter;
+        readonly selector: LanguageSelector;
         /**
          * Provide a Map of Uri --> document highlights, like all occurrences of a variable or
          * all exit-points of a function.
@@ -7860,13 +7922,19 @@ declare namespace monaco.languages {
         AIGenerated = 1
     }
 
+    export enum NewSymbolNameTriggerKind {
+        Invoke = 0,
+        Automatic = 1
+    }
+
     export interface NewSymbolName {
         readonly newSymbolName: string;
         readonly tags?: readonly NewSymbolNameTag[];
     }
 
     export interface NewSymbolNamesProvider {
-        provideNewSymbolNames(model: editor.ITextModel, range: IRange, token: CancellationToken): ProviderResult<NewSymbolName[]>;
+        supportsAutomaticNewSymbolNamesTriggerKind?: Promise<boolean | undefined>;
+        provideNewSymbolNames(model: editor.ITextModel, range: IRange, triggerKind: NewSymbolNameTriggerKind, token: CancellationToken): ProviderResult<NewSymbolName[]>;
     }
 
     export interface Command {
@@ -8989,9 +9057,10 @@ declare namespace monaco.languages.typescript {
         length: number | undefined;
         messageText: string | DiagnosticMessageChain;
     }
-    interface EmitOutput {
+    export interface EmitOutput {
         outputFiles: OutputFile[];
         emitSkipped: boolean;
+        diagnostics?: Diagnostic[];
     }
     interface OutputFile {
         name: string;
@@ -9221,7 +9290,7 @@ declare namespace monaco.languages.typescript {
          * Get transpiled output for the given file.
          * @returns `typescript.EmitOutput`
          */
-        getEmitOutput(fileName: string): Promise<EmitOutput>;
+        getEmitOutput(fileName: string, emitOnlyDtsFiles?: boolean, forceDtsEmit?: boolean): Promise<EmitOutput>;
         /**
          * Get possible code fixes at the given position in the file.
          * @param formatOptions `typescript.FormatCodeOptions`

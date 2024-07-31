@@ -17,6 +17,9 @@ export class ToggleTabFocusModeAction extends Action2 {
                 mac: { primary: 256 /* KeyMod.WinCtrl */ | 1024 /* KeyMod.Shift */ | 43 /* KeyCode.KeyM */ },
                 weight: 100 /* KeybindingWeight.EditorContrib */
             },
+            metadata: {
+                description: nls.localize2('tabMovesFocusDescriptions', "Determines whether the tab key moves focus around the workbench or inserts the tab character in the current editor. This is also called tab trapping, tab navigation, or tab focus mode."),
+            },
             f1: true
         });
     }

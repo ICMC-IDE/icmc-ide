@@ -5,9 +5,21 @@
 import { coalesce } from '../../../../base/common/arrays.js';
 import { CancellationToken } from '../../../../base/common/cancellation.js';
 import { onUnexpectedExternalError } from '../../../../base/common/errors.js';
+import { matchesSomeScheme, Schemas } from '../../../../base/common/network.js';
 import { registerModelAndPositionCommand } from '../../../browser/editorExtensions.js';
 import { ILanguageFeaturesService } from '../../../common/services/languageFeatures.js';
 import { ReferencesModel } from './referencesModel.js';
+function shouldIncludeLocationLink(sourceModel, loc) {
+    // Always allow the location if the request comes from a document with the same scheme.
+    if (loc.uri.scheme === sourceModel.uri.scheme) {
+        return true;
+    }
+    // Otherwise filter out locations from internal schemes
+    if (matchesSomeScheme(loc.uri, Schemas.walkThroughSnippet, Schemas.vscodeChatCodeBlock, Schemas.vscodeChatCodeCompareBlock, Schemas.vscodeCopilotBackingChatCodeBlock)) {
+        return false;
+    }
+    return true;
+}
 async function getLocationLinks(model, position, registry, provide) {
     const provider = registry.ordered(model);
     // get results
@@ -18,7 +30,7 @@ async function getLocationLinks(model, position, registry, provide) {
         });
     });
     const values = await Promise.all(promises);
-    return coalesce(values.flat());
+    return coalesce(values.flat()).filter(loc => shouldIncludeLocationLink(model, loc));
 }
 export function getDefinitionsAtPosition(registry, model, position, token) {
     return getLocationLinks(model, position, registry, (provider, model, position) => {
@@ -42,11 +54,12 @@ export function getTypeDefinitionsAtPosition(registry, model, position, token) {
 }
 export function getReferencesAtPosition(registry, model, position, compact, token) {
     return getLocationLinks(model, position, registry, async (provider, model, position) => {
-        const result = await provider.provideReferences(model, position, { includeDeclaration: true }, token);
+        var _a, _b;
+        const result = (_a = (await provider.provideReferences(model, position, { includeDeclaration: true }, token))) === null || _a === void 0 ? void 0 : _a.filter(ref => shouldIncludeLocationLink(model, ref));
         if (!compact || !result || result.length !== 2) {
             return result;
         }
-        const resultWithoutDeclaration = await provider.provideReferences(model, position, { includeDeclaration: false }, token);
+        const resultWithoutDeclaration = (_b = (await provider.provideReferences(model, position, { includeDeclaration: false }, token))) === null || _b === void 0 ? void 0 : _b.filter(ref => shouldIncludeLocationLink(model, ref));
         if (resultWithoutDeclaration && resultWithoutDeclaration.length === 1) {
             return resultWithoutDeclaration;
         }

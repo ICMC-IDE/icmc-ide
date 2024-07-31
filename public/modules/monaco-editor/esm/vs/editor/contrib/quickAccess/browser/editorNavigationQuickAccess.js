@@ -22,7 +22,7 @@ export class AbstractEditorNavigationQuickAccessProvider {
         this.rangeHighlightDecorationId = undefined;
     }
     //#region Provider methods
-    provide(picker, token) {
+    provide(picker, token, runOptions) {
         var _a;
         const disposables = new DisposableStore();
         // Apply options if any
@@ -31,7 +31,7 @@ export class AbstractEditorNavigationQuickAccessProvider {
         picker.matchOnLabel = picker.matchOnDescription = picker.matchOnDetail = picker.sortByLabel = false;
         // Provide based on current active editor
         const pickerDisposable = disposables.add(new MutableDisposable());
-        pickerDisposable.value = this.doProvide(picker, token);
+        pickerDisposable.value = this.doProvide(picker, token, runOptions);
         // Re-create whenever the active editor changes
         disposables.add(this.onDidActiveTextEditorControlChange(() => {
             // Clear old
@@ -41,7 +41,7 @@ export class AbstractEditorNavigationQuickAccessProvider {
         }));
         return disposables;
     }
-    doProvide(picker, token) {
+    doProvide(picker, token, runOptions) {
         var _a;
         const disposables = new DisposableStore();
         // With text control
@@ -71,7 +71,7 @@ export class AbstractEditorNavigationQuickAccessProvider {
             // Clean up decorations on dispose
             disposables.add(toDisposable(() => this.clearDecorations(editor)));
             // Ask subclass for entries
-            disposables.add(this.provideWithTextEditor(context, picker, token));
+            disposables.add(this.provideWithTextEditor(context, picker, token, runOptions));
         }
         // Without text control
         else {

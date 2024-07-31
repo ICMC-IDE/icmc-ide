@@ -19,8 +19,8 @@ import { Event } from '../../../base/common/event.js';
 import { Disposable } from '../../../base/common/lifecycle.js';
 import { IOpenerService } from '../common/opener.js';
 import './link.css';
-import { setupCustomHover } from '../../../base/browser/ui/hover/updatableHoverWidget.js';
 import { getDefaultHoverDelegate } from '../../../base/browser/ui/hover/hoverDelegateFactory.js';
+import { IHoverService } from '../../hover/browser/hover.js';
 let Link = class Link extends Disposable {
     get enabled() {
         return this._enabled;
@@ -44,10 +44,11 @@ let Link = class Link extends Disposable {
         }
         this._enabled = enabled;
     }
-    constructor(container, _link, options = {}, openerService) {
+    constructor(container, _link, options = {}, _hoverService, openerService) {
         var _a, _b;
         super();
         this._link = _link;
+        this._hoverService = _hoverService;
         this._enabled = true;
         this.el = append(container, $('a.monaco-link', {
             tabIndex: (_a = _link.tabIndex) !== null && _a !== void 0 ? _a : 0,
@@ -82,7 +83,7 @@ let Link = class Link extends Disposable {
             this.el.title = title !== null && title !== void 0 ? title : '';
         }
         else if (!this.hover && title) {
-            this.hover = this._register(setupCustomHover(this.hoverDelegate, this.el, title));
+            this.hover = this._register(this._hoverService.setupUpdatableHover(this.hoverDelegate, this.el, title));
         }
         else if (this.hover) {
             this.hover.update(title);
@@ -90,6 +91,7 @@ let Link = class Link extends Disposable {
     }
 };
 Link = __decorate([
-    __param(3, IOpenerService)
+    __param(3, IHoverService),
+    __param(4, IOpenerService)
 ], Link);
 export { Link };

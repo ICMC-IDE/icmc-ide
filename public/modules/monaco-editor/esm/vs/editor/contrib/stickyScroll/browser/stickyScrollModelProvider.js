@@ -39,8 +39,6 @@ let StickyModelProvider = class StickyModelProvider extends Disposable {
     constructor(_editor, onProviderUpdate, _languageConfigurationService, _languageFeaturesService) {
         super();
         this._editor = _editor;
-        this._languageConfigurationService = _languageConfigurationService;
-        this._languageFeaturesService = _languageFeaturesService;
         this._modelProviders = [];
         this._modelPromise = null;
         this._updateScheduler = this._register(new Delayer(300));

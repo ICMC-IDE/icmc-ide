@@ -3,8 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 import { $, append, clearNode, createStyleSheet } from '../../dom.js';
+import { getBaseLayerHoverDelegate } from '../hover/hoverDelegate2.js';
 import { getDefaultHoverDelegate } from '../hover/hoverDelegateFactory.js';
-import { setupCustomHover } from '../hover/updatableHoverWidget.js';
 import { List, unthemedListStyles } from '../list/listWidget.js';
 import { SplitView } from '../splitview/splitview.js';
 import { Emitter, Event } from '../../../common/event.js';
@@ -92,7 +92,7 @@ class ColumnHeader extends Disposable {
         this.onDidLayout = this._onDidLayout.event;
         this.element = $('.monaco-table-th', { 'data-col-index': index }, column.label);
         if (column.tooltip) {
-            this._register(setupCustomHover(getDefaultHoverDelegate('mouse'), this.element, column.tooltip));
+            this._register(getBaseLayerHoverDelegate().setupUpdatableHover(getDefaultHoverDelegate('mouse'), this.element, column.tooltip));
         }
     }
     layout(size) {

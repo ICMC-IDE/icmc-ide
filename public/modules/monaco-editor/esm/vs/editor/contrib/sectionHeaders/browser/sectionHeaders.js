@@ -64,6 +64,11 @@ let SectionHeaderDetector = class SectionHeaderDetector extends Disposable {
         this._register(this.editor.onDidChangeModelContent(e => {
             this.computeSectionHeaders.schedule();
         }));
+        this._register(editor.onDidChangeModelTokens((e) => {
+            if (!this.computeSectionHeaders.isScheduled()) {
+                this.computeSectionHeaders.schedule(1000);
+            }
+        }));
         this.computeSectionHeaders = this._register(new RunOnceScheduler(() => {
             this.findSectionHeaders();
         }, 250));

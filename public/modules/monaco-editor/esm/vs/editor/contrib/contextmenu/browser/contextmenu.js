@@ -20,7 +20,7 @@ import { isIOS } from '../../../../base/common/platform.js';
 import { EditorAction, registerEditorAction, registerEditorContribution } from '../../../browser/editorExtensions.js';
 import { EditorContextKeys } from '../../../common/editorContextKeys.js';
 import * as nls from '../../../../nls.js';
-import { IMenuService, MenuId, SubmenuItemAction } from '../../../../platform/actions/common/actions.js';
+import { IMenuService, SubmenuItemAction } from '../../../../platform/actions/common/actions.js';
 import { IContextKeyService } from '../../../../platform/contextkey/common/contextkey.js';
 import { IContextMenuService, IContextViewService } from '../../../../platform/contextview/browser/contextView.js';
 import { IKeybindingService } from '../../../../platform/keybinding/common/keybinding.js';
@@ -122,7 +122,7 @@ let ContextMenuController = ContextMenuController_1 = class ContextMenuControlle
             return;
         }
         // Find actions available for menu
-        const menuActions = this._getMenuActions(this._editor.getModel(), this._editor.isSimpleWidget ? MenuId.SimpleEditorContext : MenuId.EditorContext);
+        const menuActions = this._getMenuActions(this._editor.getModel(), this._editor.contextMenuId);
         // Show menu if we have actions to show
         if (menuActions.length > 0) {
             this._doShowContextMenu(menuActions, anchor);

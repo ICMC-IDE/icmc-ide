@@ -8,7 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-import { asCssValueWithDefault, createStyleSheet, EventHelper, getActiveElement, getWindow, isMouseEvent } from '../../dom.js';
+import { asCssValueWithDefault, createStyleSheet, EventHelper, getActiveElement, getWindow, isHTMLElement, isMouseEvent } from '../../dom.js';
 import { DomEmitter } from '../../event.js';
 import { StandardKeyboardEvent } from '../../keyboardEvent.js';
 import { Gesture } from '../../touch.js';
@@ -504,7 +504,7 @@ class DOMFocusController {
             return;
         }
         const tabIndexElement = focusedDomElement.querySelector('[tabIndex]');
-        if (!tabIndexElement || !(tabIndexElement instanceof HTMLElement) || tabIndexElement.tabIndex === -1) {
+        if (!tabIndexElement || !(isHTMLElement(tabIndexElement)) || tabIndexElement.tabIndex === -1) {
             return;
         }
         const style = getWindow(tabIndexElement).getComputedStyle(tabIndexElement);
@@ -835,7 +835,10 @@ export const unthemedListStyles = {
     listFocusOutline: undefined,
     listInactiveFocusOutline: undefined,
     listSelectionOutline: undefined,
-    listHoverOutline: undefined
+    listHoverOutline: undefined,
+    treeStickyScrollBackground: undefined,
+    treeStickyScrollBorder: undefined,
+    treeStickyScrollShadow: undefined
 };
 const DefaultOptions = {
     keyboardSupport: true,

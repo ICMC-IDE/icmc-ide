@@ -14,12 +14,15 @@ interface EventMap {
   "delete-file": FileManagerFile;
   "open-file": FileManagerFile;
   "open-window": string;
+  error: Error;
   render: void;
 }
 
 const eventManager = new EventManager<EventMap>();
 const configManager = new ConfigManager();
 const resources = await loadResources();
+
+configManager.loadAll();
 
 export default <GlobalState>{
   eventManager,

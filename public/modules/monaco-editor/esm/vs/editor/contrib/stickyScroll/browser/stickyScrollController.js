@@ -62,12 +62,7 @@ let StickyScrollController = StickyScrollController_1 = class StickyScrollContro
         this._readConfiguration();
         const stickyScrollDomNode = this._stickyScrollWidget.getDomNode();
         this._register(this._editor.onDidChangeConfiguration(e => {
-            if (e.hasChanged(115 /* EditorOption.stickyScroll */)
-                || e.hasChanged(73 /* EditorOption.minimap */)
-                || e.hasChanged(67 /* EditorOption.lineHeight */)
-                || e.hasChanged(110 /* EditorOption.showFoldingControls */)) {
-                this._readConfiguration();
-            }
+            this._readConfigurationChange(e);
         }));
         this._register(dom.addDisposableListener(stickyScrollDomNode, dom.EventType.CONTEXT_MENU, async (event) => {
             this._onContextMenu(dom.getWindow(stickyScrollDomNode), event);
@@ -383,6 +378,18 @@ let StickyScrollController = StickyScrollController_1 = class StickyScrollContro
                 this._showEndForLine = null;
                 this._renderStickyScroll(0);
             }));
+        }
+    }
+    _readConfigurationChange(event) {
+        if (event.hasChanged(115 /* EditorOption.stickyScroll */)
+            || event.hasChanged(73 /* EditorOption.minimap */)
+            || event.hasChanged(67 /* EditorOption.lineHeight */)
+            || event.hasChanged(110 /* EditorOption.showFoldingControls */)
+            || event.hasChanged(68 /* EditorOption.lineNumbers */)) {
+            this._readConfiguration();
+        }
+        if (event.hasChanged(68 /* EditorOption.lineNumbers */)) {
+            this._renderStickyScroll(0);
         }
     }
     _needsUpdate(event) {

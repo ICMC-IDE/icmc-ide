@@ -24,13 +24,17 @@ import * as nls from '../../../../nls.js';
 import { IQuickInputService } from '../../../../platform/quickinput/common/quickInput.js';
 import { getGoodIndentForLine, getIndentMetadata } from '../../../common/languages/autoIndent.js';
 import { getReindentEditOperations } from '../common/indentation.js';
+import { getStandardTokenTypeAtPosition } from '../../../common/tokens/lineTokens.js';
 export class IndentationToSpacesAction extends EditorAction {
     constructor() {
         super({
             id: IndentationToSpacesAction.ID,
             label: nls.localize('indentationToSpaces', "Convert Indentation to Spaces"),
             alias: 'Convert Indentation to Spaces',
-            precondition: EditorContextKeys.writable
+            precondition: EditorContextKeys.writable,
+            metadata: {
+                description: nls.localize2('indentationToSpacesDescription', "Convert the tab indentation to spaces."),
+            }
         });
     }
     run(accessor, editor) {
@@ -59,7 +63,10 @@ export class IndentationToTabsAction extends EditorAction {
             id: IndentationToTabsAction.ID,
             label: nls.localize('indentationToTabs', "Convert Indentation to Tabs"),
             alias: 'Convert Indentation to Tabs',
-            precondition: EditorContextKeys.writable
+            precondition: EditorContextKeys.writable,
+            metadata: {
+                description: nls.localize2('indentationToTabsDescription', "Convert the spaces indentation to tabs."),
+            }
         });
     }
     run(accessor, editor) {
@@ -140,7 +147,10 @@ export class IndentUsingTabs extends ChangeIndentationSizeAction {
             id: IndentUsingTabs.ID,
             label: nls.localize('indentUsingTabs', "Indent Using Tabs"),
             alias: 'Indent Using Tabs',
-            precondition: undefined
+            precondition: undefined,
+            metadata: {
+                description: nls.localize2('indentUsingTabsDescription', "Use indentation with tabs."),
+            }
         });
     }
 }
@@ -151,7 +161,10 @@ export class IndentUsingSpaces extends ChangeIndentationSizeAction {
             id: IndentUsingSpaces.ID,
             label: nls.localize('indentUsingSpaces', "Indent Using Spaces"),
             alias: 'Indent Using Spaces',
-            precondition: undefined
+            precondition: undefined,
+            metadata: {
+                description: nls.localize2('indentUsingSpacesDescription', "Use indentation with spaces."),
+            }
         });
     }
 }
@@ -162,7 +175,10 @@ export class ChangeTabDisplaySize extends ChangeIndentationSizeAction {
             id: ChangeTabDisplaySize.ID,
             label: nls.localize('changeTabDisplaySize', "Change Tab Display Size"),
             alias: 'Change Tab Display Size',
-            precondition: undefined
+            precondition: undefined,
+            metadata: {
+                description: nls.localize2('changeTabDisplaySizeDescription', "Change the space size equivalent of the tab."),
+            }
         });
     }
 }
@@ -173,7 +189,10 @@ export class DetectIndentation extends EditorAction {
             id: DetectIndentation.ID,
             label: nls.localize('detectIndentation', "Detect Indentation from Content"),
             alias: 'Detect Indentation from Content',
-            precondition: undefined
+            precondition: undefined,
+            metadata: {
+                description: nls.localize2('detectIndentationDescription', "Detect the indentation from content."),
+            }
         });
     }
     run(accessor, editor) {
@@ -193,7 +212,10 @@ export class ReindentLinesAction extends EditorAction {
             id: 'editor.action.reindentlines',
             label: nls.localize('editor.reindentlines', "Reindent Lines"),
             alias: 'Reindent Lines',
-            precondition: EditorContextKeys.writable
+            precondition: EditorContextKeys.writable,
+            metadata: {
+                description: nls.localize2('editor.reindentlinesDescription', "Reindent the lines of the editor."),
+            }
         });
     }
     run(accessor, editor) {
@@ -216,7 +238,10 @@ export class ReindentSelectedLinesAction extends EditorAction {
             id: 'editor.action.reindentselectedlines',
             label: nls.localize('editor.reindentselectedlines', "Reindent Selected Lines"),
             alias: 'Reindent Selected Lines',
-            precondition: EditorContextKeys.writable
+            precondition: EditorContextKeys.writable,
+            metadata: {
+                description: nls.localize2('editor.reindentselectedlinesDescription', "Reindent the selected lines of the editor."),
+            }
         });
     }
     run(accessor, editor) {
@@ -322,6 +347,9 @@ let AutoIndentOnPaste = class AutoIndentOnPaste {
         }
         const model = this.editor.getModel();
         if (!model) {
+            return;
+        }
+        if (isStartOrEndInString(model, range)) {
             return;
         }
         if (!model.tokenization.isCheapToTokenize(range.getStartPosition().lineNumber)) {
@@ -461,6 +489,13 @@ AutoIndentOnPaste = __decorate([
     __param(1, ILanguageConfigurationService)
 ], AutoIndentOnPaste);
 export { AutoIndentOnPaste };
+function isStartOrEndInString(model, range) {
+    const isPositionInString = (position) => {
+        const tokenType = getStandardTokenTypeAtPosition(model, position);
+        return tokenType === 2 /* StandardTokenType.String */;
+    };
+    return isPositionInString(range.getStartPosition()) || isPositionInString(range.getEndPosition());
+}
 function getIndentationEditOperations(model, builder, tabSize, tabsToSpaces) {
     if (model.getLineCount() === 1 && model.getLineMaxColumn(1) === 1) {
         // Model is empty

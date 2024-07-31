@@ -169,7 +169,7 @@ export function forEachWithNeighbors(arr, f) {
  * @returns New array with all falsy values removed. The original array IS NOT modified.
  */
 export function coalesce(array) {
-    return array.filter(e => !!e);
+    return array.filter((e) => !!e);
 }
 /**
  * Remove all falsy values from `array`. The original array IS modified.

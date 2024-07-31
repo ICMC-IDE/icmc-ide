@@ -2,6 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+import { Event } from '../event.js';
 import { DisposableStore, toDisposable } from '../lifecycle.js';
 import { BaseObservable, ConvenientObservable, _setKeepObserved, _setRecomputeInitiallyAndOnChange, subtransaction, transaction } from './base.js';
 import { DebugNameData, getFunctionName } from './debugName.js';
@@ -97,7 +98,8 @@ export class FromEventObservable extends BaseObservable {
         }
         else {
             // no cache, as there are no subscribers to keep it updated
-            return this._getValue(undefined);
+            const value = this._getValue(undefined);
+            return value;
         }
     }
 }
@@ -237,13 +239,32 @@ export class KeepAliveObserver {
         // NO OP
     }
 }
-export function derivedObservableWithCache(computeFn) {
+export function derivedObservableWithCache(owner, computeFn) {
     let lastValue = undefined;
-    const observable = derived(reader => {
+    const observable = derived(owner, reader => {
         lastValue = computeFn(reader, lastValue);
         return lastValue;
     });
     return observable;
+}
+export function derivedObservableWithWritableCache(owner, computeFn) {
+    let lastValue = undefined;
+    const onChange = observableSignal('derivedObservableWithWritableCache');
+    const observable = derived(owner, reader => {
+        onChange.read(reader);
+        lastValue = computeFn(reader, lastValue);
+        return lastValue;
+    });
+    return Object.assign(observable, {
+        clearCache: (tx) => {
+            lastValue = undefined;
+            onChange.trigger(tx);
+        },
+        setCache: (newValue, tx) => {
+            lastValue = newValue;
+            onChange.trigger(tx);
+        }
+    });
 }
 /**
  * When the items array changes, referential equal items are not mapped again.
@@ -301,4 +322,21 @@ class ArrayMap {
     getItems() {
         return this._items;
     }
+}
+export class ValueWithChangeEventFromObservable {
+    constructor(observable) {
+        this.observable = observable;
+    }
+    get onDidChange() {
+        return Event.fromObservableLight(this.observable);
+    }
+    get value() {
+        return this.observable.get();
+    }
+}
+export function observableFromValueWithChangeEvent(_owner, value) {
+    if (value instanceof ValueWithChangeEventFromObservable) {
+        return value.observable;
+    }
+    return observableFromEvent(value.onDidChange, () => value.value);
 }

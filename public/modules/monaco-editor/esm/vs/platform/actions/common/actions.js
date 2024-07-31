@@ -15,7 +15,7 @@ var MenuItemAction_1;
 import { SubmenuAction } from '../../../base/common/actions.js';
 import { ThemeIcon } from '../../../base/common/themables.js';
 import { MicrotaskEmitter } from '../../../base/common/event.js';
-import { DisposableStore, toDisposable } from '../../../base/common/lifecycle.js';
+import { DisposableStore, dispose, toDisposable } from '../../../base/common/lifecycle.js';
 import { LinkedList } from '../../../base/common/linkedList.js';
 import { CommandsRegistry, ICommandService } from '../../commands/common/commands.js';
 import { ContextKeyExpr, IContextKeyService } from '../../contextkey/common/contextkey.js';
@@ -211,6 +211,7 @@ MenuId.InlineSuggestionToolbar = new MenuId('InlineSuggestionToolbar');
 MenuId.InlineEditToolbar = new MenuId('InlineEditToolbar');
 MenuId.ChatContext = new MenuId('ChatContext');
 MenuId.ChatCodeBlock = new MenuId('ChatCodeblock');
+MenuId.ChatCompareBlock = new MenuId('ChatCompareBlock');
 MenuId.ChatMessageTitle = new MenuId('ChatMessageTitle');
 MenuId.ChatExecute = new MenuId('ChatExecute');
 MenuId.ChatExecuteSecondary = new MenuId('ChatExecuteSecondary');
@@ -337,9 +338,10 @@ let MenuItemAction = MenuItemAction_1 = class MenuItemAction {
             ? (typeof action.shortTitle === 'string' ? action.shortTitle : action.shortTitle.value)
             : (typeof action.title === 'string' ? action.title : action.title.value);
     }
-    constructor(item, alt, options, hideActions, contextKeyService, _commandService) {
+    constructor(item, alt, options, hideActions, menuKeybinding, contextKeyService, _commandService) {
         var _a, _b;
         this.hideActions = hideActions;
+        this.menuKeybinding = menuKeybinding;
         this._commandService = _commandService;
         this.id = item.id;
         this.label = MenuItemAction_1.label(item, options);
@@ -364,7 +366,7 @@ let MenuItemAction = MenuItemAction_1 = class MenuItemAction {
             icon = ThemeIcon.isThemeIcon(item.icon) ? item.icon : undefined;
         }
         this.item = item;
-        this.alt = alt ? new MenuItemAction_1(alt, undefined, options, hideActions, contextKeyService, _commandService) : undefined;
+        this.alt = alt ? new MenuItemAction_1(alt, undefined, options, hideActions, undefined, contextKeyService, _commandService) : undefined;
         this._options = options;
         this.class = icon && ThemeIcon.asClassName(icon);
     }
@@ -381,8 +383,8 @@ let MenuItemAction = MenuItemAction_1 = class MenuItemAction {
     }
 };
 MenuItemAction = MenuItemAction_1 = __decorate([
-    __param(4, IContextKeyService),
-    __param(5, ICommandService)
+    __param(5, IContextKeyService),
+    __param(6, ICommandService)
 ], MenuItemAction);
 export { MenuItemAction };
 export class Action2 {
@@ -391,14 +393,14 @@ export class Action2 {
     }
 }
 export function registerAction2(ctor) {
-    const disposables = new DisposableStore();
+    const disposables = []; // not using `DisposableStore` to reduce startup perf cost
     const action = new ctor();
     const { f1, menu, keybinding, ...command } = action.desc;
     if (CommandsRegistry.getCommand(command.id)) {
         throw new Error(`Cannot register two commands with the same id: ${command.id}`);
     }
     // command
-    disposables.add(CommandsRegistry.registerCommand({
+    disposables.push(CommandsRegistry.registerCommand({
         id: command.id,
         handler: (accessor, ...args) => action.run(accessor, ...args),
         metadata: command.metadata,
@@ -406,20 +408,20 @@ export function registerAction2(ctor) {
     // menu
     if (Array.isArray(menu)) {
         for (const item of menu) {
-            disposables.add(MenuRegistry.appendMenuItem(item.id, { command: { ...command, precondition: item.precondition === null ? undefined : command.precondition }, ...item }));
+            disposables.push(MenuRegistry.appendMenuItem(item.id, { command: { ...command, precondition: item.precondition === null ? undefined : command.precondition }, ...item }));
         }
     }
     else if (menu) {
-        disposables.add(MenuRegistry.appendMenuItem(menu.id, { command: { ...command, precondition: menu.precondition === null ? undefined : command.precondition }, ...menu }));
+        disposables.push(MenuRegistry.appendMenuItem(menu.id, { command: { ...command, precondition: menu.precondition === null ? undefined : command.precondition }, ...menu }));
     }
     if (f1) {
-        disposables.add(MenuRegistry.appendMenuItem(MenuId.CommandPalette, { command, when: command.precondition }));
-        disposables.add(MenuRegistry.addCommand(command));
+        disposables.push(MenuRegistry.appendMenuItem(MenuId.CommandPalette, { command, when: command.precondition }));
+        disposables.push(MenuRegistry.addCommand(command));
     }
     // keybinding
     if (Array.isArray(keybinding)) {
         for (const item of keybinding) {
-            disposables.add(KeybindingsRegistry.registerKeybindingRule({
+            disposables.push(KeybindingsRegistry.registerKeybindingRule({
                 ...item,
                 id: command.id,
                 when: command.precondition ? ContextKeyExpr.and(command.precondition, item.when) : item.when
@@ -427,12 +429,16 @@ export function registerAction2(ctor) {
         }
     }
     else if (keybinding) {
-        disposables.add(KeybindingsRegistry.registerKeybindingRule({
+        disposables.push(KeybindingsRegistry.registerKeybindingRule({
             ...keybinding,
             id: command.id,
             when: command.precondition ? ContextKeyExpr.and(command.precondition, keybinding.when) : keybinding.when
         }));
     }
-    return disposables;
+    return {
+        dispose() {
+            dispose(disposables);
+        }
+    };
 }
 //#endregion

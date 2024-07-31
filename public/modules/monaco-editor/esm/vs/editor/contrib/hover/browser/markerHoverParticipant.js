@@ -87,6 +87,7 @@ let MarkerHoverParticipant = class MarkerHoverParticipant {
     }
     renderMarkerHover(markerHover, disposables) {
         const hoverElement = $('div.hover-row');
+        hoverElement.tabIndex = 0;
         const markerElement = dom.append(hoverElement, $('div.marker.hover-contents'));
         const { source, message, code, relatedInformation } = markerHover.marker;
         this._editor.applyFontInfo(markerElement);

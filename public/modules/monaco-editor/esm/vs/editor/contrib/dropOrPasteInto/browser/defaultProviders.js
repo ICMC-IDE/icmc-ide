@@ -34,7 +34,7 @@ class SimplePasteAndDropProvider {
             edits: [{ insertText: edit.insertText, title: edit.title, kind: edit.kind, handledMimeType: edit.handledMimeType, yieldTo: edit.yieldTo }]
         };
     }
-    async provideDocumentOnDropEdits(_model, _position, dataTransfer, token) {
+    async provideDocumentDropEdits(_model, _position, dataTransfer, token) {
         const edit = await this.getEdit(dataTransfer, token);
         return edit ? [{ insertText: edit.insertText, title: edit.title, kind: edit.kind, handledMimeType: edit.handledMimeType, yieldTo: edit.yieldTo }] : undefined;
     }
@@ -192,9 +192,9 @@ async function extractUriList(dataTransfer) {
 let DefaultDropProvidersFeature = class DefaultDropProvidersFeature extends Disposable {
     constructor(languageFeaturesService, workspaceContextService) {
         super();
-        this._register(languageFeaturesService.documentOnDropEditProvider.register('*', new DefaultTextPasteOrDropEditProvider()));
-        this._register(languageFeaturesService.documentOnDropEditProvider.register('*', new PathProvider()));
-        this._register(languageFeaturesService.documentOnDropEditProvider.register('*', new RelativePathProvider(workspaceContextService)));
+        this._register(languageFeaturesService.documentDropEditProvider.register('*', new DefaultTextPasteOrDropEditProvider()));
+        this._register(languageFeaturesService.documentDropEditProvider.register('*', new PathProvider()));
+        this._register(languageFeaturesService.documentDropEditProvider.register('*', new RelativePathProvider(workspaceContextService)));
     }
 };
 DefaultDropProvidersFeature = __decorate([

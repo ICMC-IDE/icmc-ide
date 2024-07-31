@@ -123,7 +123,7 @@ function _wrapAsStandardKeyboardEvent(handler) {
 }
 export const addStandardDisposableListener = function addStandardDisposableListener(node, type, handler, useCapture) {
     let wrapHandler = handler;
-    if (type === 'click' || type === 'mousedown') {
+    if (type === 'click' || type === 'mousedown' || type === 'contextmenu') {
         wrapHandler = _wrapAsStandardMouseEvent(getWindow(node), handler);
     }
     else if (type === 'keydown' || type === 'keypress' || type === 'keyup') {
@@ -752,6 +752,14 @@ export function removeCSSRulesContainingSelector(ruleName, style = getSharedStyl
 function isCSSStyleRule(rule) {
     return typeof rule.selectorText === 'string';
 }
+export function isHTMLElement(e) {
+    // eslint-disable-next-line no-restricted-syntax
+    return e instanceof HTMLElement || e instanceof getWindow(e).HTMLElement;
+}
+export function isHTMLAnchorElement(e) {
+    // eslint-disable-next-line no-restricted-syntax
+    return e instanceof HTMLAnchorElement || e instanceof getWindow(e).HTMLAnchorElement;
+}
 export function isMouseEvent(e) {
     // eslint-disable-next-line no-restricted-syntax
     return e instanceof MouseEvent || e instanceof getWindow(e).MouseEvent;
@@ -852,7 +860,7 @@ export function restoreParentsScrollTop(node, state) {
 }
 class FocusTracker extends Disposable {
     static hasFocusWithin(element) {
-        if (element instanceof HTMLElement) {
+        if (isHTMLElement(element)) {
             const shadowRoot = getShadowRoot(element);
             const activeElement = (shadowRoot ? shadowRoot.activeElement : element.ownerDocument.activeElement);
             return isAncestor(activeElement, element);
@@ -880,7 +888,7 @@ class FocusTracker extends Disposable {
         const onBlur = () => {
             if (hasFocus) {
                 loosingFocus = true;
-                (element instanceof HTMLElement ? getWindow(element) : element).setTimeout(() => {
+                (isHTMLElement(element) ? getWindow(element) : element).setTimeout(() => {
                     if (loosingFocus) {
                         loosingFocus = false;
                         hasFocus = false;
@@ -902,7 +910,7 @@ class FocusTracker extends Disposable {
         };
         this._register(addDisposableListener(element, EventType.FOCUS, onFocus, true));
         this._register(addDisposableListener(element, EventType.BLUR, onBlur, true));
-        if (element instanceof HTMLElement) {
+        if (isHTMLElement(element)) {
             this._register(addDisposableListener(element, EventType.FOCUS_IN, () => this._refreshStateHandler()));
             this._register(addDisposableListener(element, EventType.FOCUS_OUT, () => this._refreshStateHandler()));
         }
@@ -1418,7 +1426,7 @@ export function h(tag, ...args) {
     }
     if (children) {
         for (const c of children) {
-            if (c instanceof HTMLElement) {
+            if (isHTMLElement(c)) {
                 el.appendChild(c);
             }
             else if (typeof c === 'string') {

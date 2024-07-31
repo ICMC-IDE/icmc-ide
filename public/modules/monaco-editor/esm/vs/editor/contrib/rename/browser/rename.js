@@ -26,6 +26,7 @@ import { ICodeEditorService } from '../../../browser/services/codeEditorService.
 import { Position } from '../../../common/core/position.js';
 import { Range } from '../../../common/core/range.js';
 import { EditorContextKeys } from '../../../common/editorContextKeys.js';
+import { NewSymbolNameTriggerKind } from '../../../common/languages.js';
 import { ILanguageFeaturesService } from '../../../common/services/languageFeatures.js';
 import { ITextResourceConfigurationService } from '../../../common/services/textResourceConfiguration.js';
 import { EditorStateCancellationTokenSource } from '../../editorState/browser/editorState.js';
@@ -196,10 +197,17 @@ let RenameController = RenameController_1 = class RenameController {
         const cts2 = new EditorStateCancellationTokenSource(this.editor, 4 /* CodeEditorStateFlag.Position */ | 1 /* CodeEditorStateFlag.Value */, loc.range, this._cts.token);
         const model = this.editor.getModel(); // @ulugbekna: assumes editor still has a model, otherwise, cts1 should've been cancelled
         const newSymbolNamesProviders = this._languageFeaturesService.newSymbolNamesProvider.all(model);
-        const requestRenameSuggestions = (cts) => newSymbolNamesProviders.map(p => p.provideNewSymbolNames(model, loc.range, cts));
+        const resolvedNewSymbolnamesProviders = await Promise.all(newSymbolNamesProviders.map(async (p) => { var _a; return [p, (_a = await p.supportsAutomaticNewSymbolNamesTriggerKind) !== null && _a !== void 0 ? _a : false]; }));
+        const requestRenameSuggestions = (triggerKind, cts) => {
+            let providers = resolvedNewSymbolnamesProviders.slice();
+            if (triggerKind === NewSymbolNameTriggerKind.Automatic) {
+                providers = providers.filter(([_, supportsAutomatic]) => supportsAutomatic);
+            }
+            return providers.map(([p,]) => p.provideNewSymbolNames(model, loc.range, triggerKind, cts));
+        };
         trace('creating rename input field and awaiting its result');
         const supportPreview = this._bulkEditService.hasPreviewHandler() && this._configService.getValue(this.editor.getModel().uri, 'editor.rename.enablePreview');
-        const inputFieldResult = await this._renameWidget.getInput(loc.range, loc.text, supportPreview, requestRenameSuggestions, cts2);
+        const inputFieldResult = await this._renameWidget.getInput(loc.range, loc.text, supportPreview, newSymbolNamesProviders.length > 0 ? requestRenameSuggestions : undefined, cts2);
         trace('received response from rename input field');
         if (newSymbolNamesProviders.length > 0) { // @ulugbekna: we're interested only in telemetry for rename suggestions currently
             this._reportTelemetry(newSymbolNamesProviders.length, model.getLanguageId(), inputFieldResult);
@@ -287,6 +295,8 @@ let RenameController = RenameController_1 = class RenameController {
                 nRenameSuggestions: inputFieldResult.stats.nRenameSuggestions,
                 timeBeforeFirstInputFieldEdit: inputFieldResult.stats.timeBeforeFirstInputFieldEdit,
                 wantsPreview: inputFieldResult.wantsPreview,
+                nRenameSuggestionsInvocations: inputFieldResult.stats.nRenameSuggestionsInvocations,
+                hadAutomaticRenameSuggestionsInvocation: inputFieldResult.stats.hadAutomaticRenameSuggestionsInvocation,
             };
         this._telemetryService.publicLog2('renameInvokedEvent', value);
     }
@@ -393,8 +403,7 @@ registerAction2(class FocusNextRenameSuggestion extends Action2 {
             precondition: CONTEXT_RENAME_INPUT_VISIBLE,
             keybinding: [
                 {
-                    primary: 2 /* KeyCode.Tab */,
-                    secondary: [18 /* KeyCode.DownArrow */],
+                    primary: 18 /* KeyCode.DownArrow */,
                     weight: 100 /* KeybindingWeight.EditorContrib */ + 99,
                 }
             ]
@@ -422,8 +431,7 @@ registerAction2(class FocusPreviousRenameSuggestion extends Action2 {
             precondition: CONTEXT_RENAME_INPUT_VISIBLE,
             keybinding: [
                 {
-                    primary: 1024 /* KeyMod.Shift */ | 2 /* KeyCode.Tab */,
-                    secondary: [16 /* KeyCode.UpArrow */],
+                    primary: 16 /* KeyCode.UpArrow */,
                     weight: 100 /* KeybindingWeight.EditorContrib */ + 99,
                 }
             ]

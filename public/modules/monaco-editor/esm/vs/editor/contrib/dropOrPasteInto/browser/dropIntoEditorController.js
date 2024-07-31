@@ -73,7 +73,7 @@ let DropIntoEditorController = DropIntoEditorController_1 = class DropIntoEditor
                 if (!model) {
                     return;
                 }
-                const providers = this._languageFeaturesService.documentOnDropEditProvider
+                const providers = this._languageFeaturesService.documentDropEditProvider
                     .ordered(model)
                     .filter(provider => {
                     if (!provider.dropMimeTypes) {
@@ -106,7 +106,7 @@ let DropIntoEditorController = DropIntoEditorController_1 = class DropIntoEditor
     async getDropEdits(providers, model, position, dataTransfer, tokenSource) {
         const results = await raceCancellation(Promise.all(providers.map(async (provider) => {
             try {
-                const edits = await provider.provideDocumentOnDropEdits(model, position, dataTransfer, tokenSource.token);
+                const edits = await provider.provideDocumentDropEdits(model, position, dataTransfer, tokenSource.token);
                 return edits === null || edits === void 0 ? void 0 : edits.map(edit => ({ ...edit, providerId: provider.id }));
             }
             catch (err) {

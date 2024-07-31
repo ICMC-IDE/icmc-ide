@@ -12,14 +12,13 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 import { ContextView } from '../../../base/browser/ui/contextview/contextview.js';
-import { Disposable, MutableDisposable, toDisposable } from '../../../base/common/lifecycle.js';
+import { Disposable } from '../../../base/common/lifecycle.js';
 import { ILayoutService } from '../../layout/browser/layoutService.js';
 import { getWindow } from '../../../base/browser/dom.js';
 let ContextViewHandler = class ContextViewHandler extends Disposable {
     constructor(layoutService) {
         super();
         this.layoutService = layoutService;
-        this.currentViewDisposable = this._register(new MutableDisposable());
         this.contextView = this._register(new ContextView(this.layoutService.mainContainer, 1 /* ContextViewDOMPosition.ABSOLUTE */));
         this.layout();
         this._register(layoutService.onDidLayoutContainer(() => this.layout()));
@@ -43,19 +42,22 @@ let ContextViewHandler = class ContextViewHandler extends Disposable {
         }
         this.contextView.setContainer(container !== null && container !== void 0 ? container : this.layoutService.activeContainer, domPosition);
         this.contextView.show(delegate);
-        const disposable = toDisposable(() => {
-            if (this.currentViewDisposable === disposable) {
-                this.hideContextView();
+        const openContextView = {
+            close: () => {
+                if (this.openContextView === openContextView) {
+                    this.hideContextView();
+                }
             }
-        });
-        this.currentViewDisposable.value = disposable;
-        return disposable;
+        };
+        this.openContextView = openContextView;
+        return openContextView;
     }
     layout() {
         this.contextView.layout();
     }
     hideContextView(data) {
         this.contextView.hide(data);
+        this.openContextView = undefined;
     }
 };
 ContextViewHandler = __decorate([

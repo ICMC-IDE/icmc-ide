@@ -283,6 +283,12 @@ export class CodeActionModel extends Disposable {
                 if (!isManualToAutoTransition) {
                     this.setState(newState);
                 }
+                else {
+                    // Reset the new state after getting code actions back.
+                    setTimeout(() => {
+                        this.setState(newState);
+                    }, 500);
+                }
             }, undefined);
             this._codeActionOracle.value.trigger({ type: 2 /* CodeActionTriggerType.Auto */, triggerAction: CodeActionTriggerSource.Default });
         }

@@ -33,9 +33,9 @@ let QuickAccessController = class QuickAccessController extends Disposable {
         this.doShowOrPick(value, false, options);
     }
     doShowOrPick(value, pick, options) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         // Find provider for the value to show
-        const [provider, descriptor] = this.getOrInstantiateProvider(value);
+        const [provider, descriptor] = this.getOrInstantiateProvider(value, options === null || options === void 0 ? void 0 : options.enabledProviderPrefixes);
         // Return early if quick access is already showing on that same prefix
         const visibleQuickAccess = this.visibleQuickAccess;
         const visibleDescriptor = visibleQuickAccess === null || visibleQuickAccess === void 0 ? void 0 : visibleQuickAccess.descriptor;
@@ -83,11 +83,11 @@ let QuickAccessController = class QuickAccessController extends Disposable {
         const picker = disposables.add(this.quickInputService.createQuickPick());
         picker.value = value;
         this.adjustValueSelection(picker, descriptor, options);
-        picker.placeholder = descriptor === null || descriptor === void 0 ? void 0 : descriptor.placeholder;
+        picker.placeholder = (_c = options === null || options === void 0 ? void 0 : options.placeholder) !== null && _c !== void 0 ? _c : descriptor === null || descriptor === void 0 ? void 0 : descriptor.placeholder;
         picker.quickNavigate = options === null || options === void 0 ? void 0 : options.quickNavigateConfiguration;
         picker.hideInput = !!picker.quickNavigate && !visibleQuickAccess; // only hide input if there was no picker opened already
         if (typeof (options === null || options === void 0 ? void 0 : options.itemActivation) === 'number' || (options === null || options === void 0 ? void 0 : options.quickNavigateConfiguration)) {
-            picker.itemActivation = (_c = options === null || options === void 0 ? void 0 : options.itemActivation) !== null && _c !== void 0 ? _c : ItemActivation.SECOND /* quick nav is always second */;
+            picker.itemActivation = (_d = options === null || options === void 0 ? void 0 : options.itemActivation) !== null && _d !== void 0 ? _d : ItemActivation.SECOND /* quick nav is always second */;
         }
         picker.contextKey = descriptor === null || descriptor === void 0 ? void 0 : descriptor.contextKey;
         picker.filterValue = (value) => value.substring(descriptor ? descriptor.prefix.length : 0);
@@ -102,7 +102,7 @@ let QuickAccessController = class QuickAccessController extends Disposable {
             }));
         }
         // Register listeners
-        disposables.add(this.registerPickerListeners(picker, provider, descriptor, value, options === null || options === void 0 ? void 0 : options.providerOptions));
+        disposables.add(this.registerPickerListeners(picker, provider, descriptor, value, options));
         // Ask provider to fill the picker as needed if we have one
         // and pass over a cancellation token that will indicate when
         // the picker is hiding without a pick being made.
@@ -147,7 +147,7 @@ let QuickAccessController = class QuickAccessController extends Disposable {
         }
         picker.valueSelection = valueSelection;
     }
-    registerPickerListeners(picker, provider, descriptor, value, providerOptions) {
+    registerPickerListeners(picker, provider, descriptor, value, options) {
         const disposables = new DisposableStore();
         // Remember as last visible picker and clean up once picker get's disposed
         const visibleQuickAccess = this.visibleQuickAccess = { picker, descriptor, value };
@@ -159,13 +159,14 @@ let QuickAccessController = class QuickAccessController extends Disposable {
         // Whenever the value changes, check if the provider has
         // changed and if so - re-create the picker from the beginning
         disposables.add(picker.onDidChangeValue(value => {
-            const [providerForValue] = this.getOrInstantiateProvider(value);
+            const [providerForValue] = this.getOrInstantiateProvider(value, options === null || options === void 0 ? void 0 : options.enabledProviderPrefixes);
             if (providerForValue !== provider) {
                 this.show(value, {
+                    enabledProviderPrefixes: options === null || options === void 0 ? void 0 : options.enabledProviderPrefixes,
                     // do not rewrite value from user typing!
                     preserveValue: true,
                     // persist the value of the providerOptions from the original showing
-                    providerOptions
+                    providerOptions: options === null || options === void 0 ? void 0 : options.providerOptions
                 });
             }
             else {
@@ -180,9 +181,9 @@ let QuickAccessController = class QuickAccessController extends Disposable {
         }
         return disposables;
     }
-    getOrInstantiateProvider(value) {
+    getOrInstantiateProvider(value, enabledProviderPrefixes) {
         const providerDescriptor = this.registry.getQuickAccessProvider(value);
-        if (!providerDescriptor) {
+        if (!providerDescriptor || enabledProviderPrefixes && !(enabledProviderPrefixes === null || enabledProviderPrefixes === void 0 ? void 0 : enabledProviderPrefixes.includes(providerDescriptor.prefix))) {
             return [undefined, undefined];
         }
         let provider = this.mapProviderToDescriptor.get(providerDescriptor);

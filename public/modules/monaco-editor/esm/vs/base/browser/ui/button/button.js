@@ -4,7 +4,6 @@ import { StandardKeyboardEvent } from '../../keyboardEvent.js';
 import { renderMarkdown, renderStringAsPlaintext } from '../../markdownRenderer.js';
 import { Gesture, EventType as TouchEventType } from '../../touch.js';
 import { getDefaultHoverDelegate } from '../hover/hoverDelegateFactory.js';
-import { setupCustomHover } from '../hover/updatableHoverWidget.js';
 import { renderLabelWithIcons } from '../iconLabel/iconLabels.js';
 import { Color } from '../../../common/color.js';
 import { Emitter } from '../../../common/event.js';
@@ -12,6 +11,7 @@ import { isMarkdownString, markdownStringEqual } from '../../../common/htmlConte
 import { Disposable } from '../../../common/lifecycle.js';
 import { ThemeIcon } from '../../../common/themables.js';
 import './button.css';
+import { getBaseLayerHoverDelegate } from '../hover/hoverDelegate2.js';
 export const unthemedButtonStyles = {
     buttonBackground: '#0E639C',
     buttonHoverBackground: '#006BB3',
@@ -208,7 +208,7 @@ export class Button extends Disposable {
     setTitle(title) {
         var _a;
         if (!this._hover && title !== '') {
-            this._hover = this._register(setupCustomHover((_a = this.options.hoverDelegate) !== null && _a !== void 0 ? _a : getDefaultHoverDelegate('mouse'), this._element, title));
+            this._hover = this._register(getBaseLayerHoverDelegate().setupUpdatableHover((_a = this.options.hoverDelegate) !== null && _a !== void 0 ? _a : getDefaultHoverDelegate('mouse'), this._element, title));
         }
         else if (this._hover) {
             this._hover.update(title);

@@ -28,7 +28,7 @@ import { IAccessibilityService } from '../../../platform/accessibility/common/ac
 import { getWindow, getWindowById } from '../../../base/browser/dom.js';
 import { PixelRatio } from '../../../base/browser/pixelRatio.js';
 let EditorConfiguration = class EditorConfiguration extends Disposable {
-    constructor(isSimpleWidget, options, container, _accessibilityService) {
+    constructor(isSimpleWidget, contextMenuId, options, container, _accessibilityService) {
         super();
         this._accessibilityService = _accessibilityService;
         this._onDidChange = this._register(new Emitter());
@@ -42,6 +42,7 @@ let EditorConfiguration = class EditorConfiguration extends Disposable {
         this._glyphMarginDecorationLaneCount = 1;
         this._computeOptionsMemory = new ComputeOptionsMemory();
         this.isSimpleWidget = isSimpleWidget;
+        this.contextMenuId = contextMenuId;
         this._containerObserver = this._register(new ElementSizeObserver(container, options.dimension));
         this._targetWindowId = getWindow(container).vscodeWindowId;
         this._rawOptions = deepCloneAndMigrateOptions(options);
@@ -157,7 +158,7 @@ let EditorConfiguration = class EditorConfiguration extends Disposable {
     }
 };
 EditorConfiguration = __decorate([
-    __param(3, IAccessibilityService)
+    __param(4, IAccessibilityService)
 ], EditorConfiguration);
 export { EditorConfiguration };
 function digitCount(n) {

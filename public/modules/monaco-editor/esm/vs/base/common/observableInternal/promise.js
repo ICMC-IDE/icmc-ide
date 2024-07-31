@@ -3,7 +3,11 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 import { autorun } from './autorun.js';
-export function waitForState(observable, predicate, isError) {
+import { CancellationError } from '../errors.js';
+export function waitForState(observable, predicate, isError, cancellationToken) {
+    if (!predicate) {
+        predicate = state => state !== null && state !== undefined;
+    }
     return new Promise((resolve, reject) => {
         let isImmediateRun = true;
         let shouldDispose = false;
@@ -34,6 +38,19 @@ export function waitForState(observable, predicate, isError) {
                 }
             }
         });
+        if (cancellationToken) {
+            const dc = cancellationToken.onCancellationRequested(() => {
+                d.dispose();
+                dc.dispose();
+                reject(new CancellationError());
+            });
+            if (cancellationToken.isCancellationRequested) {
+                d.dispose();
+                dc.dispose();
+                reject(new CancellationError());
+                return;
+            }
+        }
         isImmediateRun = false;
         if (shouldDispose) {
             d.dispose();

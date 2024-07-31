@@ -14,13 +14,15 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 import { EventType, addDisposableListener, h } from '../../../../../base/browser/dom.js';
 import { Disposable } from '../../../../../base/common/lifecycle.js';
 import { autorun, autorunWithStore, derived, observableFromEvent, observableValue } from '../../../../../base/common/observable.js';
+import { derivedDisposable, derivedWithSetter } from '../../../../../base/common/observableInternal/derived.js';
+import { DiffEditorSash } from '../components/diffEditorSash.js';
 import { appendRemoveOnDispose, applyStyle, prependRemoveOnDispose } from '../utils.js';
 import { EditorGutter } from '../utils/editorGutter.js';
 import { ActionRunnerWithContext } from '../../multiDiffEditor/utils.js';
 import { LineRange, LineRangeSet } from '../../../../common/core/lineRange.js';
 import { OffsetRange } from '../../../../common/core/offsetRange.js';
 import { Range } from '../../../../common/core/range.js';
-import { SingleTextEdit, TextEdit } from '../../../../common/core/textEdit.js';
+import { TextEdit } from '../../../../common/core/textEdit.js';
 import { DetailedLineRangeMapping } from '../../../../common/diff/rangeMapping.js';
 import { TextModelText } from '../../../../common/model/textModelText.js';
 import { MenuWorkbenchToolBar } from '../../../../../platform/actions/browser/toolbar.js';
@@ -31,16 +33,20 @@ import { IInstantiationService } from '../../../../../platform/instantiation/com
 const emptyArr = [];
 const width = 35;
 let DiffEditorGutter = class DiffEditorGutter extends Disposable {
-    constructor(diffEditorRoot, _diffModel, _editors, _instantiationService, _contextKeyService, _menuService) {
+    constructor(diffEditorRoot, _diffModel, _editors, _options, _sashLayout, _boundarySashes, _instantiationService, _contextKeyService, _menuService) {
         super();
         this._diffModel = _diffModel;
         this._editors = _editors;
+        this._options = _options;
+        this._sashLayout = _sashLayout;
+        this._boundarySashes = _boundarySashes;
         this._instantiationService = _instantiationService;
         this._contextKeyService = _contextKeyService;
         this._menuService = _menuService;
         this._menu = this._register(this._menuService.createMenu(MenuId.DiffEditorHunkToolbar, this._contextKeyService));
         this._actions = observableFromEvent(this._menu.onDidChange, () => this._menu.getActions());
         this._hasActions = this._actions.map(a => a.length > 0);
+        this._showSash = derived(this, reader => this._options.renderSideBySide.read(reader) && this._hasActions.read(reader));
         this.width = derived(this, reader => this._hasActions.read(reader) ? width : 0);
         this.elements = h('div.gutter@gutter', { style: { position: 'absolute', height: '100%', width: width + 'px' } }, []);
         this._currentDiff = derived(this, (reader) => {
@@ -84,6 +90,10 @@ let DiffEditorGutter = class DiffEditorGutter extends Disposable {
             this._editors.modified.focus();
         }));
         this._register(applyStyle(this.elements.root, { display: this._hasActions.map(a => a ? 'block' : 'none') }));
+        derivedDisposable(this, reader => {
+            const showSash = this._showSash.read(reader);
+            return !showSash ? undefined : new DiffEditorSash(diffEditorRoot, this._sashLayout.dimensions, this._options.enableSplitViewResizing, this._boundarySashes, derivedWithSetter(this, reader => this._sashLayout.sashLeft.read(reader) - width, (v, tx) => this._sashLayout.sashLeft.set(v + width, tx)), () => this._sashLayout.resetSash());
+        }).recomputeInitiallyAndOnChange(this._store);
         this._register(new EditorGutter(this._editors.modified, this.elements.root, {
             getIntersectingGutterItems: (range, reader) => {
                 const model = this._diffModel.read(reader);
@@ -117,8 +127,10 @@ let DiffEditorGutter = class DiffEditorGutter extends Disposable {
     computeStagedValue(mapping) {
         var _a;
         const c = (_a = mapping.innerChanges) !== null && _a !== void 0 ? _a : [];
-        const edit = new TextEdit(c.map(c => new SingleTextEdit(c.originalRange, this._editors.modifiedModel.get().getValueInRange(c.modifiedRange))));
-        const value = edit.apply(new TextModelText(this._editors.original.getModel()));
+        const modified = new TextModelText(this._editors.modifiedModel.get());
+        const original = new TextModelText(this._editors.original.getModel());
+        const edit = new TextEdit(c.map(c => c.toTextEdit(modified)));
+        const value = edit.apply(original);
         return value;
     }
     layout(left) {
@@ -126,9 +138,9 @@ let DiffEditorGutter = class DiffEditorGutter extends Disposable {
     }
 };
 DiffEditorGutter = __decorate([
-    __param(3, IInstantiationService),
-    __param(4, IContextKeyService),
-    __param(5, IMenuService)
+    __param(6, IInstantiationService),
+    __param(7, IContextKeyService),
+    __param(8, IMenuService)
 ], DiffEditorGutter);
 export { DiffEditorGutter };
 class DiffGutterItem {
@@ -205,8 +217,6 @@ let DiffToolBar = class DiffToolBar extends Disposable {
         this._isSmall.set(this._item.get().mapping.original.startLineNumber === 1 && itemRange.length < 30, undefined);
         // Item might have changed
         itemHeight = this._elements.buttons.clientHeight;
-        this._elements.root.style.top = itemRange.start + 'px';
-        this._elements.root.style.height = itemRange.length + 'px';
         const middleHeight = itemRange.length / 2 - itemHeight / 2;
         const margin = itemHeight;
         let effectiveCheckboxTop = itemRange.start + middleHeight;

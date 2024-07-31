@@ -28,7 +28,7 @@ export class DefaultLinesDiffComputer {
         if (originalLines.length === 1 && originalLines[0].length === 0 || modifiedLines.length === 1 && modifiedLines[0].length === 0) {
             return new LinesDiff([
                 new DetailedLineRangeMapping(new LineRange(1, originalLines.length + 1), new LineRange(1, modifiedLines.length + 1), [
-                    new RangeMapping(new Range(1, 1, originalLines.length, originalLines[0].length + 1), new Range(1, 1, modifiedLines.length, modifiedLines[0].length + 1))
+                    new RangeMapping(new Range(1, 1, originalLines.length, originalLines[originalLines.length - 1].length + 1), new Range(1, 1, modifiedLines.length, modifiedLines[modifiedLines.length - 1].length + 1))
                 ])
             ], [], false);
         }
@@ -56,7 +56,7 @@ export class DefaultLinesDiffComputer {
                         : 1 + Math.log(1 + modifiedLines[offset2].length)
                     : 0.99);
             }
-            return this.myersDiffingAlgorithm.compute(sequence1, sequence2);
+            return this.myersDiffingAlgorithm.compute(sequence1, sequence2, timeout);
         })();
         let lineAlignments = lineAlignmentResult.diffs;
         let hitTimeout = lineAlignmentResult.hitTimeout;

@@ -64,7 +64,10 @@ export class SingleTextEdit {
     }
 }
 function rangeFromPositions(start, end) {
-    if (!start.isBeforeOrEqual(end)) {
+    if (start.lineNumber === end.lineNumber && start.column === Number.MAX_SAFE_INTEGER) {
+        return Range.fromPositions(end, end);
+    }
+    else if (!start.isBeforeOrEqual(end)) {
         throw new BugIndicatingError('start must be before end');
     }
     return new Range(start.lineNumber, start.column, end.lineNumber, end.column);

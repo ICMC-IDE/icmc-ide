@@ -2,7 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-import { $, addDisposableListener, EventType, getActiveElement, getWindow, isAncestor } from '../../../base/browser/dom.js';
+import { $, addDisposableListener, EventType, getActiveElement, getWindow, isAncestor, isHTMLElement } from '../../../base/browser/dom.js';
 import { StandardMouseEvent } from '../../../base/browser/mouseEvent.js';
 import { Menu } from '../../../base/browser/ui/menu/menu.js';
 import { ActionRunner } from '../../../base/common/actions.js';
@@ -31,7 +31,7 @@ export class ContextMenuHandler {
         }
         this.focusToReturn = getActiveElement();
         let menu;
-        const shadowRootElement = delegate.domForShadowRoot instanceof HTMLElement ? delegate.domForShadowRoot : undefined;
+        const shadowRootElement = isHTMLElement(delegate.domForShadowRoot) ? delegate.domForShadowRoot : undefined;
         this.contextViewService.showContextView({
             getAnchor: () => delegate.getAnchor(),
             canRelayout: false,

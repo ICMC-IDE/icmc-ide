@@ -70,8 +70,8 @@ export default class FilePickerElement extends HTMLElement {
       this.lastElementChild.remove();
     }
 
-    for (const fileName of this.#filenames) {
-      this.appendChild(this.#generateFile(fileName));
+    for (const filename of this.#filenames) {
+      this.appendChild(this.#generateFile(filename));
     }
   }
 

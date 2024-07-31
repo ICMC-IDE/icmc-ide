@@ -7,8 +7,8 @@ import { DomEmitter } from '../../event.js';
 import { renderFormattedText, renderText } from '../../formattedTextRenderer.js';
 import { ActionBar } from '../actionbar/actionbar.js';
 import * as aria from '../aria/aria.js';
+import { getBaseLayerHoverDelegate } from '../hover/hoverDelegate2.js';
 import { getDefaultHoverDelegate } from '../hover/hoverDelegateFactory.js';
-import { setupCustomHover } from '../hover/updatableHoverWidget.js';
 import { ScrollableElement } from '../scrollbar/scrollableElement.js';
 import { Widget } from '../widget.js';
 import { Emitter, Event } from '../../../common/event.js';
@@ -126,7 +126,7 @@ export class InputBox extends Widget {
     setTooltip(tooltip) {
         this.tooltip = tooltip;
         if (!this.hover) {
-            this.hover = this._register(setupCustomHover(getDefaultHoverDelegate('mouse'), this.input, tooltip));
+            this.hover = this._register(getBaseLayerHoverDelegate().setupUpdatableHover(getDefaultHoverDelegate('mouse'), this.input, tooltip));
         }
         else {
             this.hover.update(tooltip);

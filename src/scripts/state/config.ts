@@ -11,10 +11,20 @@ export interface ConfigMap {
 const CONFIG_STORAGE_PREFIX = "config:";
 
 export default class ConfigManager extends EventManager<ConfigMap> {
-  #configs: Partial<ConfigMap> = {};
+  #configs: Partial<ConfigMap> = {
+    syntax: "icmc",
+    "screen-width": 40,
+    "screen-height": 30,
+    frequency: 6,
+    "entry-file": "example.asm",
+  };
 
   get<K extends keyof ConfigMap>(config: K) {
     return this.#configs[config] as ConfigMap[K];
+  }
+
+  getMany<K extends keyof ConfigMap>(...args: K[]) {
+    return args.map((key) => this.#configs[key]);
   }
 
   set<K extends keyof ConfigMap>(config: K, value: ConfigMap[K]) {

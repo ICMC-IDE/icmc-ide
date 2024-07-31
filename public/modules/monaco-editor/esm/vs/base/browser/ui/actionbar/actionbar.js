@@ -214,7 +214,7 @@ export class ActionBar extends Disposable {
             return (_a = this.viewItems[indexOrElement]) === null || _a === void 0 ? void 0 : _a.action;
         }
         // by element
-        if (indexOrElement instanceof HTMLElement) {
+        if (DOM.isHTMLElement(indexOrElement)) {
             while (indexOrElement.parentElement !== this.actionsList) {
                 if (!indexOrElement.parentElement) {
                     return undefined;

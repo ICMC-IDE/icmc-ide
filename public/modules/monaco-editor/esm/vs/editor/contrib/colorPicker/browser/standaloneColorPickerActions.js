@@ -19,7 +19,10 @@ export class ShowOrFocusStandaloneColorPicker extends EditorAction2 {
             precondition: undefined,
             menu: [
                 { id: MenuId.CommandPalette },
-            ]
+            ],
+            metadata: {
+                description: localize2('showOrFocusStandaloneColorPickerDescription', "Show or focus a standalone color picker which uses the default color provider. It displays hex/rgb/hsl colors."),
+            }
         });
     }
     runEditorCommand(_accessor, editor) {
@@ -42,6 +45,9 @@ class HideStandaloneColorPicker extends EditorAction {
             kbOpts: {
                 primary: 9 /* KeyCode.Escape */,
                 weight: 100 /* KeybindingWeight.EditorContrib */
+            },
+            metadata: {
+                description: localize2('hideColorPickerDescription', "Hide the standalone color picker."),
             }
         });
     }
@@ -65,6 +71,9 @@ class InsertColorWithStandaloneColorPicker extends EditorAction {
             kbOpts: {
                 primary: 3 /* KeyCode.Enter */,
                 weight: 100 /* KeybindingWeight.EditorContrib */
+            },
+            metadata: {
+                description: localize2('insertColorWithStandaloneColorPickerDescription', "Insert hex/rgb/hsl colors with the focused standalone color picker."),
             }
         });
     }

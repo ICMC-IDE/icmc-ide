@@ -624,7 +624,8 @@ EventProfiling.all = new Set();
 EventProfiling._idPool = 0;
 let _globalLeakWarningThreshold = -1;
 class LeakageMonitor {
-    constructor(threshold, name = Math.random().toString(18).slice(2, 5)) {
+    constructor(_errorHandler, threshold, name = Math.random().toString(18).slice(2, 5)) {
+        this._errorHandler = _errorHandler;
         this.threshold = threshold;
         this.name = name;
         this._warnCountdown = 0;
@@ -648,34 +649,61 @@ class LeakageMonitor {
             // only warn on first exceed and then every time the limit
             // is exceeded by 50% again
             this._warnCountdown = threshold * 0.5;
-            // find most frequent listener and print warning
-            let topStack;
-            let topCount = 0;
-            for (const [stack, count] of this._stacks) {
-                if (!topStack || topCount < count) {
-                    topStack = stack;
-                    topCount = count;
-                }
-            }
-            console.warn(`[${this.name}] potential listener LEAK detected, having ${listenerCount} listeners already. MOST frequent listener (${topCount}):`);
+            const [topStack, topCount] = this.getMostFrequentStack();
+            const message = `[${this.name}] potential listener LEAK detected, having ${listenerCount} listeners already. MOST frequent listener (${topCount}):`;
+            console.warn(message);
             console.warn(topStack);
+            const error = new ListenerLeakError(message, topStack);
+            this._errorHandler(error);
         }
         return () => {
             const count = (this._stacks.get(stack.value) || 0);
             this._stacks.set(stack.value, count - 1);
         };
     }
+    getMostFrequentStack() {
+        if (!this._stacks) {
+            return undefined;
+        }
+        let topStack;
+        let topCount = 0;
+        for (const [stack, count] of this._stacks) {
+            if (!topStack || topCount < count) {
+                topStack = [stack, count];
+                topCount = count;
+            }
+        }
+        return topStack;
+    }
 }
 class Stacktrace {
     static create() {
         var _a;
-        return new Stacktrace((_a = new Error().stack) !== null && _a !== void 0 ? _a : '');
+        const err = new Error();
+        return new Stacktrace((_a = err.stack) !== null && _a !== void 0 ? _a : '');
     }
     constructor(value) {
         this.value = value;
     }
     print() {
         console.warn(this.value.split('\n').slice(2).join('\n'));
+    }
+}
+// error that is logged when going over the configured listener threshold
+export class ListenerLeakError extends Error {
+    constructor(message, stack) {
+        super(message);
+        this.name = 'ListenerLeakError';
+        this.stack = stack;
+    }
+}
+// SEVERE error that is logged when having gone way over the configured listener
+// threshold so that the emitter refuses to accept more listeners
+export class ListenerRefusalError extends Error {
+    constructor(message, stack) {
+        super(message);
+        this.name = 'ListenerRefusalError';
+        this.stack = stack;
     }
 }
 class UniqueContainer {
@@ -728,12 +756,14 @@ const _listenerFinalizers = _enableListenerGCedWarning
  */
 export class Emitter {
     constructor(options) {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c, _d, _e, _f;
         this._size = 0;
         this._options = options;
-        this._leakageMon = _globalLeakWarningThreshold > 0 || ((_a = this._options) === null || _a === void 0 ? void 0 : _a.leakWarningThreshold) ? new LeakageMonitor((_c = (_b = this._options) === null || _b === void 0 ? void 0 : _b.leakWarningThreshold) !== null && _c !== void 0 ? _c : _globalLeakWarningThreshold) : undefined;
-        this._perfMon = ((_d = this._options) === null || _d === void 0 ? void 0 : _d._profName) ? new EventProfiling(this._options._profName) : undefined;
-        this._deliveryQueue = (_e = this._options) === null || _e === void 0 ? void 0 : _e.deliveryQueue;
+        this._leakageMon = (_globalLeakWarningThreshold > 0 || ((_a = this._options) === null || _a === void 0 ? void 0 : _a.leakWarningThreshold))
+            ? new LeakageMonitor((_b = options === null || options === void 0 ? void 0 : options.onListenerError) !== null && _b !== void 0 ? _b : onUnexpectedError, (_d = (_c = this._options) === null || _c === void 0 ? void 0 : _c.leakWarningThreshold) !== null && _d !== void 0 ? _d : _globalLeakWarningThreshold) :
+            undefined;
+        this._perfMon = ((_e = this._options) === null || _e === void 0 ? void 0 : _e._profName) ? new EventProfiling(this._options._profName) : undefined;
+        this._deliveryQueue = (_f = this._options) === null || _f === void 0 ? void 0 : _f.deliveryQueue;
     }
     dispose() {
         var _a, _b, _c, _d;
@@ -772,9 +802,14 @@ export class Emitter {
     get event() {
         var _a;
         (_a = this._event) !== null && _a !== void 0 ? _a : (this._event = (callback, thisArgs, disposables) => {
-            var _a, _b, _c, _d, _e;
-            if (this._leakageMon && this._size > this._leakageMon.threshold * 3) {
-                console.warn(`[${this._leakageMon.name}] REFUSES to accept new listeners because it exceeded its threshold by far`);
+            var _a, _b, _c, _d, _e, _f, _g;
+            if (this._leakageMon && this._size > this._leakageMon.threshold ** 2) {
+                const message = `[${this._leakageMon.name}] REFUSES to accept new listeners because it exceeded its threshold by far (${this._size} vs ${this._leakageMon.threshold})`;
+                console.warn(message);
+                const tuple = (_a = this._leakageMon.getMostFrequentStack()) !== null && _a !== void 0 ? _a : ['UNKNOWN stack', -1];
+                const error = new ListenerRefusalError(`${message}. HINT: Stack shows most frequent listener (${tuple[1]}-times)`, tuple[0]);
+                const errorHandler = ((_b = this._options) === null || _b === void 0 ? void 0 : _b.onListenerError) || onUnexpectedError;
+                errorHandler(error);
                 return Disposable.None;
             }
             if (this._disposed) {
@@ -796,12 +831,12 @@ export class Emitter {
                 contained.stack = stack !== null && stack !== void 0 ? stack : Stacktrace.create();
             }
             if (!this._listeners) {
-                (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onWillAddFirstListener) === null || _b === void 0 ? void 0 : _b.call(_a, this);
+                (_d = (_c = this._options) === null || _c === void 0 ? void 0 : _c.onWillAddFirstListener) === null || _d === void 0 ? void 0 : _d.call(_c, this);
                 this._listeners = contained;
-                (_d = (_c = this._options) === null || _c === void 0 ? void 0 : _c.onDidAddFirstListener) === null || _d === void 0 ? void 0 : _d.call(_c, this);
+                (_f = (_e = this._options) === null || _e === void 0 ? void 0 : _e.onDidAddFirstListener) === null || _f === void 0 ? void 0 : _f.call(_e, this);
             }
             else if (this._listeners instanceof UniqueContainer) {
-                (_e = this._deliveryQueue) !== null && _e !== void 0 ? _e : (this._deliveryQueue = new EventDeliveryQueuePrivate());
+                (_g = this._deliveryQueue) !== null && _g !== void 0 ? _g : (this._deliveryQueue = new EventDeliveryQueuePrivate());
                 this._listeners = [this._listeners, contained];
             }
             else {
@@ -1128,27 +1163,56 @@ export class EventMultiplexer {
  */
 export class EventBufferer {
     constructor() {
-        this.buffers = [];
+        this.data = [];
     }
-    wrapEvent(event) {
+    wrapEvent(event, reduce, initial) {
         return (listener, thisArgs, disposables) => {
             return event(i => {
-                const buffer = this.buffers[this.buffers.length - 1];
-                if (buffer) {
-                    buffer.push(() => listener.call(thisArgs, i));
+                var _a;
+                const data = this.data[this.data.length - 1];
+                // Non-reduce scenario
+                if (!reduce) {
+                    // Buffering case
+                    if (data) {
+                        data.buffers.push(() => listener.call(thisArgs, i));
+                    }
+                    else {
+                        // Not buffering case
+                        listener.call(thisArgs, i);
+                    }
+                    return;
                 }
-                else {
-                    listener.call(thisArgs, i);
+                // Reduce scenario
+                const reduceData = data;
+                // Not buffering case
+                if (!reduceData) {
+                    // TODO: Is there a way to cache this reduce call for all listeners?
+                    listener.call(thisArgs, reduce(initial, i));
+                    return;
+                }
+                // Buffering case
+                (_a = reduceData.items) !== null && _a !== void 0 ? _a : (reduceData.items = []);
+                reduceData.items.push(i);
+                if (reduceData.buffers.length === 0) {
+                    // Include a single buffered function that will reduce all events when we're done buffering events
+                    data.buffers.push(() => {
+                        var _a;
+                        // cache the reduced result so that the value can be shared across all listeners
+                        (_a = reduceData.reducedResult) !== null && _a !== void 0 ? _a : (reduceData.reducedResult = initial
+                            ? reduceData.items.reduce(reduce, initial)
+                            : reduceData.items.reduce(reduce));
+                        listener.call(thisArgs, reduceData.reducedResult);
+                    });
                 }
             }, undefined, disposables);
         };
     }
     bufferEvents(fn) {
-        const buffer = [];
-        this.buffers.push(buffer);
+        const data = { buffers: new Array() };
+        this.data.push(data);
         const r = fn();
-        this.buffers.pop();
-        buffer.forEach(flush => flush());
+        this.data.pop();
+        data.buffers.forEach(flush => flush());
         return r;
     }
 }

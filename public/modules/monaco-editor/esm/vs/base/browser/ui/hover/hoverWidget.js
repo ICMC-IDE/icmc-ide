@@ -42,19 +42,8 @@ export class HoverAction extends Disposable {
         }
         const label = dom.append(this.action, $('span'));
         label.textContent = keybindingLabel ? `${actionOptions.label} (${keybindingLabel})` : actionOptions.label;
-        this._register(dom.addDisposableListener(this.actionContainer, dom.EventType.CLICK, e => {
-            e.stopPropagation();
-            e.preventDefault();
-            actionOptions.run(this.actionContainer);
-        }));
-        this._register(dom.addDisposableListener(this.actionContainer, dom.EventType.KEY_DOWN, e => {
-            const event = new StandardKeyboardEvent(e);
-            if (event.equals(3 /* KeyCode.Enter */) || event.equals(10 /* KeyCode.Space */)) {
-                e.stopPropagation();
-                e.preventDefault();
-                actionOptions.run(this.actionContainer);
-            }
-        }));
+        this._store.add(new ClickAction(this.actionContainer, actionOptions.run));
+        this._store.add(new KeyDownAction(this.actionContainer, actionOptions.run, [3 /* KeyCode.Enter */, 10 /* KeyCode.Space */]));
         this.setEnabled(true);
     }
     setEnabled(enabled) {
@@ -70,4 +59,27 @@ export class HoverAction extends Disposable {
 }
 export function getHoverAccessibleViewHint(shouldHaveHint, keybinding) {
     return shouldHaveHint && keybinding ? localize('acessibleViewHint', "Inspect this in the accessible view with {0}.", keybinding) : shouldHaveHint ? localize('acessibleViewHintNoKbOpen', "Inspect this in the accessible view via the command Open Accessible View which is currently not triggerable via keybinding.") : '';
+}
+export class ClickAction extends Disposable {
+    constructor(container, run) {
+        super();
+        this._register(dom.addDisposableListener(container, dom.EventType.CLICK, e => {
+            e.stopPropagation();
+            e.preventDefault();
+            run(container);
+        }));
+    }
+}
+export class KeyDownAction extends Disposable {
+    constructor(container, run, keyCodes) {
+        super();
+        this._register(dom.addDisposableListener(container, dom.EventType.KEY_DOWN, e => {
+            const event = new StandardKeyboardEvent(e);
+            if (keyCodes.some(keyCode => event.equals(keyCode))) {
+                e.stopPropagation();
+                e.preventDefault();
+                run(container);
+            }
+        }));
+    }
 }

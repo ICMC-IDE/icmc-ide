@@ -6,7 +6,7 @@ import { h } from '../../../../../base/browser/dom.js';
 import { ActionBar } from '../../../../../base/browser/ui/actionbar/actionbar.js';
 import { Action } from '../../../../../base/common/actions.js';
 import { booleanComparator, compareBy, numberComparator, tieBreakComparators } from '../../../../../base/common/arrays.js';
-import { findMaxIdxBy } from '../../../../../base/common/arraysFind.js';
+import { findMaxIdx } from '../../../../../base/common/arraysFind.js';
 import { Codicon } from '../../../../../base/common/codicons.js';
 import { Disposable, toDisposable } from '../../../../../base/common/lifecycle.js';
 import { autorun, autorunHandleChanges, autorunWithStore, constObservable, derived, derivedWithStore, observableFromEvent, observableSignalFromEvent, observableValue, recomputeInitiallyAndOnChange } from '../../../../../base/common/observable.js';
@@ -201,7 +201,7 @@ class LinesLayout {
             if (trackIdx === -1) {
                 const maxTrackCount = 6;
                 if (setsPerTrack.length >= maxTrackCount) {
-                    trackIdx = findMaxIdxBy(setsPerTrack, compareBy(set => set.intersectWithRangeLength(line), numberComparator));
+                    trackIdx = findMaxIdx(setsPerTrack, compareBy(set => set.intersectWithRangeLength(line), numberComparator));
                 }
                 else {
                     trackIdx = setsPerTrack.length;

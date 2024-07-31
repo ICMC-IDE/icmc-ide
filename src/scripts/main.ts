@@ -41,6 +41,7 @@ function openFile(filename: string) {
 
     if (extension) {
       language = extension[1].toLowerCase();
+      console.log(language);
     }
 
     return monaco.editor.createModel(

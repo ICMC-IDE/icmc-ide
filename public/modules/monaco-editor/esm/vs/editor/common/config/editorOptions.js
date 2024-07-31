@@ -1370,6 +1370,7 @@ class EditorMinimap extends BaseEditorOption {
             showRegionSectionHeaders: true,
             showMarkSectionHeaders: true,
             sectionHeaderFontSize: 9,
+            sectionHeaderLetterSpacing: 1,
         };
         super(73 /* EditorOption.minimap */, 'minimap', defaults, {
             'editor.minimap.enabled': {
@@ -1437,11 +1438,16 @@ class EditorMinimap extends BaseEditorOption {
                 type: 'number',
                 default: defaults.sectionHeaderFontSize,
                 description: nls.localize('minimap.sectionHeaderFontSize', "Controls the font size of section headers in the minimap.")
+            },
+            'editor.minimap.sectionHeaderLetterSpacing': {
+                type: 'number',
+                default: defaults.sectionHeaderLetterSpacing,
+                description: nls.localize('minimap.sectionHeaderLetterSpacing', "Controls the amount of space (in pixels) between characters of section header. This helps the readability of the header in small font sizes.")
             }
         });
     }
     validate(_input) {
-        var _a;
+        var _a, _b;
         if (!_input || typeof _input !== 'object') {
             return this.defaultValue;
         }
@@ -1458,6 +1464,7 @@ class EditorMinimap extends BaseEditorOption {
             showRegionSectionHeaders: boolean(input.showRegionSectionHeaders, this.defaultValue.showRegionSectionHeaders),
             showMarkSectionHeaders: boolean(input.showMarkSectionHeaders, this.defaultValue.showMarkSectionHeaders),
             sectionHeaderFontSize: EditorFloatOption.clamp((_a = input.sectionHeaderFontSize) !== null && _a !== void 0 ? _a : this.defaultValue.sectionHeaderFontSize, 4, 32),
+            sectionHeaderLetterSpacing: EditorFloatOption.clamp((_b = input.sectionHeaderLetterSpacing) !== null && _b !== void 0 ? _b : this.defaultValue.sectionHeaderLetterSpacing, 0, 5),
         };
     }
 }

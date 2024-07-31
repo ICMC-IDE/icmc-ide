@@ -9,7 +9,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 import { DataTransfers } from '../../dnd.js';
-import { $, addDisposableListener, animate, getContentHeight, getContentWidth, getTopLeftOffset, getWindow, isAncestor, scheduleAtNextAnimationFrame } from '../../dom.js';
+import { $, addDisposableListener, animate, getContentHeight, getContentWidth, getTopLeftOffset, getWindow, isAncestor, isHTMLElement, scheduleAtNextAnimationFrame } from '../../dom.js';
 import { DomEmitter } from '../../event.js';
 import { EventType as TouchEventType, Gesture } from '../../touch.js';
 import { SmoothScrollableElement } from '../scrollbar/scrollableElement.js';
@@ -315,7 +315,7 @@ export class ListView {
                 if (renderer && renderer.disposeElement) {
                     renderer.disposeElement(item.element, i, item.row.templateData, item.size);
                 }
-                rows.push(item.row);
+                rows.unshift(item.row);
             }
             item.row = null;
             item.stale = true;
@@ -538,11 +538,13 @@ export class ListView {
         else if (checked) {
             const update = (checked) => item.row.domNode.setAttribute('aria-checked', String(!!checked));
             update(checked.value);
-            item.checkedDisposable = checked.onDidChange(update);
+            item.checkedDisposable = checked.onDidChange(() => update(checked.value));
         }
         if (item.stale || !item.row.domNode.parentElement) {
             const referenceNode = (_c = (_b = (_a = this.items.at(index + 1)) === null || _a === void 0 ? void 0 : _a.row) === null || _b === void 0 ? void 0 : _b.domNode) !== null && _c !== void 0 ? _c : null;
-            this.rowsContainer.insertBefore(item.row.domNode, referenceNode);
+            if (item.row.domNode.parentElement !== this.rowsContainer || item.row.domNode.nextElementSibling !== referenceNode) {
+                this.rowsContainer.insertBefore(item.row.domNode, referenceNode);
+            }
             item.stale = false;
         }
         this.updateItemInDOM(item, index);
@@ -897,7 +899,7 @@ export class ListView {
     getItemIndexFromEventTarget(target) {
         const scrollableElement = this.scrollableElement.getDomNode();
         let element = target;
-        while (element instanceof HTMLElement && element !== this.rowsContainer && scrollableElement.contains(element)) {
+        while (isHTMLElement(element) && element !== this.rowsContainer && scrollableElement.contains(element)) {
             const rawIndex = element.getAttribute('data-index');
             if (rawIndex) {
                 const index = Number(rawIndex);

@@ -38,7 +38,7 @@ let AbstractGotoSymbolQuickAccessProvider = AbstractGotoSymbolQuickAccessProvide
         this.provideLabelPick(picker, localize('cannotRunGotoSymbolWithoutEditor', "To go to a symbol, first open a text editor with symbol information."));
         return Disposable.None;
     }
-    provideWithTextEditor(context, picker, token) {
+    provideWithTextEditor(context, picker, token, runOptions) {
         const editor = context.editor;
         const model = this.getModel(editor);
         if (!model) {
@@ -46,7 +46,7 @@ let AbstractGotoSymbolQuickAccessProvider = AbstractGotoSymbolQuickAccessProvide
         }
         // Provide symbols from model if available in registry
         if (this._languageFeaturesService.documentSymbolProvider.has(model)) {
-            return this.doProvideWithEditorSymbols(context, model, picker, token);
+            return this.doProvideWithEditorSymbols(context, model, picker, token, runOptions);
         }
         // Otherwise show an entry for a model without registry
         // But give a chance to resolve the symbols at a later
@@ -91,15 +91,17 @@ let AbstractGotoSymbolQuickAccessProvider = AbstractGotoSymbolQuickAccessProvide
         disposables.add(toDisposable(() => symbolProviderRegistryPromise.complete(false)));
         return symbolProviderRegistryPromise.p;
     }
-    doProvideWithEditorSymbols(context, model, picker, token) {
+    doProvideWithEditorSymbols(context, model, picker, token, runOptions) {
         var _a;
         const editor = context.editor;
         const disposables = new DisposableStore();
         // Goto symbol once picked
         disposables.add(picker.onDidAccept(event => {
+            var _a;
             const [item] = picker.selectedItems;
             if (item && item.range) {
                 this.gotoLocation(context, { range: item.range.selection, keyMods: picker.keyMods, preserveFocus: event.inBackground });
+                (_a = runOptions === null || runOptions === void 0 ? void 0 : runOptions.handleAccept) === null || _a === void 0 ? void 0 : _a.call(runOptions, item);
                 if (!event.inBackground) {
                     picker.hide();
                 }
@@ -127,7 +129,7 @@ let AbstractGotoSymbolQuickAccessProvider = AbstractGotoSymbolQuickAccessProvide
             picker.busy = true;
             try {
                 const query = prepareQuery(picker.value.substr(AbstractGotoSymbolQuickAccessProvider_1.PREFIX.length).trim());
-                const items = await this.doGetSymbolPicks(symbolsPromise, query, undefined, picksCts.token);
+                const items = await this.doGetSymbolPicks(symbolsPromise, query, undefined, picksCts.token, model);
                 if (token.isCancellationRequested) {
                     return;
                 }
@@ -169,7 +171,7 @@ let AbstractGotoSymbolQuickAccessProvider = AbstractGotoSymbolQuickAccessProvide
         }));
         return disposables;
     }
-    async doGetSymbolPicks(symbolsPromise, query, options, token) {
+    async doGetSymbolPicks(symbolsPromise, query, options, token, model) {
         var _a, _b;
         const symbols = await symbolsPromise;
         if (token.isCancellationRequested) {
@@ -263,6 +265,8 @@ let AbstractGotoSymbolQuickAccessProvider = AbstractGotoSymbolQuickAccessProvide
                     selection: Range.collapseToStart(symbol.selectionRange),
                     decoration: symbol.range
                 },
+                uri: model.uri,
+                symbolName: symbolLabel,
                 strikethrough: deprecated,
                 buttons
             });

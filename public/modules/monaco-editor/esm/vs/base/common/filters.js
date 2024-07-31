@@ -638,7 +638,7 @@ export function fuzzyScore(pattern, patternLow, patternStart, word, wordLow, wor
         column = diagColumn - 1;
         result.push(column);
     }
-    if (wordLen === patternLen && options.boostFullMatch) {
+    if (wordLen - wordStart === patternLen && options.boostFullMatch) {
         // the word matches the pattern with all characters!
         // giving the score a total match boost (to come up ahead other words)
         result[0] += 2;

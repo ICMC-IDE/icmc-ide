@@ -24,6 +24,7 @@ import { Position } from '../../../common/core/position.js';
 import { MenuEntryActionViewItem, createAndFillInActionBarActions } from '../../../../platform/actions/browser/menuEntryActionViewItem.js';
 import { WorkbenchToolBar } from '../../../../platform/actions/browser/toolbar.js';
 import { IMenuService, MenuId, MenuItemAction } from '../../../../platform/actions/common/actions.js';
+import { ICommandService } from '../../../../platform/commands/common/commands.js';
 import { IContextKeyService } from '../../../../platform/contextkey/common/contextkey.js';
 import { IContextMenuService } from '../../../../platform/contextview/browser/contextView.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
@@ -158,8 +159,8 @@ class StatusBarViewItem extends MenuEntryActionViewItem {
     }
 }
 let CustomizedMenuWorkbenchToolBar = class CustomizedMenuWorkbenchToolBar extends WorkbenchToolBar {
-    constructor(container, editor, menuId, options2, menuService, contextKeyService, contextMenuService, keybindingService, telemetryService) {
-        super(container, { resetMenu: menuId, ...options2 }, menuService, contextKeyService, contextMenuService, keybindingService, telemetryService);
+    constructor(container, editor, menuId, options2, menuService, contextKeyService, contextMenuService, keybindingService, commandService, telemetryService) {
+        super(container, { resetMenu: menuId, ...options2 }, menuService, contextKeyService, contextMenuService, keybindingService, commandService, telemetryService);
         this.editor = editor;
         this.menuId = menuId;
         this.options2 = options2;
@@ -194,6 +195,7 @@ CustomizedMenuWorkbenchToolBar = __decorate([
     __param(5, IContextKeyService),
     __param(6, IContextMenuService),
     __param(7, IKeybindingService),
-    __param(8, ITelemetryService)
+    __param(8, ICommandService),
+    __param(9, ITelemetryService)
 ], CustomizedMenuWorkbenchToolBar);
 export { CustomizedMenuWorkbenchToolBar };

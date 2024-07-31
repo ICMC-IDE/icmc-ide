@@ -8,7 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-import { $, append, createStyleSheet, EventHelper, getWindow } from '../../dom.js';
+import { $, append, createStyleSheet, EventHelper, getWindow, isHTMLElement } from '../../dom.js';
 import { DomEmitter } from '../../event.js';
 import { EventType, Gesture } from '../../touch.js';
 import { Delayer } from '../../../common/async.js';
@@ -434,7 +434,7 @@ export class Sash extends Disposable {
     getOrthogonalSash(e) {
         var _a;
         const target = (_a = e.initialTarget) !== null && _a !== void 0 ? _a : e.target;
-        if (!target || !(target instanceof HTMLElement)) {
+        if (!target || !(isHTMLElement(target))) {
             return undefined;
         }
         if (target.classList.contains('orthogonal-drag-handle')) {

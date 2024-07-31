@@ -3,20 +3,23 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 import { assertFn } from '../assert.js';
+import { strictEquals } from '../equals.js';
 import { DisposableStore } from '../lifecycle.js';
 import { BaseObservable, _setDerivedOpts } from './base.js';
 import { DebugNameData } from './debugName.js';
 import { getLogger } from './logging.js';
-export const defaultEqualityComparer = (a, b) => a === b;
 export function derived(computeFnOrOwner, computeFn) {
     if (computeFn !== undefined) {
-        return new Derived(new DebugNameData(computeFnOrOwner, undefined, computeFn), computeFn, undefined, undefined, undefined, defaultEqualityComparer);
+        return new Derived(new DebugNameData(computeFnOrOwner, undefined, computeFn), computeFn, undefined, undefined, undefined, strictEquals);
     }
-    return new Derived(new DebugNameData(undefined, undefined, computeFnOrOwner), computeFnOrOwner, undefined, undefined, undefined, defaultEqualityComparer);
+    return new Derived(new DebugNameData(undefined, undefined, computeFnOrOwner), computeFnOrOwner, undefined, undefined, undefined, strictEquals);
+}
+export function derivedWithSetter(owner, computeFn, setter) {
+    return new DerivedWithSetter(new DebugNameData(owner, undefined, computeFn), computeFn, undefined, undefined, undefined, strictEquals, setter);
 }
 export function derivedOpts(options, computeFn) {
     var _a;
-    return new Derived(new DebugNameData(options.owner, options.debugName, options.debugReferenceFn), computeFn, undefined, undefined, options.onLastObserverRemoved, (_a = options.equalityComparer) !== null && _a !== void 0 ? _a : defaultEqualityComparer);
+    return new Derived(new DebugNameData(options.owner, options.debugName, options.debugReferenceFn), computeFn, undefined, undefined, options.onLastObserverRemoved, (_a = options.equalsFn) !== null && _a !== void 0 ? _a : strictEquals);
 }
 _setDerivedOpts(derivedOpts);
 /**
@@ -34,7 +37,7 @@ _setDerivedOpts(derivedOpts);
  */
 export function derivedHandleChanges(options, computeFn) {
     var _a;
-    return new Derived(new DebugNameData(options.owner, options.debugName, undefined), computeFn, options.createEmptyChangeSummary, options.handleChange, undefined, (_a = options.equalityComparer) !== null && _a !== void 0 ? _a : defaultEqualityComparer);
+    return new Derived(new DebugNameData(options.owner, options.debugName, undefined), computeFn, options.createEmptyChangeSummary, options.handleChange, undefined, (_a = options.equalityComparer) !== null && _a !== void 0 ? _a : strictEquals);
 }
 export function derivedWithStore(computeFnOrOwner, computeFnOrUndefined) {
     let computeFn;
@@ -51,7 +54,7 @@ export function derivedWithStore(computeFnOrOwner, computeFnOrUndefined) {
     return new Derived(new DebugNameData(owner, undefined, computeFn), r => {
         store.clear();
         return computeFn(r, store);
-    }, undefined, undefined, () => store.dispose(), defaultEqualityComparer);
+    }, undefined, undefined, () => store.dispose(), strictEquals);
 }
 export function derivedDisposable(computeFnOrOwner, computeFnOrUndefined) {
     let computeFn;
@@ -72,7 +75,7 @@ export function derivedDisposable(computeFnOrOwner, computeFnOrUndefined) {
             store.add(result);
         }
         return result;
-    }, undefined, undefined, () => store.dispose(), defaultEqualityComparer);
+    }, undefined, undefined, () => store.dispose(), strictEquals);
 }
 export class Derived extends BaseObservable {
     get debugName() {
@@ -232,7 +235,7 @@ export class Derived extends BaseObservable {
             const shouldReact = this._handleChange ? this._handleChange({
                 changedObservable: observable,
                 change,
-                didChange: o => o === observable,
+                didChange: (o) => o === observable,
             }, this.changeSummary) : true;
             const wasUpToDate = this.state === 3 /* DerivedState.upToDate */;
             if (shouldReact && (this.state === 1 /* DerivedState.dependenciesMightHaveChanged */ || wasUpToDate)) {
@@ -270,5 +273,11 @@ export class Derived extends BaseObservable {
             // Calling end update after removing the observer makes sure endUpdate cannot be called twice here.
             observer.endUpdate(this);
         }
+    }
+}
+export class DerivedWithSetter extends Derived {
+    constructor(debugNameData, computeFn, createChangeSummary, handleChange, handleLastObserverRemoved = undefined, equalityComparator, set) {
+        super(debugNameData, computeFn, createChangeSummary, handleChange, handleLastObserverRemoved, equalityComparator);
+        this.set = set;
     }
 }

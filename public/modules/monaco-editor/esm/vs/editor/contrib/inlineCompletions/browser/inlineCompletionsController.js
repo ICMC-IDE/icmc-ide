@@ -14,8 +14,14 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 var InlineCompletionsController_1;
 import { createStyleSheet2 } from '../../../../base/browser/dom.js';
 import { alert } from '../../../../base/browser/ui/aria/aria.js';
-import { Disposable, toDisposable } from '../../../../base/common/lifecycle.js';
-import { autorun, autorunHandleChanges, constObservable, derived, disposableObservableValue, observableFromEvent, observableSignal, observableValue, transaction } from '../../../../base/common/observable.js';
+import { timeout } from '../../../../base/common/async.js';
+import { cancelOnDispose } from '../../../../base/common/cancellation.js';
+import { itemEquals, itemsEquals } from '../../../../base/common/equals.js';
+import { Disposable, DisposableStore, toDisposable } from '../../../../base/common/lifecycle.js';
+import { autorun, autorunHandleChanges, constObservable, derived, disposableObservableValue, observableFromEvent, observableSignal, observableValue, transaction, waitForState } from '../../../../base/common/observable.js';
+import { observableValueOpts } from '../../../../base/common/observableInternal/base.js';
+import { mapObservableArrayCached } from '../../../../base/common/observableInternal/utils.js';
+import { isUndefined } from '../../../../base/common/types.js';
 import { CoreEditingCommands } from '../../../browser/coreCommands.js';
 import { Position } from '../../../common/core/position.js';
 import { ILanguageFeatureDebounceService } from '../../../common/services/languageFeatureDebounce.js';
@@ -27,18 +33,18 @@ import { InlineCompletionsHintsWidget, InlineSuggestionHintsContentWidget } from
 import { InlineCompletionsModel, VersionIdChangeReason } from './inlineCompletionsModel.js';
 import { SuggestWidgetAdaptor } from './suggestWidgetInlineCompletionProvider.js';
 import { localize } from '../../../../nls.js';
+import { IAccessibilityService } from '../../../../platform/accessibility/common/accessibility.js';
 import { AccessibilitySignal, IAccessibilitySignalService } from '../../../../platform/accessibilitySignal/browser/accessibilitySignalService.js';
 import { ICommandService } from '../../../../platform/commands/common/commands.js';
 import { IConfigurationService } from '../../../../platform/configuration/common/configuration.js';
 import { IContextKeyService } from '../../../../platform/contextkey/common/contextkey.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { IKeybindingService } from '../../../../platform/keybinding/common/keybinding.js';
-import { mapObservableArrayCached } from '../../../../base/common/observableInternal/utils.js';
 let InlineCompletionsController = InlineCompletionsController_1 = class InlineCompletionsController extends Disposable {
     static get(editor) {
         return editor.getContribution(InlineCompletionsController_1.ID);
     }
-    constructor(editor, _instantiationService, _contextKeyService, _configurationService, _commandService, _debounceService, _languageFeaturesService, _accessibilitySignalService, _keybindingService) {
+    constructor(editor, _instantiationService, _contextKeyService, _configurationService, _commandService, _debounceService, _languageFeaturesService, _accessibilitySignalService, _keybindingService, _accessibilityService) {
         super();
         this.editor = editor;
         this._instantiationService = _instantiationService;
@@ -49,9 +55,10 @@ let InlineCompletionsController = InlineCompletionsController_1 = class InlineCo
         this._languageFeaturesService = _languageFeaturesService;
         this._accessibilitySignalService = _accessibilitySignalService;
         this._keybindingService = _keybindingService;
+        this._accessibilityService = _accessibilityService;
         this.model = this._register(disposableObservableValue('inlineCompletionModel', undefined));
         this._textModelVersionId = observableValue(this, -1);
-        this._positions = observableValue(this, [new Position(1, 1)]);
+        this._positions = observableValueOpts({ owner: this, equalsFn: itemsEquals(itemEquals()) }, [new Position(1, 1)]);
         this._suggestWidgetAdaptor = this._register(new SuggestWidgetAdaptor(this.editor, () => { var _a, _b; return (_b = (_a = this.model.get()) === null || _a === void 0 ? void 0 : _a.selectedInlineCompletion.get()) === null || _b === void 0 ? void 0 : _b.toSingleTextEdit(undefined); }, (tx) => this.updateObservables(tx, VersionIdChangeReason.Other), (item) => {
             transaction(tx => {
                 var _a;
@@ -60,7 +67,10 @@ let InlineCompletionsController = InlineCompletionsController_1 = class InlineCo
                 (_a = this.model.get()) === null || _a === void 0 ? void 0 : _a.handleSuggestAccepted(item);
             });
         }));
-        this._enabled = observableFromEvent(this.editor.onDidChangeConfiguration, () => this.editor.getOption(62 /* EditorOption.inlineSuggest */).enabled);
+        this._enabledInConfig = observableFromEvent(this.editor.onDidChangeConfiguration, () => this.editor.getOption(62 /* EditorOption.inlineSuggest */).enabled);
+        this._isScreenReaderEnabled = observableFromEvent(this._accessibilityService.onDidChangeScreenReaderOptimized, () => this._accessibilityService.isScreenReaderOptimized());
+        this._editorDictationInProgress = observableFromEvent(this._contextKeyService.onDidChangeContext, () => this._contextKeyService.getContext(this.editor.getDomNode()).getValue('editorDictation.inProgress') === true);
+        this._enabled = derived(this, reader => this._enabledInConfig.read(reader) && (!this._isScreenReaderEnabled.read(reader) || !this._editorDictationInProgress.read(reader)));
         this._fontFamily = observableFromEvent(this.editor.onDidChangeConfiguration, () => this.editor.getOption(62 /* EditorOption.inlineSuggest */).fontFamily);
         this._ghostTexts = derived(this, (reader) => {
             var _a;
@@ -184,6 +194,7 @@ let InlineCompletionsController = InlineCompletionsController_1 = class InlineCo
         this._register(toDisposable(() => {
             this._suggestWidgetAdaptor.stopForceRenderingAbove();
         }));
+        const cancellationStore = this._register(new DisposableStore());
         let lastInlineCompletionId = undefined;
         this._register(autorunHandleChanges({
             handleChange: (context, changeSummary) => {
@@ -192,7 +203,7 @@ let InlineCompletionsController = InlineCompletionsController_1 = class InlineCo
                 }
                 return true;
             },
-        }, async (reader) => {
+        }, async (reader, _) => {
             /** @description InlineCompletionsController.playAccessibilitySignalAndReadSuggestion */
             this._playAccessibilitySignal.read(reader);
             const model = this.model.read(reader);
@@ -202,13 +213,15 @@ let InlineCompletionsController = InlineCompletionsController_1 = class InlineCo
                 return;
             }
             if (state.inlineCompletion.semanticId !== lastInlineCompletionId) {
+                cancellationStore.clear();
                 lastInlineCompletionId = state.inlineCompletion.semanticId;
                 const lineText = model.textModel.getLineContent(state.primaryGhostText.lineNumber);
-                this._accessibilitySignalService.playSignal(AccessibilitySignal.inlineSuggestion).then(() => {
-                    if (this.editor.getOption(8 /* EditorOption.screenReaderAnnounceInlineSuggestion */)) {
-                        this.provideScreenReaderUpdate(state.primaryGhostText.renderForScreenReader(lineText));
-                    }
-                });
+                await timeout(50, cancelOnDispose(cancellationStore));
+                await waitForState(this._suggestWidgetAdaptor.selectedItem, isUndefined, () => false, cancelOnDispose(cancellationStore));
+                await this._accessibilitySignalService.playSignal(AccessibilitySignal.inlineSuggestion);
+                if (this.editor.getOption(8 /* EditorOption.screenReaderAnnounceInlineSuggestion */)) {
+                    this.provideScreenReaderUpdate(state.primaryGhostText.renderForScreenReader(lineText));
+                }
             }
         }));
         this._register(new InlineCompletionsHintsWidget(this.editor, this.model, this._instantiationService));
@@ -264,7 +277,8 @@ InlineCompletionsController = InlineCompletionsController_1 = __decorate([
     __param(5, ILanguageFeatureDebounceService),
     __param(6, ILanguageFeaturesService),
     __param(7, IAccessibilitySignalService),
-    __param(8, IKeybindingService)
+    __param(8, IKeybindingService),
+    __param(9, IAccessibilityService)
 ], InlineCompletionsController);
 export { InlineCompletionsController };
 function convertItemsToStableObservables(items, store) {

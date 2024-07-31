@@ -6,8 +6,8 @@ import * as dom from '../../dom.js';
 import { DomEmitter } from '../../event.js';
 import { StandardKeyboardEvent } from '../../keyboardEvent.js';
 import { renderMarkdown } from '../../markdownRenderer.js';
+import { getBaseLayerHoverDelegate } from '../hover/hoverDelegate2.js';
 import { getDefaultHoverDelegate } from '../hover/hoverDelegateFactory.js';
-import { setupCustomHover } from '../hover/updatableHoverWidget.js';
 import { List } from '../list/listWidget.js';
 import * as arrays from '../../../common/arrays.js';
 import { Emitter, Event } from '../../../common/event.js';
@@ -88,7 +88,7 @@ export class SelectBoxList extends Disposable {
     }
     setTitle(title) {
         if (!this._hover && title) {
-            this._hover = this._register(setupCustomHover(getDefaultHoverDelegate('mouse'), this.selectElement, title));
+            this._hover = this._register(getBaseLayerHoverDelegate().setupUpdatableHover(getDefaultHoverDelegate('mouse'), this.selectElement, title));
         }
         else if (this._hover) {
             this._hover.update(title);

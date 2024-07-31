@@ -75,7 +75,7 @@ export default class MemoryEditorElement extends HTMLElement {
     length: number,
     // originOffset = 0,
   ) {
-    const rows = length / 16;
+    const rows = length / 8;
 
     const region = document.createElement("details");
     const name = document.createElement("summary");
@@ -117,7 +117,7 @@ export default class MemoryEditorElement extends HTMLElement {
 
     for (let i = 0; i < rows; i++) {
       const span = document.createElement("span");
-      span.innerText = (offset + 16 * i)
+      span.innerText = (offset + 8 * i)
         .toString(16)
         .padStart(4, "0")
         .toUpperCase();

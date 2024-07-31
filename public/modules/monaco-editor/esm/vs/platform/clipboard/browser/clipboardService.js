@@ -13,7 +13,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 var BrowserClipboardService_1;
 import { isSafari, isWebkitWebView } from '../../../base/browser/browser.js';
-import { $, addDisposableListener, getActiveDocument, onDidRegisterWindow } from '../../../base/browser/dom.js';
+import { $, addDisposableListener, getActiveDocument, getActiveWindow, isHTMLElement, onDidRegisterWindow } from '../../../base/browser/dom.js';
 import { mainWindow } from '../../../base/browser/window.js';
 import { DeferredPromise } from '../../../base/common/async.js';
 import { Event } from '../../../base/common/event.js';
@@ -65,7 +65,7 @@ let BrowserClipboardService = BrowserClipboardService_1 = class BrowserClipboard
             // This allows us to pass in a Promise that will either be cancelled by another event or
             // resolved with the contents of the first call to this.writeText.
             // see https://developer.mozilla.org/en-US/docs/Web/API/ClipboardItem/ClipboardItem#parameters
-            navigator.clipboard.write([new ClipboardItem({
+            getActiveWindow().navigator.clipboard.write([new ClipboardItem({
                     'text/plain': currentWritePromise.p,
                 })]).catch(async (err) => {
                 if (!(err instanceof Error) || err.name !== 'NotAllowedError' || !currentWritePromise.isRejected) {
@@ -96,7 +96,7 @@ let BrowserClipboardService = BrowserClipboardService_1 = class BrowserClipboard
         // as we have seen DOMExceptions in certain browsers
         // due to security policies.
         try {
-            return await navigator.clipboard.writeText(text);
+            return await getActiveWindow().navigator.clipboard.writeText(text);
         }
         catch (error) {
             console.error(error);
@@ -115,7 +115,7 @@ let BrowserClipboardService = BrowserClipboardService_1 = class BrowserClipboard
         textArea.focus();
         textArea.select();
         activeDocument.execCommand('copy');
-        if (activeElement instanceof HTMLElement) {
+        if (isHTMLElement(activeElement)) {
             activeElement.focus();
         }
         activeDocument.body.removeChild(textArea);
@@ -129,7 +129,7 @@ let BrowserClipboardService = BrowserClipboardService_1 = class BrowserClipboard
         // as we have seen DOMExceptions in certain browsers
         // due to security policies.
         try {
-            return await navigator.clipboard.readText();
+            return await getActiveWindow().navigator.clipboard.readText();
         }
         catch (error) {
             console.error(error);

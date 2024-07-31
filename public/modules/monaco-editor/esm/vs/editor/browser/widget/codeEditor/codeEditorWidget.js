@@ -52,13 +52,17 @@ import { ServiceCollection } from '../../../../platform/instantiation/common/ser
 import { INotificationService, Severity } from '../../../../platform/notification/common/notification.js';
 import { editorErrorForeground, editorHintForeground, editorInfoForeground, editorWarningForeground } from '../../../../platform/theme/common/colorRegistry.js';
 import { IThemeService, registerThemingParticipant } from '../../../../platform/theme/common/themeService.js';
+import { MenuId } from '../../../../platform/actions/common/actions.js';
 let CodeEditorWidget = CodeEditorWidget_1 = class CodeEditorWidget extends Disposable {
     //#endregion
     get isSimpleWidget() {
         return this._configuration.isSimpleWidget;
     }
+    get contextMenuId() {
+        return this._configuration.contextMenuId;
+    }
     constructor(domElement, _options, codeEditorWidgetOptions, instantiationService, codeEditorService, commandService, contextKeyService, themeService, notificationService, accessibilityService, languageConfigurationService, languageFeaturesService) {
-        var _a;
+        var _a, _b;
         super();
         this.languageConfigurationService = languageConfigurationService;
         //#region Eventing
@@ -140,6 +144,11 @@ let CodeEditorWidget = CodeEditorWidget_1 = class CodeEditorWidget extends Dispo
         this.onDidChangeViewZones = this._onDidChangeViewZones.event;
         this._onDidChangeHiddenAreas = this._register(new Emitter({ deliveryQueue: this._deliveryQueue }));
         this.onDidChangeHiddenAreas = this._onDidChangeHiddenAreas.event;
+        this._updateCounter = 0;
+        this._onBeginUpdate = this._register(new Emitter());
+        this.onBeginUpdate = this._onBeginUpdate.event;
+        this._onEndUpdate = this._register(new Emitter());
+        this.onEndUpdate = this._onEndUpdate.event;
         this._actions = new Map();
         this._bannerDomNode = null;
         this._dropIntoEditorDecorations = this.createDecorationsCollection();
@@ -152,7 +161,7 @@ let CodeEditorWidget = CodeEditorWidget_1 = class CodeEditorWidget extends Dispo
         this._decorationTypeKeysToIds = {};
         this._decorationTypeSubtypes = {};
         this._telemetryData = codeEditorWidgetOptions.telemetryData;
-        this._configuration = this._register(this._createConfiguration(codeEditorWidgetOptions.isSimpleWidget || false, options, accessibilityService));
+        this._configuration = this._register(this._createConfiguration(codeEditorWidgetOptions.isSimpleWidget || false, (_a = codeEditorWidgetOptions.contextMenuId) !== null && _a !== void 0 ? _a : (codeEditorWidgetOptions.isSimpleWidget ? MenuId.SimpleEditorContext : MenuId.EditorContext), options, accessibilityService));
         this._register(this._configuration.onDidChange((e) => {
             this._onDidChangeConfiguration.fire(e);
             const options = this._configuration.options;
@@ -168,7 +177,7 @@ let CodeEditorWidget = CodeEditorWidget_1 = class CodeEditorWidget extends Dispo
         this._themeService = themeService;
         this._register(new EditorContextKeysManager(this, this._contextKeyService));
         this._register(new EditorModeContext(this, this._contextKeyService, languageFeaturesService));
-        this._instantiationService = instantiationService.createChild(new ServiceCollection([IContextKeyService, this._contextKeyService]));
+        this._instantiationService = this._register(instantiationService.createChild(new ServiceCollection([IContextKeyService, this._contextKeyService])));
         this._modelData = null;
         this._focusTracker = new CodeEditorWidgetFocusTracker(domElement, this._overflowWidgetsDomNode);
         this._register(this._focusTracker.onChange(() => {
@@ -190,7 +199,7 @@ let CodeEditorWidget = CodeEditorWidget_1 = class CodeEditorWidget extends Dispo
                 onUnexpectedError(new Error(`Cannot have two actions with the same id ${action.id}`));
                 continue;
             }
-            const internalAction = new InternalEditorAction(action.id, action.label, action.alias, action.metadata, (_a = action.precondition) !== null && _a !== void 0 ? _a : undefined, (args) => {
+            const internalAction = new InternalEditorAction(action.id, action.label, action.alias, action.metadata, (_b = action.precondition) !== null && _b !== void 0 ? _b : undefined, (args) => {
                 return this._instantiationService.invokeFunction((accessor) => {
                     return Promise.resolve(action.runEditorCommand(accessor, this, args));
                 });
@@ -237,8 +246,8 @@ let CodeEditorWidget = CodeEditorWidget_1 = class CodeEditorWidget extends Dispo
         var _a;
         (_a = this._modelData) === null || _a === void 0 ? void 0 : _a.view.writeScreenReaderContent(reason);
     }
-    _createConfiguration(isSimpleWidget, options, accessibilityService) {
-        return new EditorConfiguration(isSimpleWidget, options, this._domElement, accessibilityService);
+    _createConfiguration(isSimpleWidget, contextMenuId, options, accessibilityService) {
+        return new EditorConfiguration(isSimpleWidget, contextMenuId, options, this._domElement, accessibilityService);
     }
     getId() {
         return this.getEditorType() + ':' + this._id;
@@ -296,10 +305,16 @@ let CodeEditorWidget = CodeEditorWidget_1 = class CodeEditorWidget extends Dispo
         return this._modelData.model.getValue(eolPreference, preserveBOM);
     }
     setValue(newValue) {
-        if (!this._modelData) {
-            return;
+        try {
+            this._beginUpdate();
+            if (!this._modelData) {
+                return;
+            }
+            this._modelData.model.setValue(newValue);
         }
-        this._modelData.model.setValue(newValue);
+        finally {
+            this._endUpdate();
+        }
     }
     getModel() {
         if (!this._modelData) {
@@ -309,30 +324,36 @@ let CodeEditorWidget = CodeEditorWidget_1 = class CodeEditorWidget extends Dispo
     }
     setModel(_model = null) {
         var _a;
-        const model = _model;
-        if (this._modelData === null && model === null) {
-            // Current model is the new model
-            return;
+        try {
+            this._beginUpdate();
+            const model = _model;
+            if (this._modelData === null && model === null) {
+                // Current model is the new model
+                return;
+            }
+            if (this._modelData && this._modelData.model === model) {
+                // Current model is the new model
+                return;
+            }
+            const e = {
+                oldModelUrl: ((_a = this._modelData) === null || _a === void 0 ? void 0 : _a.model.uri) || null,
+                newModelUrl: (model === null || model === void 0 ? void 0 : model.uri) || null
+            };
+            this._onWillChangeModel.fire(e);
+            const hasTextFocus = this.hasTextFocus();
+            const detachedModel = this._detachModel();
+            this._attachModel(model);
+            if (hasTextFocus && this.hasModel()) {
+                this.focus();
+            }
+            this._removeDecorationTypes();
+            this._onDidChangeModel.fire(e);
+            this._postDetachModelCleanup(detachedModel);
+            this._contributionsDisposable = this._contributions.onAfterModelAttached();
         }
-        if (this._modelData && this._modelData.model === model) {
-            // Current model is the new model
-            return;
+        finally {
+            this._endUpdate();
         }
-        const e = {
-            oldModelUrl: ((_a = this._modelData) === null || _a === void 0 ? void 0 : _a.model.uri) || null,
-            newModelUrl: (model === null || model === void 0 ? void 0 : model.uri) || null
-        };
-        this._onWillChangeModel.fire(e);
-        const hasTextFocus = this.hasTextFocus();
-        const detachedModel = this._detachModel();
-        this._attachModel(model);
-        if (hasTextFocus && this.hasModel()) {
-            this.focus();
-        }
-        this._removeDecorationTypes();
-        this._onDidChangeModel.fire(e);
-        this._postDetachModelCleanup(detachedModel);
-        this._contributionsDisposable = this._contributions.onAfterModelAttached();
     }
     _removeDecorationTypes() {
         this._decorationTypeKeysToIds = {};
@@ -696,49 +717,55 @@ let CodeEditorWidget = CodeEditorWidget_1 = class CodeEditorWidget extends Dispo
     }
     trigger(source, handlerId, payload) {
         payload = payload || {};
-        switch (handlerId) {
-            case "compositionStart" /* editorCommon.Handler.CompositionStart */:
-                this._startComposition();
-                return;
-            case "compositionEnd" /* editorCommon.Handler.CompositionEnd */:
-                this._endComposition(source);
-                return;
-            case "type" /* editorCommon.Handler.Type */: {
-                const args = payload;
-                this._type(source, args.text || '');
+        try {
+            this._beginUpdate();
+            switch (handlerId) {
+                case "compositionStart" /* editorCommon.Handler.CompositionStart */:
+                    this._startComposition();
+                    return;
+                case "compositionEnd" /* editorCommon.Handler.CompositionEnd */:
+                    this._endComposition(source);
+                    return;
+                case "type" /* editorCommon.Handler.Type */: {
+                    const args = payload;
+                    this._type(source, args.text || '');
+                    return;
+                }
+                case "replacePreviousChar" /* editorCommon.Handler.ReplacePreviousChar */: {
+                    const args = payload;
+                    this._compositionType(source, args.text || '', args.replaceCharCnt || 0, 0, 0);
+                    return;
+                }
+                case "compositionType" /* editorCommon.Handler.CompositionType */: {
+                    const args = payload;
+                    this._compositionType(source, args.text || '', args.replacePrevCharCnt || 0, args.replaceNextCharCnt || 0, args.positionDelta || 0);
+                    return;
+                }
+                case "paste" /* editorCommon.Handler.Paste */: {
+                    const args = payload;
+                    this._paste(source, args.text || '', args.pasteOnNewLine || false, args.multicursorText || null, args.mode || null, args.clipboardEvent);
+                    return;
+                }
+                case "cut" /* editorCommon.Handler.Cut */:
+                    this._cut(source);
+                    return;
+            }
+            const action = this.getAction(handlerId);
+            if (action) {
+                Promise.resolve(action.run(payload)).then(undefined, onUnexpectedError);
                 return;
             }
-            case "replacePreviousChar" /* editorCommon.Handler.ReplacePreviousChar */: {
-                const args = payload;
-                this._compositionType(source, args.text || '', args.replaceCharCnt || 0, 0, 0);
+            if (!this._modelData) {
                 return;
             }
-            case "compositionType" /* editorCommon.Handler.CompositionType */: {
-                const args = payload;
-                this._compositionType(source, args.text || '', args.replacePrevCharCnt || 0, args.replaceNextCharCnt || 0, args.positionDelta || 0);
+            if (this._triggerEditorCommand(source, handlerId, payload)) {
                 return;
             }
-            case "paste" /* editorCommon.Handler.Paste */: {
-                const args = payload;
-                this._paste(source, args.text || '', args.pasteOnNewLine || false, args.multicursorText || null, args.mode || null, args.clipboardEvent);
-                return;
-            }
-            case "cut" /* editorCommon.Handler.Cut */:
-                this._cut(source);
-                return;
+            this._triggerCommand(handlerId, payload);
         }
-        const action = this.getAction(handlerId);
-        if (action) {
-            Promise.resolve(action.run(payload)).then(undefined, onUnexpectedError);
-            return;
+        finally {
+            this._endUpdate();
         }
-        if (!this._modelData) {
-            return;
-        }
-        if (this._triggerEditorCommand(source, handlerId, payload)) {
-            return;
-        }
-        this._triggerCommand(handlerId, payload);
     }
     _triggerCommand(handlerId, payload) {
         this._commandService.executeCommand(handlerId, payload);
@@ -1114,7 +1141,9 @@ let CodeEditorWidget = CodeEditorWidget_1 = class CodeEditorWidget extends Dispo
         if (!this._modelData || !this._modelData.hasRealView) {
             return;
         }
-        this._modelData.view.render(true, forceRedraw);
+        this._modelData.viewModel.batchEvents(() => {
+            this._modelData.view.render(true, forceRedraw);
+        });
     }
     setAriaOptions(options) {
         if (!this._modelData || !this._modelData.hasRealView) {
@@ -1370,6 +1399,18 @@ let CodeEditorWidget = CodeEditorWidget_1 = class CodeEditorWidget extends Dispo
     }
     setContextValue(key, value) {
         this._contextKeyService.createKey(key, value);
+    }
+    _beginUpdate() {
+        this._updateCounter++;
+        if (this._updateCounter === 1) {
+            this._onBeginUpdate.fire();
+        }
+    }
+    _endUpdate() {
+        this._updateCounter--;
+        if (this._updateCounter === 0) {
+            this._onEndUpdate.fire();
+        }
     }
 };
 CodeEditorWidget.dropIntoEditorDecorationOptions = ModelDecorationOptions.register({

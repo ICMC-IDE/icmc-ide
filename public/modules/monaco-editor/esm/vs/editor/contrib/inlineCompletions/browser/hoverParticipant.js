@@ -94,7 +94,7 @@ let InlineCompletionsHoverParticipant = class InlineCompletionsHoverParticipant 
             this.renderScreenReaderText(context, part, disposableStore);
         }
         const model = part.controller.model.get();
-        const w = this._instantiationService.createInstance(InlineSuggestionHintsContentWidget, this._editor, false, constObservable(null), model.selectedInlineCompletionIndex, model.inlineCompletionsCount, model.selectedInlineCompletion.map(v => /** @description commands */ { var _a; /** @description commands */ return (_a = v === null || v === void 0 ? void 0 : v.inlineCompletion.source.inlineCompletions.commands) !== null && _a !== void 0 ? _a : []; }));
+        const w = this._instantiationService.createInstance(InlineSuggestionHintsContentWidget, this._editor, false, constObservable(null), model.selectedInlineCompletionIndex, model.inlineCompletionsCount, model.activeCommands);
         context.fragment.appendChild(w.getDomNode());
         model.triggerExplicitly();
         disposableStore.add(w);

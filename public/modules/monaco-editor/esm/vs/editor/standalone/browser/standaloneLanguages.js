@@ -5,17 +5,17 @@
 import { Color } from '../../../base/common/color.js';
 import { Range } from '../../common/core/range.js';
 import * as languages from '../../common/languages.js';
+import { ILanguageService } from '../../common/languages/language.js';
 import { ILanguageConfigurationService } from '../../common/languages/languageConfigurationRegistry.js';
 import { ModesRegistry } from '../../common/languages/modesRegistry.js';
-import { ILanguageService } from '../../common/languages/language.js';
+import { ILanguageFeaturesService } from '../../common/services/languageFeatures.js';
 import * as standaloneEnums from '../../common/standalone/standaloneEnums.js';
 import { StandaloneServices } from './standaloneServices.js';
 import { compile } from '../common/monarch/monarchCompile.js';
 import { MonarchTokenizer } from '../common/monarch/monarchLexer.js';
 import { IStandaloneThemeService } from '../common/standaloneTheme.js';
-import { IMarkerService } from '../../../platform/markers/common/markers.js';
-import { ILanguageFeaturesService } from '../../common/services/languageFeatures.js';
 import { IConfigurationService } from '../../../platform/configuration/common/configuration.js';
+import { IMarkerService } from '../../../platform/markers/common/markers.js';
 /**
  * Register information about a new language.
  */
@@ -328,9 +328,9 @@ export function registerSignatureHelpProvider(languageSelector, provider) {
 export function registerHoverProvider(languageSelector, provider) {
     const languageFeaturesService = StandaloneServices.get(ILanguageFeaturesService);
     return languageFeaturesService.hoverProvider.register(languageSelector, {
-        provideHover: (model, position, token) => {
+        provideHover: async (model, position, token, context) => {
             const word = model.getWordAtPosition(position);
-            return Promise.resolve(provider.provideHover(model, position, token)).then((value) => {
+            return Promise.resolve(provider.provideHover(model, position, token, context)).then((value) => {
                 if (!value) {
                     return undefined;
                 }
@@ -573,7 +573,9 @@ export function createMonacoLanguagesAPI() {
         InlineEditTriggerKind: standaloneEnums.InlineEditTriggerKind,
         CodeActionTriggerType: standaloneEnums.CodeActionTriggerType,
         NewSymbolNameTag: standaloneEnums.NewSymbolNameTag,
+        NewSymbolNameTriggerKind: standaloneEnums.NewSymbolNameTriggerKind,
         PartialAcceptTriggerKind: standaloneEnums.PartialAcceptTriggerKind,
+        HoverVerbosityAction: standaloneEnums.HoverVerbosityAction,
         // classes
         FoldingRangeKind: languages.FoldingRangeKind,
         SelectedSuggestionInfo: languages.SelectedSuggestionInfo,

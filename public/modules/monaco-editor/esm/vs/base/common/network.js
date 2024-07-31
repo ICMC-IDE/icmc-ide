@@ -51,6 +51,12 @@ export var Schemas;
     Schemas.vscodeTerminal = 'vscode-terminal';
     /** Scheme used for code blocks in chat. */
     Schemas.vscodeChatCodeBlock = 'vscode-chat-code-block';
+    /**
+     * Scheme used for backing documents created by copilot for chat.
+     */
+    Schemas.vscodeCopilotBackingChatCodeBlock = 'vscode-copilot-chat-code-block';
+    /** Scheme used for LHS of code compare (aka diff) blocks in chat. */
+    Schemas.vscodeChatCodeCompareBlock = 'vscode-chat-code-compare-block';
     /** Scheme used for the chat input editor. */
     Schemas.vscodeChatSesssion = 'vscode-chat-editor';
     /**
@@ -82,6 +88,10 @@ export var Schemas;
      * Scheme used for the Source Control commit input's text document
      */
     Schemas.vscodeSourceControl = 'vscode-scm';
+    /**
+     * Scheme used for input box for creating comments.
+     */
+    Schemas.commentsInput = 'comment';
     /**
      * Scheme used for special rendering of settings in the release notes
      */

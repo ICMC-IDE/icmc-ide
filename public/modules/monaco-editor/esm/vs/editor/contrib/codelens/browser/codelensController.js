@@ -190,7 +190,7 @@ let CodeLensContribution = class CodeLensContribution {
             (_a = this._resolveCodeLensesPromise) === null || _a === void 0 ? void 0 : _a.cancel();
             this._resolveCodeLensesPromise = undefined;
         }));
-        this._localToDispose.add(this._editor.onDidFocusEditorWidget(() => {
+        this._localToDispose.add(this._editor.onDidFocusEditorText(() => {
             scheduler.schedule();
         }));
         this._localToDispose.add(this._editor.onDidBlurEditorText(() => {

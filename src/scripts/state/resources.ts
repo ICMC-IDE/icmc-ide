@@ -26,9 +26,22 @@ export default class ResourceManager extends EventManager<ResourceMap> {
     return this.#resources[config] as ResourceMap[K];
   }
 
+  getMany<K extends keyof ResourceMap>(...args: K[]) {
+    return args.map((key) => this.#resources[key]);
+  }
+
   set<K extends keyof ResourceMap>(config: K, value: ResourceMap[K]) {
-    this.#resources[config] = value;
-    this.emmit(config, value);
+    this.emmit(config, (this.#resources[config] = value));
+  }
+
+  update<K extends keyof ResourceMap>(
+    config: K,
+    func: (current: ResourceMap[K]) => ResourceMap[K],
+  ) {
+    this.emmit(
+      config,
+      (this.#resources[config] = func(this.#resources[config])),
+    );
   }
 }
 
@@ -48,13 +61,14 @@ export async function loadResources(): Promise<ResourceManager> {
   {
     const filenames = fs.files();
 
-    if (!filenames.includes("example.c")) {
-      fs.write("example.c", assets["example.c"]!);
+    for (const name of ["example.c", "example.asm", "charmap.mif"]) {
+      if (filenames.includes(name)) continue;
+      fs.write(name, assets[name]!);
     }
+  }
 
-    if (!filenames.includes("example.asm")) {
-      fs.write("example.asm", assets["example.asm"]!);
-    }
+  for (const name of ["giroto", "icmc"]) {
+    fs.write(`syntax/${name}.asm`, assets[`${name}.asm`]);
   }
 
   return resources;

@@ -2,6 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
+import { strictEquals } from '../equals.js';
 import { DebugNameData, getFunctionName } from './debugName.js';
 import { getLogger } from './logging.js';
 let _recomputeInitiallyAndOnChange;
@@ -55,6 +56,7 @@ export class ConvenientObservable {
                 }
                 return undefined;
             },
+            debugReferenceFn: fn,
         }, (reader) => fn(this.read(reader), reader));
     }
     recomputeInitiallyAndOnChange(store, handleValue) {
@@ -167,22 +169,28 @@ export class TransactionImpl {
     }
 }
 export function observableValue(nameOrOwner, initialValue) {
+    let debugNameData;
     if (typeof nameOrOwner === 'string') {
-        return new ObservableValue(undefined, nameOrOwner, initialValue);
+        debugNameData = new DebugNameData(undefined, nameOrOwner, undefined);
     }
     else {
-        return new ObservableValue(nameOrOwner, undefined, initialValue);
+        debugNameData = new DebugNameData(nameOrOwner, undefined, undefined);
     }
+    return new ObservableValue(debugNameData, initialValue, strictEquals);
+}
+export function observableValueOpts(options, initialValue) {
+    var _a;
+    return new ObservableValue(new DebugNameData(options.owner, options.debugName, undefined), initialValue, (_a = options.equalsFn) !== null && _a !== void 0 ? _a : strictEquals);
 }
 export class ObservableValue extends BaseObservable {
     get debugName() {
         var _a;
-        return (_a = new DebugNameData(this._owner, this._debugName, undefined).getDebugName(this)) !== null && _a !== void 0 ? _a : 'ObservableValue';
+        return (_a = this._debugNameData.getDebugName(this)) !== null && _a !== void 0 ? _a : 'ObservableValue';
     }
-    constructor(_owner, _debugName, initialValue) {
+    constructor(_debugNameData, initialValue, _equalityComparator) {
         super();
-        this._owner = _owner;
-        this._debugName = _debugName;
+        this._debugNameData = _debugNameData;
+        this._equalityComparator = _equalityComparator;
         this._value = initialValue;
     }
     get() {
@@ -190,7 +198,7 @@ export class ObservableValue extends BaseObservable {
     }
     set(value, tx, change) {
         var _a;
-        if (this._value === value) {
+        if (change === undefined && this._equalityComparator(this._value, value)) {
             return;
         }
         let _tx;
@@ -224,12 +232,14 @@ export class ObservableValue extends BaseObservable {
  * When a new value is set, the previous value is disposed.
  */
 export function disposableObservableValue(nameOrOwner, initialValue) {
+    let debugNameData;
     if (typeof nameOrOwner === 'string') {
-        return new DisposableObservableValue(undefined, nameOrOwner, initialValue);
+        debugNameData = new DebugNameData(undefined, nameOrOwner, undefined);
     }
     else {
-        return new DisposableObservableValue(nameOrOwner, undefined, initialValue);
+        debugNameData = new DebugNameData(nameOrOwner, undefined, undefined);
     }
+    return new DisposableObservableValue(debugNameData, initialValue, strictEquals);
 }
 export class DisposableObservableValue extends ObservableValue {
     _setValue(newValue) {

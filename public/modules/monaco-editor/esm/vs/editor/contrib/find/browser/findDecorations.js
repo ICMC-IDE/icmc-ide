@@ -244,6 +244,7 @@ FindDecorations._CURRENT_FIND_MATCH_DECORATION = ModelDecorationOptions.register
     stickiness: 1 /* TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges */,
     zIndex: 13,
     className: 'currentFindMatch',
+    inlineClassName: 'currentFindMatchInline',
     showIfCollapsed: true,
     overviewRuler: {
         color: themeColorFromId(overviewRulerFindMatchForeground),
@@ -259,6 +260,7 @@ FindDecorations._FIND_MATCH_DECORATION = ModelDecorationOptions.register({
     stickiness: 1 /* TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges */,
     zIndex: 10,
     className: 'findMatch',
+    inlineClassName: 'findMatchInline',
     showIfCollapsed: true,
     overviewRuler: {
         color: themeColorFromId(overviewRulerFindMatchForeground),

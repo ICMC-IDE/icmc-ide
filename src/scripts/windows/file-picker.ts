@@ -16,25 +16,9 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
     }
 
     {
-      body.addEventListener("open-file", ({ detail: fileName }) => {
-        eventManager.emmit("open-file", fileName);
-      });
-
-      body.addEventListener("delete-file", ({ detail: fileName }) => {
-        eventManager.emmit("delete-file", fileName);
-      });
-
       // maybe we should pass fs to file-picker intead of updating it through the window?
-      body.files = resources.get("fs").files();
-    }
+      const fs = resources.get("fs");
 
-    super({
-      title,
-      body,
-      style,
-    });
-
-    resources.subscribe("fs", (fs) => {
       body.files = fs.files();
 
       fs.subscribe("create", () => {
@@ -44,6 +28,20 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
       fs.subscribe("delete", () => {
         body.files = fs.files();
       });
+
+      body.addEventListener("open-file", ({ detail: filename }) => {
+        eventManager.emmit("open-file", filename);
+      });
+
+      body.addEventListener("delete-file", ({ detail: filename }) => {
+        fs.delete(filename);
+      });
+    }
+
+    super({
+      title,
+      body,
+      style,
     });
   }
 }

@@ -46,7 +46,6 @@ export class GhostTextPart {
         this.preview = preview;
         this.lines = splitLines(this.text);
     }
-    ;
     equals(other) {
         return this.column === other.column &&
             this.lines.length === other.lines.length &&

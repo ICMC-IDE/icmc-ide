@@ -1,12 +1,12 @@
 /*!-----------------------------------------------------------
  * Copyright (c) Microsoft Corporation. All rights reserved.
- * Version: 0.48.0-rc(8503aef01e4f06dff414c15904a1d961e25eb8eb)
+ * Version: 0.50.0(c321d0fbecb50ab8a5365fa1965476b0ae63fc87)
  * Released under the MIT license
  * https://github.com/microsoft/vscode/blob/main/LICENSE.txt
  *-----------------------------------------------------------*/
 
 (function() {
-var __m = ["require","exports","vs/editor/common/core/range","vs/editor/common/core/offsetRange","vs/editor/common/core/position","vs/base/common/errors","vs/base/common/strings","vs/base/common/arrays","vs/editor/common/diff/defaultLinesDiffComputer/algorithms/diffAlgorithm","vs/base/common/event","vs/editor/common/core/lineRange","vs/base/common/arraysFind","vs/base/common/assert","vs/base/common/lifecycle","vs/base/common/objects","vs/editor/common/diff/defaultLinesDiffComputer/utils","vs/editor/common/diff/rangeMapping","vs/base/common/platform","vs/base/common/uri","vs/nls","vs/base/common/functional","vs/base/common/iterator","vs/base/common/linkedList","vs/base/common/map","vs/base/common/stopwatch","vs/base/common/diff/diff","vs/base/common/types","vs/base/common/codiconsUtil","vs/base/common/uint","vs/editor/common/core/characterClassifier","vs/editor/common/core/wordHelper","vs/editor/common/diff/defaultLinesDiffComputer/algorithms/myersDiffAlgorithm","vs/editor/common/diff/defaultLinesDiffComputer/linesSliceCharSequence","vs/editor/common/diff/linesDiffComputer","vs/base/common/cache","vs/base/common/color","vs/base/common/diff/diffChange","vs/base/common/keyCodes","vs/base/common/lazy","vs/base/common/cancellation","vs/base/common/hash","vs/base/common/codiconsLibrary","vs/base/common/codicons","vs/editor/common/core/selection","vs/editor/common/core/wordCharacterClassifier","vs/editor/common/diff/defaultLinesDiffComputer/heuristicSequenceOptimizations","vs/editor/common/diff/defaultLinesDiffComputer/lineSequence","vs/editor/common/diff/defaultLinesDiffComputer/algorithms/dynamicProgrammingDiffing","vs/editor/common/diff/defaultLinesDiffComputer/computeMovedLines","vs/editor/common/diff/defaultLinesDiffComputer/defaultLinesDiffComputer","vs/editor/common/diff/legacyLinesDiffComputer","vs/editor/common/diff/linesDiffComputers","vs/editor/common/languages/defaultDocumentColorsComputer","vs/editor/common/languages/linkComputer","vs/editor/common/languages/supports/inplaceReplaceSupport","vs/editor/common/model","vs/editor/common/model/prefixSumComputer","vs/editor/common/model/mirrorTextModel","vs/editor/common/model/textModelSearch","vs/editor/common/services/findSectionHeaders","vs/editor/common/services/unicodeTextModelHighlighter","vs/editor/common/standalone/standaloneEnums","vs/editor/common/tokenizationRegistry","vs/nls!vs/base/common/platform","vs/nls!vs/base/common/worker/simpleWorker","vs/base/common/process","vs/base/common/path","vs/nls!vs/editor/common/languages","vs/editor/common/languages","vs/editor/common/services/editorBaseApi","vs/base/common/worker/simpleWorker","vs/editor/common/services/editorSimpleWorker"];
+var __m = ["require","exports","vs/editor/common/core/range","vs/editor/common/core/offsetRange","vs/editor/common/core/position","vs/base/common/errors","vs/base/common/strings","vs/base/common/arrays","vs/editor/common/diff/defaultLinesDiffComputer/algorithms/diffAlgorithm","vs/base/common/assert","vs/base/common/event","vs/editor/common/core/lineRange","vs/base/common/arraysFind","vs/base/common/lifecycle","vs/base/common/objects","vs/editor/common/diff/defaultLinesDiffComputer/utils","vs/editor/common/diff/rangeMapping","vs/base/common/platform","vs/base/common/uri","vs/nls","vs/base/common/functional","vs/base/common/iterator","vs/base/common/linkedList","vs/base/common/map","vs/base/common/stopwatch","vs/base/common/diff/diff","vs/base/common/types","vs/base/common/codiconsUtil","vs/base/common/uint","vs/editor/common/core/characterClassifier","vs/editor/common/core/textLength","vs/editor/common/core/wordHelper","vs/editor/common/diff/defaultLinesDiffComputer/algorithms/myersDiffAlgorithm","vs/editor/common/diff/defaultLinesDiffComputer/linesSliceCharSequence","vs/editor/common/diff/linesDiffComputer","vs/base/common/cache","vs/base/common/color","vs/base/common/diff/diffChange","vs/base/common/keyCodes","vs/base/common/lazy","vs/base/common/cancellation","vs/base/common/hash","vs/base/common/codiconsLibrary","vs/base/common/codicons","vs/editor/common/core/selection","vs/editor/common/core/positionToOffset","vs/editor/common/core/textEdit","vs/editor/common/core/wordCharacterClassifier","vs/editor/common/diff/defaultLinesDiffComputer/heuristicSequenceOptimizations","vs/editor/common/diff/defaultLinesDiffComputer/lineSequence","vs/editor/common/diff/defaultLinesDiffComputer/algorithms/dynamicProgrammingDiffing","vs/editor/common/diff/defaultLinesDiffComputer/computeMovedLines","vs/editor/common/diff/defaultLinesDiffComputer/defaultLinesDiffComputer","vs/editor/common/diff/legacyLinesDiffComputer","vs/editor/common/diff/linesDiffComputers","vs/editor/common/languages/defaultDocumentColorsComputer","vs/editor/common/languages/linkComputer","vs/editor/common/languages/supports/inplaceReplaceSupport","vs/editor/common/model","vs/editor/common/model/prefixSumComputer","vs/editor/common/model/mirrorTextModel","vs/editor/common/model/textModelSearch","vs/editor/common/services/findSectionHeaders","vs/editor/common/services/unicodeTextModelHighlighter","vs/editor/common/standalone/standaloneEnums","vs/editor/common/tokenizationRegistry","vs/nls!vs/base/common/platform","vs/nls!vs/base/common/worker/simpleWorker","vs/base/common/process","vs/base/common/path","vs/nls!vs/editor/common/languages","vs/editor/common/languages","vs/editor/common/services/editorBaseApi","vs/base/common/worker/simpleWorker","vs/editor/common/services/editorSimpleWorker"];
 var __M = function(deps) {
   var result = [];
   for (var i = 0, len = deps.length; i < len; i++) {
@@ -2447,7 +2447,7 @@ define(__m[7/*vs/base/common/arrays*/], __M([0/*require*/,1/*exports*/]), functi
      * @returns New array with all falsy values removed. The original array IS NOT modified.
      */
     function coalesce(array) {
-        return array.filter(e => !!e);
+        return array.filter((e) => !!e);
     }
     /**
      * Remove all falsy values from `array`. The original array IS modified.
@@ -2788,7 +2788,7 @@ define(__m[7/*vs/base/common/arrays*/], __M([0/*require*/,1/*exports*/]), functi
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[11/*vs/base/common/arraysFind*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
+define(__m[12/*vs/base/common/arraysFind*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MonotonousArray = void 0;
@@ -2798,12 +2798,12 @@ define(__m[11/*vs/base/common/arraysFind*/], __M([0/*require*/,1/*exports*/]), f
     exports.findLastIdxMonotonous = findLastIdxMonotonous;
     exports.findFirstMonotonous = findFirstMonotonous;
     exports.findFirstIdxMonotonousOrArrLen = findFirstIdxMonotonousOrArrLen;
-    exports.findFirstMaxBy = findFirstMaxBy;
-    exports.findLastMaxBy = findLastMaxBy;
-    exports.findFirstMinBy = findFirstMinBy;
-    exports.findMaxIdxBy = findMaxIdxBy;
+    exports.findFirstMax = findFirstMax;
+    exports.findLastMax = findLastMax;
+    exports.findFirstMin = findFirstMin;
+    exports.findMaxIdx = findMaxIdx;
     exports.mapFindFirst = mapFindFirst;
-    function findLast(array, predicate, fromIdx) {
+    function findLast(array, predicate) {
         const idx = findLastIdx(array, predicate);
         if (idx === -1) {
             return undefined;
@@ -2915,7 +2915,7 @@ define(__m[11/*vs/base/common/arraysFind*/], __M([0/*require*/,1/*exports*/]), f
     /**
      * Returns the first item that is equal to or greater than every other item.
     */
-    function findFirstMaxBy(array, comparator) {
+    function findFirstMax(array, comparator) {
         if (array.length === 0) {
             return undefined;
         }
@@ -2931,7 +2931,7 @@ define(__m[11/*vs/base/common/arraysFind*/], __M([0/*require*/,1/*exports*/]), f
     /**
      * Returns the last item that is equal to or greater than every other item.
     */
-    function findLastMaxBy(array, comparator) {
+    function findLastMax(array, comparator) {
         if (array.length === 0) {
             return undefined;
         }
@@ -2947,10 +2947,10 @@ define(__m[11/*vs/base/common/arraysFind*/], __M([0/*require*/,1/*exports*/]), f
     /**
      * Returns the first item that is equal to or less than every other item.
     */
-    function findFirstMinBy(array, comparator) {
-        return findFirstMaxBy(array, (a, b) => -comparator(a, b));
+    function findFirstMin(array, comparator) {
+        return findFirstMax(array, (a, b) => -comparator(a, b));
     }
-    function findMaxIdxBy(array, comparator) {
+    function findMaxIdx(array, comparator) {
         if (array.length === 0) {
             return -1;
         }
@@ -2977,48 +2977,68 @@ define(__m[11/*vs/base/common/arraysFind*/], __M([0/*require*/,1/*exports*/]), f
     }
 });
 
-define(__m[34/*vs/base/common/cache*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
+define(__m[35/*vs/base/common/cache*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CachedFunction = exports.LRUCachedFunction = void 0;
+    exports.identity = identity;
+    function identity(t) {
+        return t;
+    }
     /**
      * Uses a LRU cache to make a given parametrized function cached.
-     * Caches just the last value.
+     * Caches just the last key/value.
     */
     class LRUCachedFunction {
-        constructor(fn, _computeKey = JSON.stringify) {
-            this.fn = fn;
-            this._computeKey = _computeKey;
+        constructor(arg1, arg2) {
             this.lastCache = undefined;
             this.lastArgKey = undefined;
+            if (typeof arg1 === 'function') {
+                this._fn = arg1;
+                this._computeKey = identity;
+            }
+            else {
+                this._fn = arg2;
+                this._computeKey = arg1.getCacheKey;
+            }
         }
         get(arg) {
             const key = this._computeKey(arg);
             if (this.lastArgKey !== key) {
                 this.lastArgKey = key;
-                this.lastCache = this.fn(arg);
+                this.lastCache = this._fn(arg);
             }
             return this.lastCache;
         }
     }
     exports.LRUCachedFunction = LRUCachedFunction;
     /**
-     * Uses an unbounded cache (referential equality) to memoize the results of the given function.
+     * Uses an unbounded cache to memoize the results of the given function.
     */
     class CachedFunction {
         get cachedValues() {
             return this._map;
         }
-        constructor(fn) {
-            this.fn = fn;
+        constructor(arg1, arg2) {
             this._map = new Map();
+            this._map2 = new Map();
+            if (typeof arg1 === 'function') {
+                this._fn = arg1;
+                this._computeKey = identity;
+            }
+            else {
+                this._fn = arg2;
+                this._computeKey = arg1.getCacheKey;
+            }
         }
         get(arg) {
-            if (this._map.has(arg)) {
-                return this._map.get(arg);
+            const key = this._computeKey(arg);
+            if (this._map2.has(key)) {
+                return this._map2.get(key);
             }
-            const value = this.fn(arg);
+            const value = this._fn(arg);
             this._map.set(arg, value);
+            this._map2.set(key, value);
             return value;
         }
     }
@@ -3029,7 +3049,7 @@ define(__m[34/*vs/base/common/cache*/], __M([0/*require*/,1/*exports*/]), functi
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[35/*vs/base/common/color*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
+define(__m[36/*vs/base/common/color*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Color = exports.HSVA = exports.HSLA = exports.RGBA = void 0;
@@ -3501,7 +3521,7 @@ define(__m[35/*vs/base/common/color*/], __M([0/*require*/,1/*exports*/]), functi
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[36/*vs/base/common/diff/diffChange*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
+define(__m[37/*vs/base/common/diff/diffChange*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.DiffChange = void 0;
@@ -3708,7 +3728,7 @@ define(__m[5/*vs/base/common/errors*/], __M([0/*require*/,1/*exports*/]), functi
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[12/*vs/base/common/assert*/], __M([0/*require*/,1/*exports*/,5/*vs/base/common/errors*/]), function (require, exports, errors_1) {
+define(__m[9/*vs/base/common/assert*/], __M([0/*require*/,1/*exports*/,5/*vs/base/common/errors*/]), function (require, exports, errors_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ok = ok;
@@ -3958,7 +3978,7 @@ define(__m[21/*vs/base/common/iterator*/], __M([0/*require*/,1/*exports*/]), fun
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[37/*vs/base/common/keyCodes*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
+define(__m[38/*vs/base/common/keyCodes*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.KeyCodeUtils = exports.IMMUTABLE_KEY_CODE_TO_CODE = exports.IMMUTABLE_CODE_TO_KEY_CODE = exports.NATIVE_WINDOWS_KEY_CODE_TO_KEY_CODE = exports.EVENT_KEY_CODE_MAP = void 0;
@@ -4337,7 +4357,7 @@ define(__m[37/*vs/base/common/keyCodes*/], __M([0/*require*/,1/*exports*/]), fun
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[38/*vs/base/common/lazy*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
+define(__m[39/*vs/base/common/lazy*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Lazy = void 0;
@@ -4465,7 +4485,7 @@ define(__m[13/*vs/base/common/lifecycle*/], __M([0/*require*/,1/*exports*/,20/*v
      * Check if `thing` is {@link IDisposable disposable}.
      */
     function isDisposable(thing) {
-        return typeof thing.dispose === 'function' && thing.dispose.length === 0;
+        return typeof thing === 'object' && thing !== null && typeof thing.dispose === 'function' && thing.dispose.length === 0;
     }
     function dispose(arg) {
         if (iterator_1.Iterable.is(arg)) {
@@ -5184,6 +5204,28 @@ define(__m[23/*vs/base/common/map*/], __M([0/*require*/,1/*exports*/]), function
             }
             this._state++;
         }
+        trimNew(newSize) {
+            if (newSize >= this.size) {
+                return;
+            }
+            if (newSize === 0) {
+                this.clear();
+                return;
+            }
+            let current = this._tail;
+            let currentSize = this.size;
+            while (current && currentSize > newSize) {
+                this._map.delete(current.key);
+                current = current.previous;
+                currentSize--;
+            }
+            this._tail = current;
+            this._size = currentSize;
+            if (current) {
+                current.next = undefined;
+            }
+            this._state++;
+        }
         addItemFirst(item) {
             // First time Insert
             if (!this._head && !this._tail) {
@@ -5322,7 +5364,7 @@ define(__m[23/*vs/base/common/map*/], __M([0/*require*/,1/*exports*/]), function
         }
     }
     exports.LinkedMap = LinkedMap;
-    class LRUCache extends LinkedMap {
+    class Cache extends LinkedMap {
         constructor(limit, ratio = 1) {
             super();
             this._limit = limit;
@@ -5343,13 +5385,25 @@ define(__m[23/*vs/base/common/map*/], __M([0/*require*/,1/*exports*/]), function
         }
         set(key, value) {
             super.set(key, value, 2 /* Touch.AsNew */);
-            this.checkTrim();
             return this;
         }
         checkTrim() {
             if (this.size > this._limit) {
-                this.trimOld(Math.round(this._limit * this._ratio));
+                this.trim(Math.round(this._limit * this._ratio));
             }
+        }
+    }
+    class LRUCache extends Cache {
+        constructor(limit, ratio = 1) {
+            super(limit, ratio);
+        }
+        trim(newSize) {
+            this.trimOld(newSize);
+        }
+        set(key, value) {
+            super.set(key, value);
+            this.checkTrim();
+            return this;
         }
     }
     exports.LRUCache = LRUCache;
@@ -5473,10 +5527,10 @@ define(__m[24/*vs/base/common/stopwatch*/], __M([0/*require*/,1/*exports*/]), fu
     exports.StopWatch = StopWatch;
 });
 
-define(__m[9/*vs/base/common/event*/], __M([0/*require*/,1/*exports*/,5/*vs/base/common/errors*/,20/*vs/base/common/functional*/,13/*vs/base/common/lifecycle*/,22/*vs/base/common/linkedList*/,24/*vs/base/common/stopwatch*/]), function (require, exports, errors_1, functional_1, lifecycle_1, linkedList_1, stopwatch_1) {
+define(__m[10/*vs/base/common/event*/], __M([0/*require*/,1/*exports*/,5/*vs/base/common/errors*/,20/*vs/base/common/functional*/,13/*vs/base/common/lifecycle*/,22/*vs/base/common/linkedList*/,24/*vs/base/common/stopwatch*/]), function (require, exports, errors_1, functional_1, lifecycle_1, linkedList_1, stopwatch_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Relay = exports.EventBufferer = exports.EventMultiplexer = exports.MicrotaskEmitter = exports.DebounceEmitter = exports.PauseableEmitter = exports.createEventDeliveryQueue = exports.Emitter = exports.EventProfiling = exports.Event = void 0;
+    exports.Relay = exports.EventBufferer = exports.EventMultiplexer = exports.MicrotaskEmitter = exports.DebounceEmitter = exports.PauseableEmitter = exports.createEventDeliveryQueue = exports.Emitter = exports.ListenerRefusalError = exports.ListenerLeakError = exports.EventProfiling = exports.Event = void 0;
     // -----------------------------------------------------------------------------------------------------------------------
     // Uncomment the next line to print warnings whenever a listener is GC'ed without having been disposed. This is a LEAK.
     // -----------------------------------------------------------------------------------------------------------------------
@@ -6099,7 +6153,8 @@ define(__m[9/*vs/base/common/event*/], __M([0/*require*/,1/*exports*/,5/*vs/base
     EventProfiling._idPool = 0;
     let _globalLeakWarningThreshold = -1;
     class LeakageMonitor {
-        constructor(threshold, name = Math.random().toString(18).slice(2, 5)) {
+        constructor(_errorHandler, threshold, name = Math.random().toString(18).slice(2, 5)) {
+            this._errorHandler = _errorHandler;
             this.threshold = threshold;
             this.name = name;
             this._warnCountdown = 0;
@@ -6123,28 +6178,38 @@ define(__m[9/*vs/base/common/event*/], __M([0/*require*/,1/*exports*/,5/*vs/base
                 // only warn on first exceed and then every time the limit
                 // is exceeded by 50% again
                 this._warnCountdown = threshold * 0.5;
-                // find most frequent listener and print warning
-                let topStack;
-                let topCount = 0;
-                for (const [stack, count] of this._stacks) {
-                    if (!topStack || topCount < count) {
-                        topStack = stack;
-                        topCount = count;
-                    }
-                }
-                console.warn(`[${this.name}] potential listener LEAK detected, having ${listenerCount} listeners already. MOST frequent listener (${topCount}):`);
+                const [topStack, topCount] = this.getMostFrequentStack();
+                const message = `[${this.name}] potential listener LEAK detected, having ${listenerCount} listeners already. MOST frequent listener (${topCount}):`;
+                console.warn(message);
                 console.warn(topStack);
+                const error = new ListenerLeakError(message, topStack);
+                this._errorHandler(error);
             }
             return () => {
                 const count = (this._stacks.get(stack.value) || 0);
                 this._stacks.set(stack.value, count - 1);
             };
         }
+        getMostFrequentStack() {
+            if (!this._stacks) {
+                return undefined;
+            }
+            let topStack;
+            let topCount = 0;
+            for (const [stack, count] of this._stacks) {
+                if (!topStack || topCount < count) {
+                    topStack = [stack, count];
+                    topCount = count;
+                }
+            }
+            return topStack;
+        }
     }
     class Stacktrace {
         static create() {
             var _a;
-            return new Stacktrace((_a = new Error().stack) !== null && _a !== void 0 ? _a : '');
+            const err = new Error();
+            return new Stacktrace((_a = err.stack) !== null && _a !== void 0 ? _a : '');
         }
         constructor(value) {
             this.value = value;
@@ -6153,6 +6218,25 @@ define(__m[9/*vs/base/common/event*/], __M([0/*require*/,1/*exports*/,5/*vs/base
             console.warn(this.value.split('\n').slice(2).join('\n'));
         }
     }
+    // error that is logged when going over the configured listener threshold
+    class ListenerLeakError extends Error {
+        constructor(message, stack) {
+            super(message);
+            this.name = 'ListenerLeakError';
+            this.stack = stack;
+        }
+    }
+    exports.ListenerLeakError = ListenerLeakError;
+    // SEVERE error that is logged when having gone way over the configured listener
+    // threshold so that the emitter refuses to accept more listeners
+    class ListenerRefusalError extends Error {
+        constructor(message, stack) {
+            super(message);
+            this.name = 'ListenerRefusalError';
+            this.stack = stack;
+        }
+    }
+    exports.ListenerRefusalError = ListenerRefusalError;
     class UniqueContainer {
         constructor(value) {
             this.value = value;
@@ -6203,12 +6287,14 @@ define(__m[9/*vs/base/common/event*/], __M([0/*require*/,1/*exports*/,5/*vs/base
      */
     class Emitter {
         constructor(options) {
-            var _a, _b, _c, _d, _e;
+            var _a, _b, _c, _d, _e, _f;
             this._size = 0;
             this._options = options;
-            this._leakageMon = _globalLeakWarningThreshold > 0 || ((_a = this._options) === null || _a === void 0 ? void 0 : _a.leakWarningThreshold) ? new LeakageMonitor((_c = (_b = this._options) === null || _b === void 0 ? void 0 : _b.leakWarningThreshold) !== null && _c !== void 0 ? _c : _globalLeakWarningThreshold) : undefined;
-            this._perfMon = ((_d = this._options) === null || _d === void 0 ? void 0 : _d._profName) ? new EventProfiling(this._options._profName) : undefined;
-            this._deliveryQueue = (_e = this._options) === null || _e === void 0 ? void 0 : _e.deliveryQueue;
+            this._leakageMon = (_globalLeakWarningThreshold > 0 || ((_a = this._options) === null || _a === void 0 ? void 0 : _a.leakWarningThreshold))
+                ? new LeakageMonitor((_b = options === null || options === void 0 ? void 0 : options.onListenerError) !== null && _b !== void 0 ? _b : errors_1.onUnexpectedError, (_d = (_c = this._options) === null || _c === void 0 ? void 0 : _c.leakWarningThreshold) !== null && _d !== void 0 ? _d : _globalLeakWarningThreshold) :
+                undefined;
+            this._perfMon = ((_e = this._options) === null || _e === void 0 ? void 0 : _e._profName) ? new EventProfiling(this._options._profName) : undefined;
+            this._deliveryQueue = (_f = this._options) === null || _f === void 0 ? void 0 : _f.deliveryQueue;
         }
         dispose() {
             var _a, _b, _c, _d;
@@ -6247,9 +6333,14 @@ define(__m[9/*vs/base/common/event*/], __M([0/*require*/,1/*exports*/,5/*vs/base
         get event() {
             var _a;
             (_a = this._event) !== null && _a !== void 0 ? _a : (this._event = (callback, thisArgs, disposables) => {
-                var _a, _b, _c, _d, _e;
-                if (this._leakageMon && this._size > this._leakageMon.threshold * 3) {
-                    console.warn(`[${this._leakageMon.name}] REFUSES to accept new listeners because it exceeded its threshold by far`);
+                var _a, _b, _c, _d, _e, _f, _g;
+                if (this._leakageMon && this._size > this._leakageMon.threshold ** 2) {
+                    const message = `[${this._leakageMon.name}] REFUSES to accept new listeners because it exceeded its threshold by far (${this._size} vs ${this._leakageMon.threshold})`;
+                    console.warn(message);
+                    const tuple = (_a = this._leakageMon.getMostFrequentStack()) !== null && _a !== void 0 ? _a : ['UNKNOWN stack', -1];
+                    const error = new ListenerRefusalError(`${message}. HINT: Stack shows most frequent listener (${tuple[1]}-times)`, tuple[0]);
+                    const errorHandler = ((_b = this._options) === null || _b === void 0 ? void 0 : _b.onListenerError) || errors_1.onUnexpectedError;
+                    errorHandler(error);
                     return lifecycle_1.Disposable.None;
                 }
                 if (this._disposed) {
@@ -6271,12 +6362,12 @@ define(__m[9/*vs/base/common/event*/], __M([0/*require*/,1/*exports*/,5/*vs/base
                     contained.stack = stack !== null && stack !== void 0 ? stack : Stacktrace.create();
                 }
                 if (!this._listeners) {
-                    (_b = (_a = this._options) === null || _a === void 0 ? void 0 : _a.onWillAddFirstListener) === null || _b === void 0 ? void 0 : _b.call(_a, this);
+                    (_d = (_c = this._options) === null || _c === void 0 ? void 0 : _c.onWillAddFirstListener) === null || _d === void 0 ? void 0 : _d.call(_c, this);
                     this._listeners = contained;
-                    (_d = (_c = this._options) === null || _c === void 0 ? void 0 : _c.onDidAddFirstListener) === null || _d === void 0 ? void 0 : _d.call(_c, this);
+                    (_f = (_e = this._options) === null || _e === void 0 ? void 0 : _e.onDidAddFirstListener) === null || _f === void 0 ? void 0 : _f.call(_e, this);
                 }
                 else if (this._listeners instanceof UniqueContainer) {
-                    (_e = this._deliveryQueue) !== null && _e !== void 0 ? _e : (this._deliveryQueue = new EventDeliveryQueuePrivate());
+                    (_g = this._deliveryQueue) !== null && _g !== void 0 ? _g : (this._deliveryQueue = new EventDeliveryQueuePrivate());
                     this._listeners = [this._listeners, contained];
                 }
                 else {
@@ -6609,27 +6700,56 @@ define(__m[9/*vs/base/common/event*/], __M([0/*require*/,1/*exports*/,5/*vs/base
      */
     class EventBufferer {
         constructor() {
-            this.buffers = [];
+            this.data = [];
         }
-        wrapEvent(event) {
+        wrapEvent(event, reduce, initial) {
             return (listener, thisArgs, disposables) => {
                 return event(i => {
-                    const buffer = this.buffers[this.buffers.length - 1];
-                    if (buffer) {
-                        buffer.push(() => listener.call(thisArgs, i));
+                    var _a;
+                    const data = this.data[this.data.length - 1];
+                    // Non-reduce scenario
+                    if (!reduce) {
+                        // Buffering case
+                        if (data) {
+                            data.buffers.push(() => listener.call(thisArgs, i));
+                        }
+                        else {
+                            // Not buffering case
+                            listener.call(thisArgs, i);
+                        }
+                        return;
                     }
-                    else {
-                        listener.call(thisArgs, i);
+                    // Reduce scenario
+                    const reduceData = data;
+                    // Not buffering case
+                    if (!reduceData) {
+                        // TODO: Is there a way to cache this reduce call for all listeners?
+                        listener.call(thisArgs, reduce(initial, i));
+                        return;
+                    }
+                    // Buffering case
+                    (_a = reduceData.items) !== null && _a !== void 0 ? _a : (reduceData.items = []);
+                    reduceData.items.push(i);
+                    if (reduceData.buffers.length === 0) {
+                        // Include a single buffered function that will reduce all events when we're done buffering events
+                        data.buffers.push(() => {
+                            var _a;
+                            // cache the reduced result so that the value can be shared across all listeners
+                            (_a = reduceData.reducedResult) !== null && _a !== void 0 ? _a : (reduceData.reducedResult = initial
+                                ? reduceData.items.reduce(reduce, initial)
+                                : reduceData.items.reduce(reduce));
+                            listener.call(thisArgs, reduceData.reducedResult);
+                        });
                     }
                 }, undefined, disposables);
             };
         }
         bufferEvents(fn) {
-            const buffer = [];
-            this.buffers.push(buffer);
+            const data = { buffers: new Array() };
+            this.data.push(data);
             const r = fn();
-            this.buffers.pop();
-            buffer.forEach(flush => flush());
+            this.data.pop();
+            data.buffers.forEach(flush => flush());
             return r;
         }
     }
@@ -6676,10 +6796,11 @@ define(__m[9/*vs/base/common/event*/], __M([0/*require*/,1/*exports*/,5/*vs/base
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[39/*vs/base/common/cancellation*/], __M([0/*require*/,1/*exports*/,9/*vs/base/common/event*/]), function (require, exports, event_1) {
+define(__m[40/*vs/base/common/cancellation*/], __M([0/*require*/,1/*exports*/,10/*vs/base/common/event*/]), function (require, exports, event_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CancellationTokenSource = exports.CancellationToken = void 0;
+    exports.cancelOnDispose = cancelOnDispose;
     const shortcutEvent = Object.freeze(function (callback, context) {
         const handle = setTimeout(callback.bind(context), 0);
         return { dispose() { clearTimeout(handle); } };
@@ -6785,13 +6906,18 @@ define(__m[39/*vs/base/common/cancellation*/], __M([0/*require*/,1/*exports*/,9/
         }
     }
     exports.CancellationTokenSource = CancellationTokenSource;
+    function cancelOnDispose(store) {
+        const source = new CancellationTokenSource();
+        store.add({ dispose() { source.cancel(); } });
+        return source.token;
+    }
 });
 
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[6/*vs/base/common/strings*/], __M([0/*require*/,1/*exports*/,34/*vs/base/common/cache*/,38/*vs/base/common/lazy*/]), function (require, exports, cache_1, lazy_1) {
+define(__m[6/*vs/base/common/strings*/], __M([0/*require*/,1/*exports*/,35/*vs/base/common/cache*/,39/*vs/base/common/lazy*/]), function (require, exports, cache_1, lazy_1) {
     "use strict";
     var _a;
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -7618,7 +7744,7 @@ define(__m[6/*vs/base/common/strings*/], __M([0/*require*/,1/*exports*/,34/*vs/b
         // Stored as key1, value1, key2, value2, ...
         return JSON.parse('{\"_common\":[8232,32,8233,32,5760,32,8192,32,8193,32,8194,32,8195,32,8196,32,8197,32,8198,32,8200,32,8201,32,8202,32,8287,32,8199,32,8239,32,2042,95,65101,95,65102,95,65103,95,8208,45,8209,45,8210,45,65112,45,1748,45,8259,45,727,45,8722,45,10134,45,11450,45,1549,44,1643,44,8218,44,184,44,42233,44,894,59,2307,58,2691,58,1417,58,1795,58,1796,58,5868,58,65072,58,6147,58,6153,58,8282,58,1475,58,760,58,42889,58,8758,58,720,58,42237,58,451,33,11601,33,660,63,577,63,2429,63,5038,63,42731,63,119149,46,8228,46,1793,46,1794,46,42510,46,68176,46,1632,46,1776,46,42232,46,1373,96,65287,96,8219,96,8242,96,1370,96,1523,96,8175,96,65344,96,900,96,8189,96,8125,96,8127,96,8190,96,697,96,884,96,712,96,714,96,715,96,756,96,699,96,701,96,700,96,702,96,42892,96,1497,96,2036,96,2037,96,5194,96,5836,96,94033,96,94034,96,65339,91,10088,40,10098,40,12308,40,64830,40,65341,93,10089,41,10099,41,12309,41,64831,41,10100,123,119060,123,10101,125,65342,94,8270,42,1645,42,8727,42,66335,42,5941,47,8257,47,8725,47,8260,47,9585,47,10187,47,10744,47,119354,47,12755,47,12339,47,11462,47,20031,47,12035,47,65340,92,65128,92,8726,92,10189,92,10741,92,10745,92,119311,92,119355,92,12756,92,20022,92,12034,92,42872,38,708,94,710,94,5869,43,10133,43,66203,43,8249,60,10094,60,706,60,119350,60,5176,60,5810,60,5120,61,11840,61,12448,61,42239,61,8250,62,10095,62,707,62,119351,62,5171,62,94015,62,8275,126,732,126,8128,126,8764,126,65372,124,65293,45,120784,50,120794,50,120804,50,120814,50,120824,50,130034,50,42842,50,423,50,1000,50,42564,50,5311,50,42735,50,119302,51,120785,51,120795,51,120805,51,120815,51,120825,51,130035,51,42923,51,540,51,439,51,42858,51,11468,51,1248,51,94011,51,71882,51,120786,52,120796,52,120806,52,120816,52,120826,52,130036,52,5070,52,71855,52,120787,53,120797,53,120807,53,120817,53,120827,53,130037,53,444,53,71867,53,120788,54,120798,54,120808,54,120818,54,120828,54,130038,54,11474,54,5102,54,71893,54,119314,55,120789,55,120799,55,120809,55,120819,55,120829,55,130039,55,66770,55,71878,55,2819,56,2538,56,2666,56,125131,56,120790,56,120800,56,120810,56,120820,56,120830,56,130040,56,547,56,546,56,66330,56,2663,57,2920,57,2541,57,3437,57,120791,57,120801,57,120811,57,120821,57,120831,57,130041,57,42862,57,11466,57,71884,57,71852,57,71894,57,9082,97,65345,97,119834,97,119886,97,119938,97,119990,97,120042,97,120094,97,120146,97,120198,97,120250,97,120302,97,120354,97,120406,97,120458,97,593,97,945,97,120514,97,120572,97,120630,97,120688,97,120746,97,65313,65,119808,65,119860,65,119912,65,119964,65,120016,65,120068,65,120120,65,120172,65,120224,65,120276,65,120328,65,120380,65,120432,65,913,65,120488,65,120546,65,120604,65,120662,65,120720,65,5034,65,5573,65,42222,65,94016,65,66208,65,119835,98,119887,98,119939,98,119991,98,120043,98,120095,98,120147,98,120199,98,120251,98,120303,98,120355,98,120407,98,120459,98,388,98,5071,98,5234,98,5551,98,65314,66,8492,66,119809,66,119861,66,119913,66,120017,66,120069,66,120121,66,120173,66,120225,66,120277,66,120329,66,120381,66,120433,66,42932,66,914,66,120489,66,120547,66,120605,66,120663,66,120721,66,5108,66,5623,66,42192,66,66178,66,66209,66,66305,66,65347,99,8573,99,119836,99,119888,99,119940,99,119992,99,120044,99,120096,99,120148,99,120200,99,120252,99,120304,99,120356,99,120408,99,120460,99,7428,99,1010,99,11429,99,43951,99,66621,99,128844,67,71922,67,71913,67,65315,67,8557,67,8450,67,8493,67,119810,67,119862,67,119914,67,119966,67,120018,67,120174,67,120226,67,120278,67,120330,67,120382,67,120434,67,1017,67,11428,67,5087,67,42202,67,66210,67,66306,67,66581,67,66844,67,8574,100,8518,100,119837,100,119889,100,119941,100,119993,100,120045,100,120097,100,120149,100,120201,100,120253,100,120305,100,120357,100,120409,100,120461,100,1281,100,5095,100,5231,100,42194,100,8558,68,8517,68,119811,68,119863,68,119915,68,119967,68,120019,68,120071,68,120123,68,120175,68,120227,68,120279,68,120331,68,120383,68,120435,68,5024,68,5598,68,5610,68,42195,68,8494,101,65349,101,8495,101,8519,101,119838,101,119890,101,119942,101,120046,101,120098,101,120150,101,120202,101,120254,101,120306,101,120358,101,120410,101,120462,101,43826,101,1213,101,8959,69,65317,69,8496,69,119812,69,119864,69,119916,69,120020,69,120072,69,120124,69,120176,69,120228,69,120280,69,120332,69,120384,69,120436,69,917,69,120492,69,120550,69,120608,69,120666,69,120724,69,11577,69,5036,69,42224,69,71846,69,71854,69,66182,69,119839,102,119891,102,119943,102,119995,102,120047,102,120099,102,120151,102,120203,102,120255,102,120307,102,120359,102,120411,102,120463,102,43829,102,42905,102,383,102,7837,102,1412,102,119315,70,8497,70,119813,70,119865,70,119917,70,120021,70,120073,70,120125,70,120177,70,120229,70,120281,70,120333,70,120385,70,120437,70,42904,70,988,70,120778,70,5556,70,42205,70,71874,70,71842,70,66183,70,66213,70,66853,70,65351,103,8458,103,119840,103,119892,103,119944,103,120048,103,120100,103,120152,103,120204,103,120256,103,120308,103,120360,103,120412,103,120464,103,609,103,7555,103,397,103,1409,103,119814,71,119866,71,119918,71,119970,71,120022,71,120074,71,120126,71,120178,71,120230,71,120282,71,120334,71,120386,71,120438,71,1292,71,5056,71,5107,71,42198,71,65352,104,8462,104,119841,104,119945,104,119997,104,120049,104,120101,104,120153,104,120205,104,120257,104,120309,104,120361,104,120413,104,120465,104,1211,104,1392,104,5058,104,65320,72,8459,72,8460,72,8461,72,119815,72,119867,72,119919,72,120023,72,120179,72,120231,72,120283,72,120335,72,120387,72,120439,72,919,72,120494,72,120552,72,120610,72,120668,72,120726,72,11406,72,5051,72,5500,72,42215,72,66255,72,731,105,9075,105,65353,105,8560,105,8505,105,8520,105,119842,105,119894,105,119946,105,119998,105,120050,105,120102,105,120154,105,120206,105,120258,105,120310,105,120362,105,120414,105,120466,105,120484,105,618,105,617,105,953,105,8126,105,890,105,120522,105,120580,105,120638,105,120696,105,120754,105,1110,105,42567,105,1231,105,43893,105,5029,105,71875,105,65354,106,8521,106,119843,106,119895,106,119947,106,119999,106,120051,106,120103,106,120155,106,120207,106,120259,106,120311,106,120363,106,120415,106,120467,106,1011,106,1112,106,65322,74,119817,74,119869,74,119921,74,119973,74,120025,74,120077,74,120129,74,120181,74,120233,74,120285,74,120337,74,120389,74,120441,74,42930,74,895,74,1032,74,5035,74,5261,74,42201,74,119844,107,119896,107,119948,107,120000,107,120052,107,120104,107,120156,107,120208,107,120260,107,120312,107,120364,107,120416,107,120468,107,8490,75,65323,75,119818,75,119870,75,119922,75,119974,75,120026,75,120078,75,120130,75,120182,75,120234,75,120286,75,120338,75,120390,75,120442,75,922,75,120497,75,120555,75,120613,75,120671,75,120729,75,11412,75,5094,75,5845,75,42199,75,66840,75,1472,108,8739,73,9213,73,65512,73,1633,108,1777,73,66336,108,125127,108,120783,73,120793,73,120803,73,120813,73,120823,73,130033,73,65321,73,8544,73,8464,73,8465,73,119816,73,119868,73,119920,73,120024,73,120128,73,120180,73,120232,73,120284,73,120336,73,120388,73,120440,73,65356,108,8572,73,8467,108,119845,108,119897,108,119949,108,120001,108,120053,108,120105,73,120157,73,120209,73,120261,73,120313,73,120365,73,120417,73,120469,73,448,73,120496,73,120554,73,120612,73,120670,73,120728,73,11410,73,1030,73,1216,73,1493,108,1503,108,1575,108,126464,108,126592,108,65166,108,65165,108,1994,108,11599,73,5825,73,42226,73,93992,73,66186,124,66313,124,119338,76,8556,76,8466,76,119819,76,119871,76,119923,76,120027,76,120079,76,120131,76,120183,76,120235,76,120287,76,120339,76,120391,76,120443,76,11472,76,5086,76,5290,76,42209,76,93974,76,71843,76,71858,76,66587,76,66854,76,65325,77,8559,77,8499,77,119820,77,119872,77,119924,77,120028,77,120080,77,120132,77,120184,77,120236,77,120288,77,120340,77,120392,77,120444,77,924,77,120499,77,120557,77,120615,77,120673,77,120731,77,1018,77,11416,77,5047,77,5616,77,5846,77,42207,77,66224,77,66321,77,119847,110,119899,110,119951,110,120003,110,120055,110,120107,110,120159,110,120211,110,120263,110,120315,110,120367,110,120419,110,120471,110,1400,110,1404,110,65326,78,8469,78,119821,78,119873,78,119925,78,119977,78,120029,78,120081,78,120185,78,120237,78,120289,78,120341,78,120393,78,120445,78,925,78,120500,78,120558,78,120616,78,120674,78,120732,78,11418,78,42208,78,66835,78,3074,111,3202,111,3330,111,3458,111,2406,111,2662,111,2790,111,3046,111,3174,111,3302,111,3430,111,3664,111,3792,111,4160,111,1637,111,1781,111,65359,111,8500,111,119848,111,119900,111,119952,111,120056,111,120108,111,120160,111,120212,111,120264,111,120316,111,120368,111,120420,111,120472,111,7439,111,7441,111,43837,111,959,111,120528,111,120586,111,120644,111,120702,111,120760,111,963,111,120532,111,120590,111,120648,111,120706,111,120764,111,11423,111,4351,111,1413,111,1505,111,1607,111,126500,111,126564,111,126596,111,65259,111,65260,111,65258,111,65257,111,1726,111,64428,111,64429,111,64427,111,64426,111,1729,111,64424,111,64425,111,64423,111,64422,111,1749,111,3360,111,4125,111,66794,111,71880,111,71895,111,66604,111,1984,79,2534,79,2918,79,12295,79,70864,79,71904,79,120782,79,120792,79,120802,79,120812,79,120822,79,130032,79,65327,79,119822,79,119874,79,119926,79,119978,79,120030,79,120082,79,120134,79,120186,79,120238,79,120290,79,120342,79,120394,79,120446,79,927,79,120502,79,120560,79,120618,79,120676,79,120734,79,11422,79,1365,79,11604,79,4816,79,2848,79,66754,79,42227,79,71861,79,66194,79,66219,79,66564,79,66838,79,9076,112,65360,112,119849,112,119901,112,119953,112,120005,112,120057,112,120109,112,120161,112,120213,112,120265,112,120317,112,120369,112,120421,112,120473,112,961,112,120530,112,120544,112,120588,112,120602,112,120646,112,120660,112,120704,112,120718,112,120762,112,120776,112,11427,112,65328,80,8473,80,119823,80,119875,80,119927,80,119979,80,120031,80,120083,80,120187,80,120239,80,120291,80,120343,80,120395,80,120447,80,929,80,120504,80,120562,80,120620,80,120678,80,120736,80,11426,80,5090,80,5229,80,42193,80,66197,80,119850,113,119902,113,119954,113,120006,113,120058,113,120110,113,120162,113,120214,113,120266,113,120318,113,120370,113,120422,113,120474,113,1307,113,1379,113,1382,113,8474,81,119824,81,119876,81,119928,81,119980,81,120032,81,120084,81,120188,81,120240,81,120292,81,120344,81,120396,81,120448,81,11605,81,119851,114,119903,114,119955,114,120007,114,120059,114,120111,114,120163,114,120215,114,120267,114,120319,114,120371,114,120423,114,120475,114,43847,114,43848,114,7462,114,11397,114,43905,114,119318,82,8475,82,8476,82,8477,82,119825,82,119877,82,119929,82,120033,82,120189,82,120241,82,120293,82,120345,82,120397,82,120449,82,422,82,5025,82,5074,82,66740,82,5511,82,42211,82,94005,82,65363,115,119852,115,119904,115,119956,115,120008,115,120060,115,120112,115,120164,115,120216,115,120268,115,120320,115,120372,115,120424,115,120476,115,42801,115,445,115,1109,115,43946,115,71873,115,66632,115,65331,83,119826,83,119878,83,119930,83,119982,83,120034,83,120086,83,120138,83,120190,83,120242,83,120294,83,120346,83,120398,83,120450,83,1029,83,1359,83,5077,83,5082,83,42210,83,94010,83,66198,83,66592,83,119853,116,119905,116,119957,116,120009,116,120061,116,120113,116,120165,116,120217,116,120269,116,120321,116,120373,116,120425,116,120477,116,8868,84,10201,84,128872,84,65332,84,119827,84,119879,84,119931,84,119983,84,120035,84,120087,84,120139,84,120191,84,120243,84,120295,84,120347,84,120399,84,120451,84,932,84,120507,84,120565,84,120623,84,120681,84,120739,84,11430,84,5026,84,42196,84,93962,84,71868,84,66199,84,66225,84,66325,84,119854,117,119906,117,119958,117,120010,117,120062,117,120114,117,120166,117,120218,117,120270,117,120322,117,120374,117,120426,117,120478,117,42911,117,7452,117,43854,117,43858,117,651,117,965,117,120534,117,120592,117,120650,117,120708,117,120766,117,1405,117,66806,117,71896,117,8746,85,8899,85,119828,85,119880,85,119932,85,119984,85,120036,85,120088,85,120140,85,120192,85,120244,85,120296,85,120348,85,120400,85,120452,85,1357,85,4608,85,66766,85,5196,85,42228,85,94018,85,71864,85,8744,118,8897,118,65366,118,8564,118,119855,118,119907,118,119959,118,120011,118,120063,118,120115,118,120167,118,120219,118,120271,118,120323,118,120375,118,120427,118,120479,118,7456,118,957,118,120526,118,120584,118,120642,118,120700,118,120758,118,1141,118,1496,118,71430,118,43945,118,71872,118,119309,86,1639,86,1783,86,8548,86,119829,86,119881,86,119933,86,119985,86,120037,86,120089,86,120141,86,120193,86,120245,86,120297,86,120349,86,120401,86,120453,86,1140,86,11576,86,5081,86,5167,86,42719,86,42214,86,93960,86,71840,86,66845,86,623,119,119856,119,119908,119,119960,119,120012,119,120064,119,120116,119,120168,119,120220,119,120272,119,120324,119,120376,119,120428,119,120480,119,7457,119,1121,119,1309,119,1377,119,71434,119,71438,119,71439,119,43907,119,71919,87,71910,87,119830,87,119882,87,119934,87,119986,87,120038,87,120090,87,120142,87,120194,87,120246,87,120298,87,120350,87,120402,87,120454,87,1308,87,5043,87,5076,87,42218,87,5742,120,10539,120,10540,120,10799,120,65368,120,8569,120,119857,120,119909,120,119961,120,120013,120,120065,120,120117,120,120169,120,120221,120,120273,120,120325,120,120377,120,120429,120,120481,120,5441,120,5501,120,5741,88,9587,88,66338,88,71916,88,65336,88,8553,88,119831,88,119883,88,119935,88,119987,88,120039,88,120091,88,120143,88,120195,88,120247,88,120299,88,120351,88,120403,88,120455,88,42931,88,935,88,120510,88,120568,88,120626,88,120684,88,120742,88,11436,88,11613,88,5815,88,42219,88,66192,88,66228,88,66327,88,66855,88,611,121,7564,121,65369,121,119858,121,119910,121,119962,121,120014,121,120066,121,120118,121,120170,121,120222,121,120274,121,120326,121,120378,121,120430,121,120482,121,655,121,7935,121,43866,121,947,121,8509,121,120516,121,120574,121,120632,121,120690,121,120748,121,1199,121,4327,121,71900,121,65337,89,119832,89,119884,89,119936,89,119988,89,120040,89,120092,89,120144,89,120196,89,120248,89,120300,89,120352,89,120404,89,120456,89,933,89,978,89,120508,89,120566,89,120624,89,120682,89,120740,89,11432,89,1198,89,5033,89,5053,89,42220,89,94019,89,71844,89,66226,89,119859,122,119911,122,119963,122,120015,122,120067,122,120119,122,120171,122,120223,122,120275,122,120327,122,120379,122,120431,122,120483,122,7458,122,43923,122,71876,122,66293,90,71909,90,65338,90,8484,90,8488,90,119833,90,119885,90,119937,90,119989,90,120041,90,120197,90,120249,90,120301,90,120353,90,120405,90,120457,90,918,90,120493,90,120551,90,120609,90,120667,90,120725,90,5059,90,42204,90,71849,90,65282,34,65284,36,65285,37,65286,38,65290,42,65291,43,65294,46,65295,47,65296,48,65297,49,65298,50,65299,51,65300,52,65301,53,65302,54,65303,55,65304,56,65305,57,65308,60,65309,61,65310,62,65312,64,65316,68,65318,70,65319,71,65324,76,65329,81,65330,82,65333,85,65334,86,65335,87,65343,95,65346,98,65348,100,65350,102,65355,107,65357,109,65358,110,65361,113,65362,114,65364,116,65365,117,65367,119,65370,122,65371,123,65373,125,119846,109],\"_default\":[160,32,8211,45,65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],\"cs\":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],\"de\":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],\"es\":[8211,45,65374,126,65306,58,65281,33,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],\"fr\":[65374,126,65306,58,65281,33,8216,96,8245,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],\"it\":[160,32,8211,45,65374,126,65306,58,65281,33,8216,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],\"ja\":[8211,45,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65292,44,65307,59],\"ko\":[8211,45,65374,126,65306,58,65281,33,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],\"pl\":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],\"pt-BR\":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],\"qps-ploc\":[160,32,8211,45,65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],\"ru\":[65374,126,65306,58,65281,33,8216,96,8217,96,8245,96,180,96,12494,47,305,105,921,73,1009,112,215,120,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],\"tr\":[160,32,8211,45,65374,126,65306,58,65281,33,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65288,40,65289,41,65292,44,65307,59,65311,63],\"zh-hans\":[65374,126,65306,58,65281,33,8245,96,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65288,40,65289,41],\"zh-hant\":[8211,45,65374,126,180,96,12494,47,1047,51,1073,54,1072,97,1040,65,1068,98,1042,66,1089,99,1057,67,1077,101,1045,69,1053,72,305,105,1050,75,921,73,1052,77,1086,111,1054,79,1009,112,1088,112,1056,80,1075,114,1058,84,215,120,1093,120,1061,88,1091,121,1059,89,65283,35,65307,59]}');
     });
-    AmbiguousCharacters.cache = new cache_1.LRUCachedFunction((locales) => {
+    AmbiguousCharacters.cache = new cache_1.LRUCachedFunction({ getCacheKey: JSON.stringify }, (locales) => {
         function arrayToMap(arr) {
             const result = new Map();
             for (let i = 0; i < arr.length; i += 2) {
@@ -7686,7 +7812,7 @@ define(__m[6/*vs/base/common/strings*/], __M([0/*require*/,1/*exports*/,34/*vs/b
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[40/*vs/base/common/hash*/], __M([0/*require*/,1/*exports*/,6/*vs/base/common/strings*/]), function (require, exports, strings) {
+define(__m[41/*vs/base/common/hash*/], __M([0/*require*/,1/*exports*/,6/*vs/base/common/strings*/]), function (require, exports, strings) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.StringSHA1 = void 0;
@@ -7955,7 +8081,7 @@ define(__m[40/*vs/base/common/hash*/], __M([0/*require*/,1/*exports*/,6/*vs/base
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[25/*vs/base/common/diff/diff*/], __M([0/*require*/,1/*exports*/,36/*vs/base/common/diff/diffChange*/,40/*vs/base/common/hash*/]), function (require, exports, diffChange_1, hash_1) {
+define(__m[25/*vs/base/common/diff/diff*/], __M([0/*require*/,1/*exports*/,37/*vs/base/common/diff/diffChange*/,41/*vs/base/common/hash*/]), function (require, exports, diffChange_1, hash_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.LcsDiff = exports.StringDiffSequence = void 0;
@@ -9020,7 +9146,7 @@ define(__m[27/*vs/base/common/codiconsUtil*/], __M([0/*require*/,1/*exports*/,26
     }
 });
 
-define(__m[41/*vs/base/common/codiconsLibrary*/], __M([0/*require*/,1/*exports*/,27/*vs/base/common/codiconsUtil*/]), function (require, exports, codiconsUtil_1) {
+define(__m[42/*vs/base/common/codiconsLibrary*/], __M([0/*require*/,1/*exports*/,27/*vs/base/common/codiconsUtil*/]), function (require, exports, codiconsUtil_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.codiconsLibrary = void 0;
@@ -9594,10 +9720,14 @@ define(__m[41/*vs/base/common/codiconsLibrary*/], __M([0/*require*/,1/*exports*/
         foldVertical: (0, codiconsUtil_1.register)('fold-vertical', 0xec30),
         mapVerticalFilled: (0, codiconsUtil_1.register)('map-vertical-filled', 0xec31),
         foldVerticalFilled: (0, codiconsUtil_1.register)('fold-vertical-filled', 0xec31),
+        goToSearch: (0, codiconsUtil_1.register)('go-to-search', 0xec32),
+        percentage: (0, codiconsUtil_1.register)('percentage', 0xec33),
+        sortPercentage: (0, codiconsUtil_1.register)('sort-percentage', 0xec33),
+        attach: (0, codiconsUtil_1.register)('attach', 0xec34),
     };
 });
 
-define(__m[42/*vs/base/common/codicons*/], __M([0/*require*/,1/*exports*/,27/*vs/base/common/codiconsUtil*/,41/*vs/base/common/codiconsLibrary*/]), function (require, exports, codiconsUtil_1, codiconsLibrary_1) {
+define(__m[43/*vs/base/common/codicons*/], __M([0/*require*/,1/*exports*/,27/*vs/base/common/codiconsUtil*/,42/*vs/base/common/codiconsLibrary*/]), function (require, exports, codiconsUtil_1, codiconsLibrary_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Codicon = exports.codiconsDerived = void 0;
@@ -10688,7 +10818,7 @@ define(__m[2/*vs/editor/common/core/range*/], __M([0/*require*/,1/*exports*/,4/*
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[10/*vs/editor/common/core/lineRange*/], __M([0/*require*/,1/*exports*/,5/*vs/base/common/errors*/,3/*vs/editor/common/core/offsetRange*/,2/*vs/editor/common/core/range*/,11/*vs/base/common/arraysFind*/]), function (require, exports, errors_1, offsetRange_1, range_1, arraysFind_1) {
+define(__m[11/*vs/editor/common/core/lineRange*/], __M([0/*require*/,1/*exports*/,5/*vs/base/common/errors*/,3/*vs/editor/common/core/offsetRange*/,2/*vs/editor/common/core/range*/,12/*vs/base/common/arraysFind*/]), function (require, exports, errors_1, offsetRange_1, range_1, arraysFind_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.LineRangeSet = exports.LineRange = void 0;
@@ -10803,6 +10933,9 @@ define(__m[10/*vs/editor/common/core/lineRange*/], __M([0/*require*/,1/*exports*
             }
             return new range_1.Range(this.startLineNumber, 1, this.endLineNumberExclusive - 1, Number.MAX_SAFE_INTEGER);
         }
+        /**
+         * @deprecated Using this function is discouraged because it might lead to bugs: The end position is not guaranteed to be a valid position!
+        */
         toExclusiveRange() {
             return new range_1.Range(this.startLineNumber, 1, this.endLineNumberExclusive, 1);
         }
@@ -10993,7 +11126,7 @@ define(__m[10/*vs/editor/common/core/lineRange*/], __M([0/*require*/,1/*exports*
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[43/*vs/editor/common/core/selection*/], __M([0/*require*/,1/*exports*/,4/*vs/editor/common/core/position*/,2/*vs/editor/common/core/range*/]), function (require, exports, position_1, range_1) {
+define(__m[44/*vs/editor/common/core/selection*/], __M([0/*require*/,1/*exports*/,4/*vs/editor/common/core/position*/,2/*vs/editor/common/core/range*/]), function (require, exports, position_1, range_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Selection = void 0;
@@ -11136,11 +11269,203 @@ define(__m[43/*vs/editor/common/core/selection*/], __M([0/*require*/,1/*exports*
     exports.Selection = Selection;
 });
 
+define(__m[30/*vs/editor/common/core/textLength*/], __M([0/*require*/,1/*exports*/,4/*vs/editor/common/core/position*/,2/*vs/editor/common/core/range*/]), function (require, exports, position_1, range_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.TextLength = void 0;
+    /**
+     * Represents a non-negative length of text in terms of line and column count.
+    */
+    class TextLength {
+        static betweenPositions(position1, position2) {
+            if (position1.lineNumber === position2.lineNumber) {
+                return new TextLength(0, position2.column - position1.column);
+            }
+            else {
+                return new TextLength(position2.lineNumber - position1.lineNumber, position2.column - 1);
+            }
+        }
+        static ofRange(range) {
+            return TextLength.betweenPositions(range.getStartPosition(), range.getEndPosition());
+        }
+        static ofText(text) {
+            let line = 0;
+            let column = 0;
+            for (const c of text) {
+                if (c === '\n') {
+                    line++;
+                    column = 0;
+                }
+                else {
+                    column++;
+                }
+            }
+            return new TextLength(line, column);
+        }
+        constructor(lineCount, columnCount) {
+            this.lineCount = lineCount;
+            this.columnCount = columnCount;
+        }
+        isGreaterThanOrEqualTo(other) {
+            if (this.lineCount !== other.lineCount) {
+                return this.lineCount > other.lineCount;
+            }
+            return this.columnCount >= other.columnCount;
+        }
+        createRange(startPosition) {
+            if (this.lineCount === 0) {
+                return new range_1.Range(startPosition.lineNumber, startPosition.column, startPosition.lineNumber, startPosition.column + this.columnCount);
+            }
+            else {
+                return new range_1.Range(startPosition.lineNumber, startPosition.column, startPosition.lineNumber + this.lineCount, this.columnCount + 1);
+            }
+        }
+        addToPosition(position) {
+            if (this.lineCount === 0) {
+                return new position_1.Position(position.lineNumber, position.column + this.columnCount);
+            }
+            else {
+                return new position_1.Position(position.lineNumber + this.lineCount, this.columnCount + 1);
+            }
+        }
+        toString() {
+            return `${this.lineCount},${this.columnCount}`;
+        }
+    }
+    exports.TextLength = TextLength;
+    TextLength.zero = new TextLength(0, 0);
+});
+
+define(__m[45/*vs/editor/common/core/positionToOffset*/], __M([0/*require*/,1/*exports*/,3/*vs/editor/common/core/offsetRange*/,30/*vs/editor/common/core/textLength*/]), function (require, exports, offsetRange_1, textLength_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.PositionOffsetTransformer = void 0;
+    class PositionOffsetTransformer {
+        constructor(text) {
+            this.text = text;
+            this.lineStartOffsetByLineIdx = [];
+            this.lineStartOffsetByLineIdx.push(0);
+            for (let i = 0; i < text.length; i++) {
+                if (text.charAt(i) === '\n') {
+                    this.lineStartOffsetByLineIdx.push(i + 1);
+                }
+            }
+        }
+        getOffset(position) {
+            return this.lineStartOffsetByLineIdx[position.lineNumber - 1] + position.column - 1;
+        }
+        getOffsetRange(range) {
+            return new offsetRange_1.OffsetRange(this.getOffset(range.getStartPosition()), this.getOffset(range.getEndPosition()));
+        }
+        get textLength() {
+            const lineIdx = this.lineStartOffsetByLineIdx.length - 1;
+            return new textLength_1.TextLength(lineIdx, this.text.length - this.lineStartOffsetByLineIdx[lineIdx]);
+        }
+    }
+    exports.PositionOffsetTransformer = PositionOffsetTransformer;
+});
+
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[44/*vs/editor/common/core/wordCharacterClassifier*/], __M([0/*require*/,1/*exports*/,23/*vs/base/common/map*/,29/*vs/editor/common/core/characterClassifier*/]), function (require, exports, map_1, characterClassifier_1) {
+define(__m[46/*vs/editor/common/core/textEdit*/], __M([0/*require*/,1/*exports*/,9/*vs/base/common/assert*/,5/*vs/base/common/errors*/,4/*vs/editor/common/core/position*/,45/*vs/editor/common/core/positionToOffset*/,2/*vs/editor/common/core/range*/,30/*vs/editor/common/core/textLength*/]), function (require, exports, assert_1, errors_1, position_1, positionToOffset_1, range_1, textLength_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.StringText = exports.AbstractText = exports.SingleTextEdit = exports.TextEdit = void 0;
+    class TextEdit {
+        constructor(edits) {
+            this.edits = edits;
+            (0, assert_1.assertFn)(() => (0, assert_1.checkAdjacentItems)(edits, (a, b) => a.range.getEndPosition().isBeforeOrEqual(b.range.getStartPosition())));
+        }
+        apply(text) {
+            let result = '';
+            let lastEditEnd = new position_1.Position(1, 1);
+            for (const edit of this.edits) {
+                const editRange = edit.range;
+                const editStart = editRange.getStartPosition();
+                const editEnd = editRange.getEndPosition();
+                const r = rangeFromPositions(lastEditEnd, editStart);
+                if (!r.isEmpty()) {
+                    result += text.getValueOfRange(r);
+                }
+                result += edit.text;
+                lastEditEnd = editEnd;
+            }
+            const r = rangeFromPositions(lastEditEnd, text.endPositionExclusive);
+            if (!r.isEmpty()) {
+                result += text.getValueOfRange(r);
+            }
+            return result;
+        }
+        applyToString(str) {
+            const strText = new StringText(str);
+            return this.apply(strText);
+        }
+        getNewRanges() {
+            const newRanges = [];
+            let previousEditEndLineNumber = 0;
+            let lineOffset = 0;
+            let columnOffset = 0;
+            for (const edit of this.edits) {
+                const textLength = textLength_1.TextLength.ofText(edit.text);
+                const newRangeStart = position_1.Position.lift({
+                    lineNumber: edit.range.startLineNumber + lineOffset,
+                    column: edit.range.startColumn + (edit.range.startLineNumber === previousEditEndLineNumber ? columnOffset : 0)
+                });
+                const newRange = textLength.createRange(newRangeStart);
+                newRanges.push(newRange);
+                lineOffset = newRange.endLineNumber - edit.range.endLineNumber;
+                columnOffset = newRange.endColumn - edit.range.endColumn;
+                previousEditEndLineNumber = edit.range.endLineNumber;
+            }
+            return newRanges;
+        }
+    }
+    exports.TextEdit = TextEdit;
+    class SingleTextEdit {
+        constructor(range, text) {
+            this.range = range;
+            this.text = text;
+        }
+    }
+    exports.SingleTextEdit = SingleTextEdit;
+    function rangeFromPositions(start, end) {
+        if (start.lineNumber === end.lineNumber && start.column === Number.MAX_SAFE_INTEGER) {
+            return range_1.Range.fromPositions(end, end);
+        }
+        else if (!start.isBeforeOrEqual(end)) {
+            throw new errors_1.BugIndicatingError('start must be before end');
+        }
+        return new range_1.Range(start.lineNumber, start.column, end.lineNumber, end.column);
+    }
+    class AbstractText {
+        get endPositionExclusive() {
+            return this.length.addToPosition(new position_1.Position(1, 1));
+        }
+    }
+    exports.AbstractText = AbstractText;
+    class StringText extends AbstractText {
+        constructor(value) {
+            super();
+            this.value = value;
+            this._t = new positionToOffset_1.PositionOffsetTransformer(this.value);
+        }
+        getValueOfRange(range) {
+            return this._t.getOffsetRange(range).substring(this.value);
+        }
+        get length() {
+            return this._t.textLength;
+        }
+    }
+    exports.StringText = StringText;
+});
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+define(__m[47/*vs/editor/common/core/wordCharacterClassifier*/], __M([0/*require*/,1/*exports*/,23/*vs/base/common/map*/,29/*vs/editor/common/core/characterClassifier*/]), function (require, exports, map_1, characterClassifier_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.WordCharacterClassifier = void 0;
@@ -11229,7 +11554,7 @@ define(__m[44/*vs/editor/common/core/wordCharacterClassifier*/], __M([0/*require
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[30/*vs/editor/common/core/wordHelper*/], __M([0/*require*/,1/*exports*/,21/*vs/base/common/iterator*/,22/*vs/base/common/linkedList*/]), function (require, exports, iterator_1, linkedList_1) {
+define(__m[31/*vs/editor/common/core/wordHelper*/], __M([0/*require*/,1/*exports*/,21/*vs/base/common/iterator*/,22/*vs/base/common/linkedList*/]), function (require, exports, iterator_1, linkedList_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.DEFAULT_WORD_REGEXP = exports.USUAL_WORD_SEPARATORS = void 0;
@@ -11494,7 +11819,7 @@ define(__m[8/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/diffAlgo
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[31/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/myersDiffAlgorithm*/], __M([0/*require*/,1/*exports*/,3/*vs/editor/common/core/offsetRange*/,8/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/diffAlgorithm*/]), function (require, exports, offsetRange_1, diffAlgorithm_1) {
+define(__m[32/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/myersDiffAlgorithm*/], __M([0/*require*/,1/*exports*/,3/*vs/editor/common/core/offsetRange*/,8/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/diffAlgorithm*/]), function (require, exports, offsetRange_1, diffAlgorithm_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MyersDiffAlgorithm = void 0;
@@ -11658,7 +11983,7 @@ define(__m[31/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/myersDi
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[45/*vs/editor/common/diff/defaultLinesDiffComputer/heuristicSequenceOptimizations*/], __M([0/*require*/,1/*exports*/,7/*vs/base/common/arrays*/,3/*vs/editor/common/core/offsetRange*/,8/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/diffAlgorithm*/]), function (require, exports, arrays_1, offsetRange_1, diffAlgorithm_1) {
+define(__m[48/*vs/editor/common/diff/defaultLinesDiffComputer/heuristicSequenceOptimizations*/], __M([0/*require*/,1/*exports*/,7/*vs/base/common/arrays*/,3/*vs/editor/common/core/offsetRange*/,8/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/diffAlgorithm*/]), function (require, exports, arrays_1, offsetRange_1, diffAlgorithm_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.optimizeSequenceDiffs = optimizeSequenceDiffs;
@@ -12036,7 +12361,7 @@ define(__m[45/*vs/editor/common/diff/defaultLinesDiffComputer/heuristicSequenceO
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[46/*vs/editor/common/diff/defaultLinesDiffComputer/lineSequence*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
+define(__m[49/*vs/editor/common/diff/defaultLinesDiffComputer/lineSequence*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.LineSequence = void 0;
@@ -12147,7 +12472,7 @@ define(__m[15/*vs/editor/common/diff/defaultLinesDiffComputer/utils*/], __M([0/*
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[47/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/dynamicProgrammingDiffing*/], __M([0/*require*/,1/*exports*/,3/*vs/editor/common/core/offsetRange*/,8/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/diffAlgorithm*/,15/*vs/editor/common/diff/defaultLinesDiffComputer/utils*/]), function (require, exports, offsetRange_1, diffAlgorithm_1, utils_1) {
+define(__m[50/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/dynamicProgrammingDiffing*/], __M([0/*require*/,1/*exports*/,3/*vs/editor/common/core/offsetRange*/,8/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/diffAlgorithm*/,15/*vs/editor/common/diff/defaultLinesDiffComputer/utils*/]), function (require, exports, offsetRange_1, diffAlgorithm_1, utils_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.DynamicProgrammingDiffing = void 0;
@@ -12249,7 +12574,7 @@ define(__m[47/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/dynamic
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[32/*vs/editor/common/diff/defaultLinesDiffComputer/linesSliceCharSequence*/], __M([0/*require*/,1/*exports*/,11/*vs/base/common/arraysFind*/,3/*vs/editor/common/core/offsetRange*/,4/*vs/editor/common/core/position*/,2/*vs/editor/common/core/range*/,15/*vs/editor/common/diff/defaultLinesDiffComputer/utils*/]), function (require, exports, arraysFind_1, offsetRange_1, position_1, range_1, utils_1) {
+define(__m[33/*vs/editor/common/diff/defaultLinesDiffComputer/linesSliceCharSequence*/], __M([0/*require*/,1/*exports*/,12/*vs/base/common/arraysFind*/,3/*vs/editor/common/core/offsetRange*/,4/*vs/editor/common/core/position*/,2/*vs/editor/common/core/range*/,15/*vs/editor/common/diff/defaultLinesDiffComputer/utils*/]), function (require, exports, arraysFind_1, offsetRange_1, position_1, range_1, utils_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.LinesSliceCharSequence = void 0;
@@ -12437,7 +12762,7 @@ define(__m[32/*vs/editor/common/diff/defaultLinesDiffComputer/linesSliceCharSequ
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[33/*vs/editor/common/diff/linesDiffComputer*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
+define(__m[34/*vs/editor/common/diff/linesDiffComputer*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MovedText = exports.LinesDiff = void 0;
@@ -12472,7 +12797,7 @@ define(__m[33/*vs/editor/common/diff/linesDiffComputer*/], __M([0/*require*/,1/*
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[16/*vs/editor/common/diff/rangeMapping*/], __M([0/*require*/,1/*exports*/,10/*vs/editor/common/core/lineRange*/]), function (require, exports, lineRange_1) {
+define(__m[16/*vs/editor/common/diff/rangeMapping*/], __M([0/*require*/,1/*exports*/,5/*vs/base/common/errors*/,11/*vs/editor/common/core/lineRange*/,2/*vs/editor/common/core/range*/,46/*vs/editor/common/core/textEdit*/]), function (require, exports, errors_1, lineRange_1, range_1, textEdit_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.RangeMapping = exports.DetailedLineRangeMapping = exports.LineRangeMapping = void 0;
@@ -12522,6 +12847,31 @@ define(__m[16/*vs/editor/common/diff/rangeMapping*/], __M([0/*require*/,1/*expor
         join(other) {
             return new LineRangeMapping(this.original.join(other.original), this.modified.join(other.modified));
         }
+        /**
+         * This method assumes that the LineRangeMapping describes a valid diff!
+         * I.e. if one range is empty, the other range cannot be the entire document.
+         * It avoids various problems when the line range points to non-existing line-numbers.
+        */
+        toRangeMapping() {
+            const origInclusiveRange = this.original.toInclusiveRange();
+            const modInclusiveRange = this.modified.toInclusiveRange();
+            if (origInclusiveRange && modInclusiveRange) {
+                return new RangeMapping(origInclusiveRange, modInclusiveRange);
+            }
+            else if (this.original.startLineNumber === 1 || this.modified.startLineNumber === 1) {
+                if (!(this.modified.startLineNumber === 1 && this.original.startLineNumber === 1)) {
+                    // If one line range starts at 1, the other one must start at 1 as well.
+                    throw new errors_1.BugIndicatingError('not a valid diff');
+                }
+                // Because one range is empty and both ranges start at line 1, none of the ranges can cover all lines.
+                // Thus, `endLineNumberExclusive` is a valid line number.
+                return new RangeMapping(new range_1.Range(this.original.startLineNumber, 1, this.original.endLineNumberExclusive, 1), new range_1.Range(this.modified.startLineNumber, 1, this.modified.endLineNumberExclusive, 1));
+            }
+            else {
+                // We can assume here that both startLineNumbers are greater than 1.
+                return new RangeMapping(new range_1.Range(this.original.startLineNumber - 1, Number.MAX_SAFE_INTEGER, this.original.endLineNumberExclusive - 1, Number.MAX_SAFE_INTEGER), new range_1.Range(this.modified.startLineNumber - 1, Number.MAX_SAFE_INTEGER, this.modified.endLineNumberExclusive - 1, Number.MAX_SAFE_INTEGER));
+            }
+        }
     }
     exports.LineRangeMapping = LineRangeMapping;
     /**
@@ -12543,9 +12893,7 @@ define(__m[16/*vs/editor/common/diff/rangeMapping*/], __M([0/*require*/,1/*expor
             return new DetailedLineRangeMapping(this.modified, this.original, (_a = this.innerChanges) === null || _a === void 0 ? void 0 : _a.map(c => c.flip()));
         }
         withInnerChangesFromLineRanges() {
-            return new DetailedLineRangeMapping(this.original, this.modified, [
-                new RangeMapping(this.original.toExclusiveRange(), this.modified.toExclusiveRange()),
-            ]);
+            return new DetailedLineRangeMapping(this.original, this.modified, [this.toRangeMapping()]);
         }
     }
     exports.DetailedLineRangeMapping = DetailedLineRangeMapping;
@@ -12563,6 +12911,13 @@ define(__m[16/*vs/editor/common/diff/rangeMapping*/], __M([0/*require*/,1/*expor
         flip() {
             return new RangeMapping(this.modifiedRange, this.originalRange);
         }
+        /**
+         * Creates a single text edit that describes the change from the original to the modified text.
+        */
+        toTextEdit(modified) {
+            const newText = modified.getValueOfRange(this.modifiedRange);
+            return new textEdit_1.SingleTextEdit(this.originalRange, newText);
+        }
     }
     exports.RangeMapping = RangeMapping;
 });
@@ -12571,7 +12926,7 @@ define(__m[16/*vs/editor/common/diff/rangeMapping*/], __M([0/*require*/,1/*expor
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[48/*vs/editor/common/diff/defaultLinesDiffComputer/computeMovedLines*/], __M([0/*require*/,1/*exports*/,8/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/diffAlgorithm*/,16/*vs/editor/common/diff/rangeMapping*/,7/*vs/base/common/arrays*/,11/*vs/base/common/arraysFind*/,23/*vs/base/common/map*/,10/*vs/editor/common/core/lineRange*/,3/*vs/editor/common/core/offsetRange*/,32/*vs/editor/common/diff/defaultLinesDiffComputer/linesSliceCharSequence*/,15/*vs/editor/common/diff/defaultLinesDiffComputer/utils*/,31/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/myersDiffAlgorithm*/]), function (require, exports, diffAlgorithm_1, rangeMapping_1, arrays_1, arraysFind_1, map_1, lineRange_1, offsetRange_1, linesSliceCharSequence_1, utils_1, myersDiffAlgorithm_1) {
+define(__m[51/*vs/editor/common/diff/defaultLinesDiffComputer/computeMovedLines*/], __M([0/*require*/,1/*exports*/,8/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/diffAlgorithm*/,16/*vs/editor/common/diff/rangeMapping*/,7/*vs/base/common/arrays*/,12/*vs/base/common/arraysFind*/,23/*vs/base/common/map*/,11/*vs/editor/common/core/lineRange*/,3/*vs/editor/common/core/offsetRange*/,33/*vs/editor/common/diff/defaultLinesDiffComputer/linesSliceCharSequence*/,15/*vs/editor/common/diff/defaultLinesDiffComputer/utils*/,32/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/myersDiffAlgorithm*/]), function (require, exports, diffAlgorithm_1, rangeMapping_1, arrays_1, arraysFind_1, map_1, lineRange_1, offsetRange_1, linesSliceCharSequence_1, utils_1, myersDiffAlgorithm_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.computeMovedLines = computeMovedLines;
@@ -12813,7 +13168,7 @@ define(__m[48/*vs/editor/common/diff/defaultLinesDiffComputer/computeMovedLines*
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[49/*vs/editor/common/diff/defaultLinesDiffComputer/defaultLinesDiffComputer*/], __M([0/*require*/,1/*exports*/,7/*vs/base/common/arrays*/,12/*vs/base/common/assert*/,10/*vs/editor/common/core/lineRange*/,3/*vs/editor/common/core/offsetRange*/,2/*vs/editor/common/core/range*/,8/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/diffAlgorithm*/,47/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/dynamicProgrammingDiffing*/,31/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/myersDiffAlgorithm*/,48/*vs/editor/common/diff/defaultLinesDiffComputer/computeMovedLines*/,45/*vs/editor/common/diff/defaultLinesDiffComputer/heuristicSequenceOptimizations*/,46/*vs/editor/common/diff/defaultLinesDiffComputer/lineSequence*/,32/*vs/editor/common/diff/defaultLinesDiffComputer/linesSliceCharSequence*/,33/*vs/editor/common/diff/linesDiffComputer*/,16/*vs/editor/common/diff/rangeMapping*/]), function (require, exports, arrays_1, assert_1, lineRange_1, offsetRange_1, range_1, diffAlgorithm_1, dynamicProgrammingDiffing_1, myersDiffAlgorithm_1, computeMovedLines_1, heuristicSequenceOptimizations_1, lineSequence_1, linesSliceCharSequence_1, linesDiffComputer_1, rangeMapping_1) {
+define(__m[52/*vs/editor/common/diff/defaultLinesDiffComputer/defaultLinesDiffComputer*/], __M([0/*require*/,1/*exports*/,7/*vs/base/common/arrays*/,9/*vs/base/common/assert*/,11/*vs/editor/common/core/lineRange*/,3/*vs/editor/common/core/offsetRange*/,2/*vs/editor/common/core/range*/,8/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/diffAlgorithm*/,50/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/dynamicProgrammingDiffing*/,32/*vs/editor/common/diff/defaultLinesDiffComputer/algorithms/myersDiffAlgorithm*/,51/*vs/editor/common/diff/defaultLinesDiffComputer/computeMovedLines*/,48/*vs/editor/common/diff/defaultLinesDiffComputer/heuristicSequenceOptimizations*/,49/*vs/editor/common/diff/defaultLinesDiffComputer/lineSequence*/,33/*vs/editor/common/diff/defaultLinesDiffComputer/linesSliceCharSequence*/,34/*vs/editor/common/diff/linesDiffComputer*/,16/*vs/editor/common/diff/rangeMapping*/]), function (require, exports, arrays_1, assert_1, lineRange_1, offsetRange_1, range_1, diffAlgorithm_1, dynamicProgrammingDiffing_1, myersDiffAlgorithm_1, computeMovedLines_1, heuristicSequenceOptimizations_1, lineSequence_1, linesSliceCharSequence_1, linesDiffComputer_1, rangeMapping_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.DefaultLinesDiffComputer = void 0;
@@ -12831,7 +13186,7 @@ define(__m[49/*vs/editor/common/diff/defaultLinesDiffComputer/defaultLinesDiffCo
             if (originalLines.length === 1 && originalLines[0].length === 0 || modifiedLines.length === 1 && modifiedLines[0].length === 0) {
                 return new linesDiffComputer_1.LinesDiff([
                     new rangeMapping_1.DetailedLineRangeMapping(new lineRange_1.LineRange(1, originalLines.length + 1), new lineRange_1.LineRange(1, modifiedLines.length + 1), [
-                        new rangeMapping_1.RangeMapping(new range_1.Range(1, 1, originalLines.length, originalLines[0].length + 1), new range_1.Range(1, 1, modifiedLines.length, modifiedLines[0].length + 1))
+                        new rangeMapping_1.RangeMapping(new range_1.Range(1, 1, originalLines.length, originalLines[originalLines.length - 1].length + 1), new range_1.Range(1, 1, modifiedLines.length, modifiedLines[modifiedLines.length - 1].length + 1))
                     ])
                 ], [], false);
             }
@@ -12859,7 +13214,7 @@ define(__m[49/*vs/editor/common/diff/defaultLinesDiffComputer/defaultLinesDiffCo
                             : 1 + Math.log(1 + modifiedLines[offset2].length)
                         : 0.99);
                 }
-                return this.myersDiffingAlgorithm.compute(sequence1, sequence2);
+                return this.myersDiffingAlgorithm.compute(sequence1, sequence2, timeout);
             })();
             let lineAlignments = lineAlignmentResult.diffs;
             let hitTimeout = lineAlignmentResult.hitTimeout;
@@ -13031,7 +13386,7 @@ define(__m[49/*vs/editor/common/diff/defaultLinesDiffComputer/defaultLinesDiffCo
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[50/*vs/editor/common/diff/legacyLinesDiffComputer*/], __M([0/*require*/,1/*exports*/,25/*vs/base/common/diff/diff*/,33/*vs/editor/common/diff/linesDiffComputer*/,16/*vs/editor/common/diff/rangeMapping*/,6/*vs/base/common/strings*/,2/*vs/editor/common/core/range*/,12/*vs/base/common/assert*/,10/*vs/editor/common/core/lineRange*/]), function (require, exports, diff_1, linesDiffComputer_1, rangeMapping_1, strings, range_1, assert_1, lineRange_1) {
+define(__m[53/*vs/editor/common/diff/legacyLinesDiffComputer*/], __M([0/*require*/,1/*exports*/,25/*vs/base/common/diff/diff*/,34/*vs/editor/common/diff/linesDiffComputer*/,16/*vs/editor/common/diff/rangeMapping*/,6/*vs/base/common/strings*/,2/*vs/editor/common/core/range*/,9/*vs/base/common/assert*/,11/*vs/editor/common/core/lineRange*/]), function (require, exports, diff_1, linesDiffComputer_1, rangeMapping_1, strings, range_1, assert_1, lineRange_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.DiffComputer = exports.LegacyLinesDiffComputer = void 0;
@@ -13498,7 +13853,7 @@ define(__m[50/*vs/editor/common/diff/legacyLinesDiffComputer*/], __M([0/*require
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[51/*vs/editor/common/diff/linesDiffComputers*/], __M([0/*require*/,1/*exports*/,50/*vs/editor/common/diff/legacyLinesDiffComputer*/,49/*vs/editor/common/diff/defaultLinesDiffComputer/defaultLinesDiffComputer*/]), function (require, exports, legacyLinesDiffComputer_1, defaultLinesDiffComputer_1) {
+define(__m[54/*vs/editor/common/diff/linesDiffComputers*/], __M([0/*require*/,1/*exports*/,53/*vs/editor/common/diff/legacyLinesDiffComputer*/,52/*vs/editor/common/diff/defaultLinesDiffComputer/defaultLinesDiffComputer*/]), function (require, exports, legacyLinesDiffComputer_1, defaultLinesDiffComputer_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.linesDiffComputers = void 0;
@@ -13508,7 +13863,7 @@ define(__m[51/*vs/editor/common/diff/linesDiffComputers*/], __M([0/*require*/,1/
     };
 });
 
-define(__m[52/*vs/editor/common/languages/defaultDocumentColorsComputer*/], __M([0/*require*/,1/*exports*/,35/*vs/base/common/color*/]), function (require, exports, color_1) {
+define(__m[55/*vs/editor/common/languages/defaultDocumentColorsComputer*/], __M([0/*require*/,1/*exports*/,36/*vs/base/common/color*/]), function (require, exports, color_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.computeDefaultDocumentColors = computeDefaultDocumentColors;
@@ -13648,7 +14003,7 @@ define(__m[52/*vs/editor/common/languages/defaultDocumentColorsComputer*/], __M(
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[53/*vs/editor/common/languages/linkComputer*/], __M([0/*require*/,1/*exports*/,29/*vs/editor/common/core/characterClassifier*/]), function (require, exports, characterClassifier_1) {
+define(__m[56/*vs/editor/common/languages/linkComputer*/], __M([0/*require*/,1/*exports*/,29/*vs/editor/common/core/characterClassifier*/]), function (require, exports, characterClassifier_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.LinkComputer = exports.StateMachine = void 0;
@@ -13926,7 +14281,7 @@ define(__m[53/*vs/editor/common/languages/linkComputer*/], __M([0/*require*/,1/*
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[54/*vs/editor/common/languages/supports/inplaceReplaceSupport*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
+define(__m[57/*vs/editor/common/languages/supports/inplaceReplaceSupport*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.BasicInplaceReplace = void 0;
@@ -14018,7 +14373,7 @@ define(__m[54/*vs/editor/common/languages/supports/inplaceReplaceSupport*/], __M
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[55/*vs/editor/common/model*/], __M([0/*require*/,1/*exports*/,14/*vs/base/common/objects*/]), function (require, exports, objects_1) {
+define(__m[58/*vs/editor/common/model*/], __M([0/*require*/,1/*exports*/,14/*vs/base/common/objects*/]), function (require, exports, objects_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ApplyEditsResult = exports.SearchData = exports.ValidAnnotatedEditOperation = exports.FindMatch = exports.TextModelResolvedOptions = exports.InjectedTextCursorStops = exports.GlyphMarginLane = exports.OverviewRulerLane = void 0;
@@ -14163,7 +14518,7 @@ define(__m[55/*vs/editor/common/model*/], __M([0/*require*/,1/*exports*/,14/*vs/
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[56/*vs/editor/common/model/prefixSumComputer*/], __M([0/*require*/,1/*exports*/,7/*vs/base/common/arrays*/,28/*vs/base/common/uint*/]), function (require, exports, arrays_1, uint_1) {
+define(__m[59/*vs/editor/common/model/prefixSumComputer*/], __M([0/*require*/,1/*exports*/,7/*vs/base/common/arrays*/,28/*vs/base/common/uint*/]), function (require, exports, arrays_1, uint_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PrefixSumIndexOfResult = exports.ConstantTimePrefixSumComputer = exports.PrefixSumComputer = void 0;
@@ -14393,7 +14748,7 @@ define(__m[56/*vs/editor/common/model/prefixSumComputer*/], __M([0/*require*/,1/
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[57/*vs/editor/common/model/mirrorTextModel*/], __M([0/*require*/,1/*exports*/,6/*vs/base/common/strings*/,4/*vs/editor/common/core/position*/,56/*vs/editor/common/model/prefixSumComputer*/]), function (require, exports, strings_1, position_1, prefixSumComputer_1) {
+define(__m[60/*vs/editor/common/model/mirrorTextModel*/], __M([0/*require*/,1/*exports*/,6/*vs/base/common/strings*/,4/*vs/editor/common/core/position*/,59/*vs/editor/common/model/prefixSumComputer*/]), function (require, exports, strings_1, position_1, prefixSumComputer_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MirrorTextModel = void 0;
@@ -14511,7 +14866,7 @@ define(__m[57/*vs/editor/common/model/mirrorTextModel*/], __M([0/*require*/,1/*e
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[58/*vs/editor/common/model/textModelSearch*/], __M([0/*require*/,1/*exports*/,6/*vs/base/common/strings*/,44/*vs/editor/common/core/wordCharacterClassifier*/,4/*vs/editor/common/core/position*/,2/*vs/editor/common/core/range*/,55/*vs/editor/common/model*/]), function (require, exports, strings, wordCharacterClassifier_1, position_1, range_1, model_1) {
+define(__m[61/*vs/editor/common/model/textModelSearch*/], __M([0/*require*/,1/*exports*/,6/*vs/base/common/strings*/,47/*vs/editor/common/core/wordCharacterClassifier*/,4/*vs/editor/common/core/position*/,2/*vs/editor/common/core/range*/,58/*vs/editor/common/model*/]), function (require, exports, strings, wordCharacterClassifier_1, position_1, range_1, model_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Searcher = exports.TextModelSearch = exports.SearchParams = void 0;
@@ -14970,11 +15325,11 @@ define(__m[58/*vs/editor/common/model/textModelSearch*/], __M([0/*require*/,1/*e
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[59/*vs/editor/common/services/findSectionHeaders*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
+define(__m[62/*vs/editor/common/services/findSectionHeaders*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.findSectionHeaders = findSectionHeaders;
-    const markRegex = /\bMARK:\s*(.*)$/d;
+    const markRegex = new RegExp('\\bMARK:\\s*(.*)$', 'd');
     const trimDashesRegex = /^-+|-+$/g;
     /**
      * Find section headers in the model.
@@ -15058,7 +15413,7 @@ define(__m[59/*vs/editor/common/services/findSectionHeaders*/], __M([0/*require*
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[60/*vs/editor/common/services/unicodeTextModelHighlighter*/], __M([0/*require*/,1/*exports*/,2/*vs/editor/common/core/range*/,58/*vs/editor/common/model/textModelSearch*/,6/*vs/base/common/strings*/,12/*vs/base/common/assert*/,30/*vs/editor/common/core/wordHelper*/]), function (require, exports, range_1, textModelSearch_1, strings, assert_1, wordHelper_1) {
+define(__m[63/*vs/editor/common/services/unicodeTextModelHighlighter*/], __M([0/*require*/,1/*exports*/,2/*vs/editor/common/core/range*/,61/*vs/editor/common/model/textModelSearch*/,6/*vs/base/common/strings*/,9/*vs/base/common/assert*/,31/*vs/editor/common/core/wordHelper*/]), function (require, exports, range_1, textModelSearch_1, strings, assert_1, wordHelper_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.UnicodeTextModelHighlighter = void 0;
@@ -15245,10 +15600,10 @@ define(__m[60/*vs/editor/common/services/unicodeTextModelHighlighter*/], __M([0/
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[61/*vs/editor/common/standalone/standaloneEnums*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
+define(__m[64/*vs/editor/common/standalone/standaloneEnums*/], __M([0/*require*/,1/*exports*/]), function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.WrappingIndent = exports.TrackedRangeStickiness = exports.TextEditorCursorStyle = exports.TextEditorCursorBlinkingStyle = exports.SymbolTag = exports.SymbolKind = exports.SignatureHelpTriggerKind = exports.ShowLightbulbIconMode = exports.SelectionDirection = exports.ScrollbarVisibility = exports.ScrollType = exports.RenderMinimap = exports.RenderLineNumbersType = exports.PositionAffinity = exports.PartialAcceptTriggerKind = exports.OverviewRulerLane = exports.OverlayWidgetPositionPreference = exports.NewSymbolNameTag = exports.MouseTargetType = exports.MinimapSectionHeaderStyle = exports.MinimapPosition = exports.MarkerTag = exports.MarkerSeverity = exports.KeyCode = exports.InlineEditTriggerKind = exports.InlineCompletionTriggerKind = exports.InlayHintKind = exports.InjectedTextCursorStops = exports.IndentAction = exports.GlyphMarginLane = exports.EndOfLineSequence = exports.EndOfLinePreference = exports.EditorOption = exports.EditorAutoIndentStrategy = exports.DocumentHighlightKind = exports.DefaultEndOfLine = exports.CursorChangeReason = exports.ContentWidgetPositionPreference = exports.CompletionTriggerKind = exports.CompletionItemTag = exports.CompletionItemKind = exports.CompletionItemInsertTextRule = exports.CodeActionTriggerType = exports.AccessibilitySupport = void 0;
+    exports.WrappingIndent = exports.TrackedRangeStickiness = exports.TextEditorCursorStyle = exports.TextEditorCursorBlinkingStyle = exports.SymbolTag = exports.SymbolKind = exports.SignatureHelpTriggerKind = exports.ShowLightbulbIconMode = exports.SelectionDirection = exports.ScrollbarVisibility = exports.ScrollType = exports.RenderMinimap = exports.RenderLineNumbersType = exports.PositionAffinity = exports.PartialAcceptTriggerKind = exports.OverviewRulerLane = exports.OverlayWidgetPositionPreference = exports.NewSymbolNameTriggerKind = exports.NewSymbolNameTag = exports.MouseTargetType = exports.MinimapSectionHeaderStyle = exports.MinimapPosition = exports.MarkerTag = exports.MarkerSeverity = exports.KeyCode = exports.InlineEditTriggerKind = exports.InlineCompletionTriggerKind = exports.InlayHintKind = exports.InjectedTextCursorStops = exports.IndentAction = exports.HoverVerbosityAction = exports.GlyphMarginLane = exports.EndOfLineSequence = exports.EndOfLinePreference = exports.EditorOption = exports.EditorAutoIndentStrategy = exports.DocumentHighlightKind = exports.DefaultEndOfLine = exports.CursorChangeReason = exports.ContentWidgetPositionPreference = exports.CompletionTriggerKind = exports.CompletionItemTag = exports.CompletionItemKind = exports.CompletionItemInsertTextRule = exports.CodeActionTriggerType = exports.AccessibilitySupport = void 0;
     // THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY.
     var AccessibilitySupport;
     (function (AccessibilitySupport) {
@@ -15610,6 +15965,17 @@ define(__m[61/*vs/editor/common/standalone/standaloneEnums*/], __M([0/*require*/
         GlyphMarginLane[GlyphMarginLane["Center"] = 2] = "Center";
         GlyphMarginLane[GlyphMarginLane["Right"] = 3] = "Right";
     })(GlyphMarginLane || (exports.GlyphMarginLane = GlyphMarginLane = {}));
+    var HoverVerbosityAction;
+    (function (HoverVerbosityAction) {
+        /**
+         * Increase the verbosity of the hover
+         */
+        HoverVerbosityAction[HoverVerbosityAction["Increase"] = 0] = "Increase";
+        /**
+         * Decrease the verbosity of the hover
+         */
+        HoverVerbosityAction[HoverVerbosityAction["Decrease"] = 1] = "Decrease";
+    })(HoverVerbosityAction || (exports.HoverVerbosityAction = HoverVerbosityAction = {}));
     /**
      * Describes what to do with the indentation when pressing Enter.
      */
@@ -15966,6 +16332,11 @@ define(__m[61/*vs/editor/common/standalone/standaloneEnums*/], __M([0/*require*/
     (function (NewSymbolNameTag) {
         NewSymbolNameTag[NewSymbolNameTag["AIGenerated"] = 1] = "AIGenerated";
     })(NewSymbolNameTag || (exports.NewSymbolNameTag = NewSymbolNameTag = {}));
+    var NewSymbolNameTriggerKind;
+    (function (NewSymbolNameTriggerKind) {
+        NewSymbolNameTriggerKind[NewSymbolNameTriggerKind["Invoke"] = 0] = "Invoke";
+        NewSymbolNameTriggerKind[NewSymbolNameTriggerKind["Automatic"] = 1] = "Automatic";
+    })(NewSymbolNameTriggerKind || (exports.NewSymbolNameTriggerKind = NewSymbolNameTriggerKind = {}));
     /**
      * A positioning preference for rendering overlay widgets.
      */
@@ -16212,7 +16583,7 @@ define(__m[61/*vs/editor/common/standalone/standaloneEnums*/], __M([0/*require*/
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[62/*vs/editor/common/tokenizationRegistry*/], __M([0/*require*/,1/*exports*/,9/*vs/base/common/event*/,13/*vs/base/common/lifecycle*/]), function (require, exports, event_1, lifecycle_1) {
+define(__m[65/*vs/editor/common/tokenizationRegistry*/], __M([0/*require*/,1/*exports*/,10/*vs/base/common/event*/,13/*vs/base/common/lifecycle*/]), function (require, exports, event_1, lifecycle_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TokenizationRegistry = void 0;
@@ -16334,8 +16705,8 @@ define(__m[62/*vs/editor/common/tokenizationRegistry*/], __M([0/*require*/,1/*ex
     }
 });
 
-define(__m[63/*vs/nls!vs/base/common/platform*/], __M([19/*vs/nls*/,64/*vs/nls!vs/base/common/worker/simpleWorker*/]), function(nls, data) { return nls.create("vs/base/common/platform", data); });
-define(__m[17/*vs/base/common/platform*/], __M([0/*require*/,1/*exports*/,63/*vs/nls!vs/base/common/platform*/]), function (require, exports, nls) {
+define(__m[66/*vs/nls!vs/base/common/platform*/], __M([19/*vs/nls*/,67/*vs/nls!vs/base/common/worker/simpleWorker*/]), function(nls, data) { return nls.create("vs/base/common/platform", data); });
+define(__m[17/*vs/base/common/platform*/], __M([0/*require*/,1/*exports*/,66/*vs/nls!vs/base/common/platform*/]), function (require, exports, nls) {
     "use strict";
     var _a, _b;
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -16503,7 +16874,7 @@ define(__m[17/*vs/base/common/platform*/], __M([0/*require*/,1/*exports*/,63/*vs
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[65/*vs/base/common/process*/], __M([0/*require*/,1/*exports*/,17/*vs/base/common/platform*/]), function (require, exports, platform_1) {
+define(__m[68/*vs/base/common/process*/], __M([0/*require*/,1/*exports*/,17/*vs/base/common/platform*/]), function (require, exports, platform_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.platform = exports.env = exports.cwd = void 0;
@@ -16566,7 +16937,7 @@ define(__m[65/*vs/base/common/process*/], __M([0/*require*/,1/*exports*/,17/*vs/
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[66/*vs/base/common/path*/], __M([0/*require*/,1/*exports*/,65/*vs/base/common/process*/]), function (require, exports, process) {
+define(__m[69/*vs/base/common/path*/], __M([0/*require*/,1/*exports*/,68/*vs/base/common/process*/]), function (require, exports, process) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.sep = exports.extname = exports.basename = exports.dirname = exports.relative = exports.resolve = exports.normalize = exports.posix = exports.win32 = void 0;
@@ -17940,7 +18311,7 @@ define(__m[66/*vs/base/common/path*/], __M([0/*require*/,1/*exports*/,65/*vs/bas
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[18/*vs/base/common/uri*/], __M([0/*require*/,1/*exports*/,66/*vs/base/common/path*/,17/*vs/base/common/platform*/]), function (require, exports, paths, platform_1) {
+define(__m[18/*vs/base/common/uri*/], __M([0/*require*/,1/*exports*/,69/*vs/base/common/path*/,17/*vs/base/common/platform*/]), function (require, exports, paths, platform_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.URI = void 0;
@@ -18549,7 +18920,7 @@ define(__m[18/*vs/base/common/uri*/], __M([0/*require*/,1/*exports*/,66/*vs/base
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[70/*vs/base/common/worker/simpleWorker*/], __M([0/*require*/,1/*exports*/,5/*vs/base/common/errors*/,9/*vs/base/common/event*/,13/*vs/base/common/lifecycle*/,14/*vs/base/common/objects*/,17/*vs/base/common/platform*/,6/*vs/base/common/strings*/]), function (require, exports, errors_1, event_1, lifecycle_1, objects_1, platform_1, strings) {
+define(__m[73/*vs/base/common/worker/simpleWorker*/], __M([0/*require*/,1/*exports*/,5/*vs/base/common/errors*/,10/*vs/base/common/event*/,13/*vs/base/common/lifecycle*/,14/*vs/base/common/objects*/,17/*vs/base/common/platform*/,6/*vs/base/common/strings*/]), function (require, exports, errors_1, event_1, lifecycle_1, objects_1, platform_1, strings) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SimpleWorkerServer = exports.SimpleWorkerClient = void 0;
@@ -18990,11 +19361,11 @@ define(__m[70/*vs/base/common/worker/simpleWorker*/], __M([0/*require*/,1/*expor
     }
 });
 
-define(__m[67/*vs/nls!vs/editor/common/languages*/], __M([19/*vs/nls*/,64/*vs/nls!vs/base/common/worker/simpleWorker*/]), function(nls, data) { return nls.create("vs/editor/common/languages", data); });
-define(__m[68/*vs/editor/common/languages*/], __M([0/*require*/,1/*exports*/,42/*vs/base/common/codicons*/,18/*vs/base/common/uri*/,2/*vs/editor/common/core/range*/,62/*vs/editor/common/tokenizationRegistry*/,67/*vs/nls!vs/editor/common/languages*/]), function (require, exports, codicons_1, uri_1, range_1, tokenizationRegistry_1, nls_1) {
+define(__m[70/*vs/nls!vs/editor/common/languages*/], __M([19/*vs/nls*/,67/*vs/nls!vs/base/common/worker/simpleWorker*/]), function(nls, data) { return nls.create("vs/editor/common/languages", data); });
+define(__m[71/*vs/editor/common/languages*/], __M([0/*require*/,1/*exports*/,43/*vs/base/common/codicons*/,18/*vs/base/common/uri*/,2/*vs/editor/common/core/range*/,65/*vs/editor/common/tokenizationRegistry*/,70/*vs/nls!vs/editor/common/languages*/]), function (require, exports, codicons_1, uri_1, range_1, tokenizationRegistry_1, nls_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.InlineEditTriggerKind = exports.TokenizationRegistry = exports.LazyTokenizationSupport = exports.InlayHintKind = exports.Command = exports.NewSymbolNameTag = exports.FoldingRangeKind = exports.TextEdit = exports.SymbolKinds = exports.symbolKindNames = exports.DocumentHighlightKind = exports.SignatureHelpTriggerKind = exports.DocumentPasteTriggerKind = exports.SelectedSuggestionInfo = exports.InlineCompletionTriggerKind = exports.CompletionItemKinds = exports.EncodedTokenizationResult = exports.TokenizationResult = exports.Token = void 0;
+    exports.InlineEditTriggerKind = exports.TokenizationRegistry = exports.LazyTokenizationSupport = exports.InlayHintKind = exports.Command = exports.NewSymbolNameTriggerKind = exports.NewSymbolNameTag = exports.FoldingRangeKind = exports.TextEdit = exports.SymbolKinds = exports.symbolKindNames = exports.DocumentHighlightKind = exports.SignatureHelpTriggerKind = exports.DocumentPasteTriggerKind = exports.SelectedSuggestionInfo = exports.InlineCompletionTriggerKind = exports.CompletionItemKinds = exports.HoverVerbosityAction = exports.EncodedTokenizationResult = exports.TokenizationResult = exports.Token = void 0;
     exports.isLocationLink = isLocationLink;
     exports.getAriaLabelForSymbol = getAriaLabelForSymbol;
     class Token {
@@ -19038,6 +19409,17 @@ define(__m[68/*vs/editor/common/languages*/], __M([0/*require*/,1/*exports*/,42/
         }
     }
     exports.EncodedTokenizationResult = EncodedTokenizationResult;
+    var HoverVerbosityAction;
+    (function (HoverVerbosityAction) {
+        /**
+         * Increase the verbosity of the hover
+         */
+        HoverVerbosityAction[HoverVerbosityAction["Increase"] = 0] = "Increase";
+        /**
+         * Decrease the verbosity of the hover
+         */
+        HoverVerbosityAction[HoverVerbosityAction["Decrease"] = 1] = "Decrease";
+    })(HoverVerbosityAction || (exports.HoverVerbosityAction = HoverVerbosityAction = {}));
     /**
      * @internal
      */
@@ -19327,6 +19709,11 @@ define(__m[68/*vs/editor/common/languages*/], __M([0/*require*/,1/*exports*/,42/
     (function (NewSymbolNameTag) {
         NewSymbolNameTag[NewSymbolNameTag["AIGenerated"] = 1] = "AIGenerated";
     })(NewSymbolNameTag || (exports.NewSymbolNameTag = NewSymbolNameTag = {}));
+    var NewSymbolNameTriggerKind;
+    (function (NewSymbolNameTriggerKind) {
+        NewSymbolNameTriggerKind[NewSymbolNameTriggerKind["Invoke"] = 0] = "Invoke";
+        NewSymbolNameTriggerKind[NewSymbolNameTriggerKind["Automatic"] = 1] = "Automatic";
+    })(NewSymbolNameTriggerKind || (exports.NewSymbolNameTriggerKind = NewSymbolNameTriggerKind = {}));
     /**
      * @internal
      */
@@ -19389,7 +19776,7 @@ define(__m[68/*vs/editor/common/languages*/], __M([0/*require*/,1/*exports*/,42/
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[69/*vs/editor/common/services/editorBaseApi*/], __M([0/*require*/,1/*exports*/,39/*vs/base/common/cancellation*/,9/*vs/base/common/event*/,37/*vs/base/common/keyCodes*/,18/*vs/base/common/uri*/,4/*vs/editor/common/core/position*/,2/*vs/editor/common/core/range*/,43/*vs/editor/common/core/selection*/,68/*vs/editor/common/languages*/,61/*vs/editor/common/standalone/standaloneEnums*/]), function (require, exports, cancellation_1, event_1, keyCodes_1, uri_1, position_1, range_1, selection_1, languages_1, standaloneEnums) {
+define(__m[72/*vs/editor/common/services/editorBaseApi*/], __M([0/*require*/,1/*exports*/,40/*vs/base/common/cancellation*/,10/*vs/base/common/event*/,38/*vs/base/common/keyCodes*/,18/*vs/base/common/uri*/,4/*vs/editor/common/core/position*/,2/*vs/editor/common/core/range*/,44/*vs/editor/common/core/selection*/,71/*vs/editor/common/languages*/,64/*vs/editor/common/standalone/standaloneEnums*/]), function (require, exports, cancellation_1, event_1, keyCodes_1, uri_1, position_1, range_1, selection_1, languages_1, standaloneEnums) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.KeyMod = void 0;
@@ -19428,7 +19815,7 @@ define(__m[69/*vs/editor/common/services/editorBaseApi*/], __M([0/*require*/,1/*
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-define(__m[71/*vs/editor/common/services/editorSimpleWorker*/], __M([0/*require*/,1/*exports*/,25/*vs/base/common/diff/diff*/,18/*vs/base/common/uri*/,4/*vs/editor/common/core/position*/,2/*vs/editor/common/core/range*/,57/*vs/editor/common/model/mirrorTextModel*/,30/*vs/editor/common/core/wordHelper*/,53/*vs/editor/common/languages/linkComputer*/,54/*vs/editor/common/languages/supports/inplaceReplaceSupport*/,69/*vs/editor/common/services/editorBaseApi*/,24/*vs/base/common/stopwatch*/,60/*vs/editor/common/services/unicodeTextModelHighlighter*/,51/*vs/editor/common/diff/linesDiffComputers*/,14/*vs/base/common/objects*/,52/*vs/editor/common/languages/defaultDocumentColorsComputer*/,59/*vs/editor/common/services/findSectionHeaders*/]), function (require, exports, diff_1, uri_1, position_1, range_1, mirrorTextModel_1, wordHelper_1, linkComputer_1, inplaceReplaceSupport_1, editorBaseApi_1, stopwatch_1, unicodeTextModelHighlighter_1, linesDiffComputers_1, objects_1, defaultDocumentColorsComputer_1, findSectionHeaders_1) {
+define(__m[74/*vs/editor/common/services/editorSimpleWorker*/], __M([0/*require*/,1/*exports*/,25/*vs/base/common/diff/diff*/,18/*vs/base/common/uri*/,4/*vs/editor/common/core/position*/,2/*vs/editor/common/core/range*/,60/*vs/editor/common/model/mirrorTextModel*/,31/*vs/editor/common/core/wordHelper*/,56/*vs/editor/common/languages/linkComputer*/,57/*vs/editor/common/languages/supports/inplaceReplaceSupport*/,72/*vs/editor/common/services/editorBaseApi*/,24/*vs/base/common/stopwatch*/,63/*vs/editor/common/services/unicodeTextModelHighlighter*/,54/*vs/editor/common/diff/linesDiffComputers*/,14/*vs/base/common/objects*/,55/*vs/editor/common/languages/defaultDocumentColorsComputer*/,62/*vs/editor/common/services/findSectionHeaders*/]), function (require, exports, diff_1, uri_1, position_1, range_1, mirrorTextModel_1, wordHelper_1, linkComputer_1, inplaceReplaceSupport_1, editorBaseApi_1, stopwatch_1, unicodeTextModelHighlighter_1, linesDiffComputers_1, objects_1, defaultDocumentColorsComputer_1, findSectionHeaders_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.EditorSimpleWorker = void 0;

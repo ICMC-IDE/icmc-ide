@@ -97,6 +97,7 @@ import { getEditorFeatures } from '../../common/editorFeatures.js';
 import { onUnexpectedError } from '../../../base/common/errors.js';
 import { IEnvironmentService } from '../../../platform/environment/common/environment.js';
 import { mainWindow } from '../../../base/browser/window.js';
+import { ResourceMap } from '../../../base/common/map.js';
 class SimpleModel {
     constructor(model) {
         this.disposed = false;
@@ -400,12 +401,13 @@ function isConfigurationOverrides(thing) {
         && (!thing.overrideIdentifier || typeof thing.overrideIdentifier === 'string')
         && (!thing.resource || thing.resource instanceof URI);
 }
-export class StandaloneConfigurationService {
-    constructor() {
+let StandaloneConfigurationService = class StandaloneConfigurationService {
+    constructor(logService) {
+        this.logService = logService;
         this._onDidChangeConfiguration = new Emitter();
         this.onDidChangeConfiguration = this._onDidChangeConfiguration.event;
-        const defaultConfiguration = new DefaultConfiguration();
-        this._configuration = new Configuration(defaultConfiguration.reload(), new ConfigurationModel(), new ConfigurationModel(), new ConfigurationModel());
+        const defaultConfiguration = new DefaultConfiguration(logService);
+        this._configuration = new Configuration(defaultConfiguration.reload(), ConfigurationModel.createEmptyModel(logService), ConfigurationModel.createEmptyModel(logService), ConfigurationModel.createEmptyModel(logService), ConfigurationModel.createEmptyModel(logService), ConfigurationModel.createEmptyModel(logService), new ResourceMap(), ConfigurationModel.createEmptyModel(logService), new ResourceMap(), logService);
         defaultConfiguration.dispose();
     }
     getValue(arg1, arg2) {
@@ -425,7 +427,7 @@ export class StandaloneConfigurationService {
             changedKeys.push(key);
         }
         if (changedKeys.length > 0) {
-            const configurationChangeEvent = new ConfigurationChangeEvent({ keys: changedKeys, overrides: [] }, previous, this._configuration);
+            const configurationChangeEvent = new ConfigurationChangeEvent({ keys: changedKeys, overrides: [] }, previous, this._configuration, undefined, this.logService);
             configurationChangeEvent.source = 8 /* ConfigurationTarget.MEMORY */;
             this._onDidChangeConfiguration.fire(configurationChangeEvent);
         }
@@ -437,7 +439,11 @@ export class StandaloneConfigurationService {
     inspect(key, options = {}) {
         return this._configuration.inspect(key, options, undefined);
     }
-}
+};
+StandaloneConfigurationService = __decorate([
+    __param(0, ILogService)
+], StandaloneConfigurationService);
+export { StandaloneConfigurationService };
 let StandaloneResourceConfigurationService = class StandaloneResourceConfigurationService {
     constructor(configurationService, modelService, languageService) {
         this.configurationService = configurationService;
@@ -641,6 +647,7 @@ class StandaloneAccessbilitySignalService {
     async playSignal(cue, options) {
     }
 }
+registerSingleton(ILogService, StandaloneLogService, 0 /* InstantiationType.Eager */);
 registerSingleton(IConfigurationService, StandaloneConfigurationService, 0 /* InstantiationType.Eager */);
 registerSingleton(ITextResourceConfigurationService, StandaloneResourceConfigurationService, 0 /* InstantiationType.Eager */);
 registerSingleton(ITextResourcePropertiesService, StandaloneResourcePropertiesService, 0 /* InstantiationType.Eager */);
@@ -653,7 +660,6 @@ registerSingleton(INotificationService, StandaloneNotificationService, 0 /* Inst
 registerSingleton(IMarkerService, MarkerService, 0 /* InstantiationType.Eager */);
 registerSingleton(ILanguageService, StandaloneLanguageService, 0 /* InstantiationType.Eager */);
 registerSingleton(IStandaloneThemeService, StandaloneThemeService, 0 /* InstantiationType.Eager */);
-registerSingleton(ILogService, StandaloneLogService, 0 /* InstantiationType.Eager */);
 registerSingleton(IModelService, ModelService, 0 /* InstantiationType.Eager */);
 registerSingleton(IMarkerDecorationsService, MarkerDecorationsService, 0 /* InstantiationType.Eager */);
 registerSingleton(IContextKeyService, ContextKeyService, 0 /* InstantiationType.Eager */);

@@ -7,7 +7,6 @@ import { DataTransfers } from '../../dnd.js';
 import { addDisposableListener, EventHelper, EventType } from '../../dom.js';
 import { EventType as TouchEventType, Gesture } from '../../touch.js';
 import { getDefaultHoverDelegate } from '../hover/hoverDelegateFactory.js';
-import { setupCustomHover } from '../hover/updatableHoverWidget.js';
 import { SelectBox } from '../selectBox/selectBox.js';
 import { Action, ActionRunner, Separator } from '../../../common/actions.js';
 import { Disposable } from '../../../common/lifecycle.js';
@@ -15,6 +14,7 @@ import * as platform from '../../../common/platform.js';
 import * as types from '../../../common/types.js';
 import './actionbar.css';
 import * as nls from '../../../../nls.js';
+import { getBaseLayerHoverDelegate } from '../hover/hoverDelegate2.js';
 export class BaseActionViewItem extends Disposable {
     get action() {
         return this._action;
@@ -172,7 +172,7 @@ export class BaseActionViewItem extends Disposable {
         else {
             if (!this.customHover && title !== '') {
                 const hoverDelegate = (_c = this.options.hoverDelegate) !== null && _c !== void 0 ? _c : getDefaultHoverDelegate('element');
-                this.customHover = this._store.add(setupCustomHover(hoverDelegate, this.element, title));
+                this.customHover = this._store.add(getBaseLayerHoverDelegate().setupUpdatableHover(hoverDelegate, this.element, title));
             }
             else if (this.customHover) {
                 this.customHover.update(title);

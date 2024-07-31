@@ -36,9 +36,13 @@ export default class CharMap extends OffscreenCanvas {
   }
 
   emmit() {
-    for (const callback of this.#handlers) {
-      callback();
-    }
+    const handlers = this.#handlers;
+
+    queueMicrotask(() => {
+      for (const callback of handlers) {
+        callback();
+      }
+    });
   }
 
   get data() {

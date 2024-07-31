@@ -33,6 +33,7 @@ let QuickInputService = class QuickInputService extends Themable {
         return this._controller;
     }
     get hasController() { return !!this._controller; }
+    get currentQuickInput() { return this.controller.currentQuickInput; }
     get quickAccess() {
         if (!this._quickAccess) {
             this._quickAccess = this._register(this.instantiationService.createInstance(QuickAccessController));

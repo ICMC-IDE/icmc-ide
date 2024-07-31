@@ -110,7 +110,7 @@ exports.features = [
   },
   {
     "label": "hover",
-    "entry": "vs/editor/contrib/hover/browser/hover"
+    "entry": "vs/editor/contrib/hover/browser/hoverContribution"
   },
   {
     "label": "iPadShowKeyboard",
@@ -267,10 +267,6 @@ exports.languages = [
   {
     "label": "apex",
     "entry": "vs/basic-languages/apex/apex.contribution"
-  },
-  {
-    "label": "asm",
-    "entry": "vs/basic-languages/asm/asm.contribution"
   },
   {
     "label": "azcli",

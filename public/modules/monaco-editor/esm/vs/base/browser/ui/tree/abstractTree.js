@@ -1617,7 +1617,7 @@ class TreeNodeListMouseController extends MouseController {
             const recursive = e.browserEvent.altKey;
             this.tree.setFocus([location]);
             this.tree.toggleCollapsed(location, recursive);
-            if (expandOnlyOnTwistieClick && onTwistie) {
+            if (onTwistie) {
                 // Do not set this before calling a handler on the super class, because it will reject it as handled
                 e.browserEvent.isHandledByList = true;
                 return;
@@ -1913,7 +1913,7 @@ export class AbstractTree {
         }
     }
     style(styles) {
-        var _a;
+        var _a, _b;
         const suffix = `.${this.view.domId}`;
         const content = [];
         if (styles.treeIndentGuidesStroke) {
@@ -1921,9 +1921,18 @@ export class AbstractTree {
             content.push(`.monaco-list${suffix} .monaco-tl-indent > .indent-guide.active { border-color: ${styles.treeIndentGuidesStroke}; }`);
         }
         // Sticky Scroll Background
-        if (styles.listBackground) {
-            content.push(`.monaco-list${suffix} .monaco-scrollable-element .monaco-tree-sticky-container { background-color: ${styles.listBackground}; }`);
-            content.push(`.monaco-list${suffix} .monaco-scrollable-element .monaco-tree-sticky-container .monaco-tree-sticky-row { background-color: ${styles.listBackground}; }`);
+        const stickyScrollBackground = (_a = styles.treeStickyScrollBackground) !== null && _a !== void 0 ? _a : styles.listBackground;
+        if (stickyScrollBackground) {
+            content.push(`.monaco-list${suffix} .monaco-scrollable-element .monaco-tree-sticky-container { background-color: ${stickyScrollBackground}; }`);
+            content.push(`.monaco-list${suffix} .monaco-scrollable-element .monaco-tree-sticky-container .monaco-tree-sticky-row { background-color: ${stickyScrollBackground}; }`);
+        }
+        // Sticky Scroll Border
+        if (styles.treeStickyScrollBorder) {
+            content.push(`.monaco-list${suffix} .monaco-scrollable-element .monaco-tree-sticky-container { border-bottom: 1px solid ${styles.treeStickyScrollBorder}; }`);
+        }
+        // Sticky Scroll Shadow
+        if (styles.treeStickyScrollShadow) {
+            content.push(`.monaco-list${suffix} .monaco-scrollable-element .monaco-tree-sticky-container .monaco-tree-sticky-container-shadow { box-shadow: ${styles.treeStickyScrollShadow} 0 6px 6px -6px inset; height: 3px; }`);
         }
         // Sticky Scroll Focus
         if (styles.listFocusForeground) {
@@ -1931,7 +1940,7 @@ export class AbstractTree {
             content.push(`.monaco-list${suffix}:not(.sticky-scroll-focused) .monaco-scrollable-element .monaco-tree-sticky-container .monaco-list-row.focused { color: inherit; }`);
         }
         // Sticky Scroll Focus Outlines
-        const focusAndSelectionOutline = asCssValueWithDefault(styles.listFocusAndSelectionOutline, asCssValueWithDefault(styles.listSelectionOutline, (_a = styles.listFocusOutline) !== null && _a !== void 0 ? _a : ''));
+        const focusAndSelectionOutline = asCssValueWithDefault(styles.listFocusAndSelectionOutline, asCssValueWithDefault(styles.listSelectionOutline, (_b = styles.listFocusOutline) !== null && _b !== void 0 ? _b : ''));
         if (focusAndSelectionOutline) { // default: listFocusOutline
             content.push(`.monaco-list${suffix}.sticky-scroll-focused .monaco-scrollable-element .monaco-tree-sticky-container:focus .monaco-list-row.focused.selected { outline: 1px solid ${focusAndSelectionOutline}; outline-offset: -1px;}`);
             content.push(`.monaco-list${suffix}:not(.sticky-scroll-focused) .monaco-scrollable-element .monaco-tree-sticky-container .monaco-list-row.focused.selected { outline: inherit;}`);

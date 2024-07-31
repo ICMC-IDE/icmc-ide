@@ -130,8 +130,9 @@ let DiffEditorItemTemplate = class DiffEditorItemTemplate extends Disposable {
             this._data.deltaScrollVertical(delta);
         }));
         this._register(autorun(reader => {
-            const isFocused = this.isFocused.read(reader);
-            this._elements.root.classList.toggle('focused', isFocused);
+            var _a;
+            const isActive = (_a = this._viewModel.read(reader)) === null || _a === void 0 ? void 0 : _a.isActive.read(reader);
+            this._elements.root.classList.toggle('active', isActive);
         }));
         this._container.appendChild(this._elements.root);
         this._outerEditorHeight = this._headerHeight;

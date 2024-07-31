@@ -48,6 +48,7 @@ let LightBulbWidget = LightBulbWidget_1 = class LightBulbWidget extends Disposab
         this._state = LightBulbState.Hidden;
         this._iconClasses = [];
         this._domNode = dom.$('div.lightBulbWidget');
+        this._domNode.role = 'listbox';
         this._register(Gesture.ignoreTarget(this._domNode));
         this._editor.addContentWidget(this);
         this._register(this._editor.onDidChangeModelContent(_ => {
@@ -148,6 +149,12 @@ let LightBulbWidget = LightBulbWidget_1 = class LightBulbWidget extends Disposab
             position: { lineNumber: effectiveLineNumber, column: effectiveColumnNumber },
             preference: LightBulbWidget_1._posPref
         });
+        const validActions = actions.validActions;
+        const actionKind = actions.validActions[0].action.kind;
+        if (validActions.length !== 1 || !actionKind) {
+            this._editor.layoutContentWidget(this);
+            return;
+        }
         this._editor.layoutContentWidget(this);
     }
     hide() {

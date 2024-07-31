@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 import { Emitter } from '../../../../../base/common/event.js';
 import { Disposable } from '../../../../../base/common/lifecycle.js';
 import { autorunHandleChanges, derivedOpts, observableFromEvent } from '../../../../../base/common/observable.js';
+import { obsCodeEditor } from '../../../observableUtilities.js';
 import { OverviewRulerFeature } from '../features/overviewRulerFeature.js';
 import { EditorOptions } from '../../../../common/config/editorOptions.js';
 import { Position } from '../../../../common/core/position.js';
@@ -36,9 +37,9 @@ let DiffEditorEditors = class DiffEditorEditors extends Disposable {
         this._onDidContentSizeChange = this._register(new Emitter());
         this.modifiedScrollTop = observableFromEvent(this.modified.onDidScrollChange, () => /** @description modified.getScrollTop */ this.modified.getScrollTop());
         this.modifiedScrollHeight = observableFromEvent(this.modified.onDidScrollChange, () => /** @description modified.getScrollHeight */ this.modified.getScrollHeight());
-        this.modifiedModel = observableFromEvent(this.modified.onDidChangeModel, () => /** @description modified.model */ this.modified.getModel());
+        this.modifiedModel = obsCodeEditor(this.modified).model;
         this.modifiedSelections = observableFromEvent(this.modified.onDidChangeCursorSelection, () => { var _a; return (_a = this.modified.getSelections()) !== null && _a !== void 0 ? _a : []; });
-        this.modifiedCursor = derivedOpts({ owner: this, equalityComparer: Position.equals }, reader => { var _a, _b; return (_b = (_a = this.modifiedSelections.read(reader)[0]) === null || _a === void 0 ? void 0 : _a.getPosition()) !== null && _b !== void 0 ? _b : new Position(1, 1); });
+        this.modifiedCursor = derivedOpts({ owner: this, equalsFn: Position.equals }, reader => { var _a, _b; return (_b = (_a = this.modifiedSelections.read(reader)[0]) === null || _a === void 0 ? void 0 : _a.getPosition()) !== null && _b !== void 0 ? _b : new Position(1, 1); });
         this.originalCursor = observableFromEvent(this.original.onDidChangeCursorPosition, () => { var _a; return (_a = this.original.getPosition()) !== null && _a !== void 0 ? _a : new Position(1, 1); });
         this._argCodeEditorWidgetOptions = null;
         this._register(autorunHandleChanges({

@@ -152,7 +152,7 @@ export class AutorunObserver {
             const shouldReact = this._handleChange ? this._handleChange({
                 changedObservable: observable,
                 change,
-                didChange: o => o === observable,
+                didChange: (o) => o === observable,
             }, this.changeSummary) : true;
             if (shouldReact) {
                 this.state = 2 /* AutorunState.stale */;

@@ -322,7 +322,11 @@ class Widget {
         }
         const { primary, secondary } = this._getAnchorsCoordinates(ctx);
         if (!primary) {
-            return null;
+            return {
+                kind: 'offViewport',
+                preserveFocus: this.domNode.domNode.contains(this.domNode.domNode.ownerDocument.activeElement)
+            };
+            // return null;
         }
         if (this._cachedDomNodeOffsetWidth === -1 || this._cachedDomNodeOffsetHeight === -1) {
             let preferredDimensions = null;
@@ -358,7 +362,11 @@ class Widget {
                         return null;
                     }
                     if (pass === 2 || placement.fitsAbove) {
-                        return { coordinate: new Coordinate(placement.aboveTop, placement.left), position: 1 /* ContentWidgetPositionPreference.ABOVE */ };
+                        return {
+                            kind: 'inViewport',
+                            coordinate: new Coordinate(placement.aboveTop, placement.left),
+                            position: 1 /* ContentWidgetPositionPreference.ABOVE */
+                        };
                     }
                 }
                 else if (pref === 2 /* ContentWidgetPositionPreference.BELOW */) {
@@ -367,15 +375,27 @@ class Widget {
                         return null;
                     }
                     if (pass === 2 || placement.fitsBelow) {
-                        return { coordinate: new Coordinate(placement.belowTop, placement.left), position: 2 /* ContentWidgetPositionPreference.BELOW */ };
+                        return {
+                            kind: 'inViewport',
+                            coordinate: new Coordinate(placement.belowTop, placement.left),
+                            position: 2 /* ContentWidgetPositionPreference.BELOW */
+                        };
                     }
                 }
                 else {
                     if (this.allowEditorOverflow) {
-                        return { coordinate: this._prepareRenderWidgetAtExactPositionOverflowing(new Coordinate(anchor.top, anchor.left)), position: 0 /* ContentWidgetPositionPreference.EXACT */ };
+                        return {
+                            kind: 'inViewport',
+                            coordinate: this._prepareRenderWidgetAtExactPositionOverflowing(new Coordinate(anchor.top, anchor.left)),
+                            position: 0 /* ContentWidgetPositionPreference.EXACT */
+                        };
                     }
                     else {
-                        return { coordinate: new Coordinate(anchor.top, anchor.left), position: 0 /* ContentWidgetPositionPreference.EXACT */ };
+                        return {
+                            kind: 'inViewport',
+                            coordinate: new Coordinate(anchor.top, anchor.left),
+                            position: 0 /* ContentWidgetPositionPreference.EXACT */
+                        };
                     }
                 }
             }
@@ -399,12 +419,20 @@ class Widget {
         this._renderData = this._prepareRenderWidget(ctx);
     }
     render(ctx) {
-        if (!this._renderData) {
+        var _a;
+        if (!this._renderData || this._renderData.kind === 'offViewport') {
             // This widget should be invisible
             if (this._isVisible) {
                 this.domNode.removeAttribute('monaco-visible-content-widget');
                 this._isVisible = false;
-                this.domNode.setVisibility('hidden');
+                if (((_a = this._renderData) === null || _a === void 0 ? void 0 : _a.kind) === 'offViewport' && this._renderData.preserveFocus) {
+                    // widget wants to be shown, but it is outside of the viewport and it
+                    // has focus which we need to preserve
+                    this.domNode.setTop(-1000);
+                }
+                else {
+                    this.domNode.setVisibility('hidden');
+                }
             }
             if (typeof this._actual.afterRender === 'function') {
                 safeInvoke(this._actual.afterRender, this._actual, null);

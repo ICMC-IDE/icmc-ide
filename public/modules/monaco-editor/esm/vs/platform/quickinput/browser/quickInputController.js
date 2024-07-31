@@ -24,19 +24,23 @@ import Severity from '../../../base/common/severity.js';
 import { localize } from '../../../nls.js';
 import { QuickInputHideReason } from '../common/quickInput.js';
 import { QuickInputBox } from './quickInputBox.js';
-import { QuickPick, backButton, InputBox } from './quickInput.js';
+import { QuickPick, backButton, InputBox, InQuickInputContextKey, QuickInputTypeContextKey, EndOfQuickInputBoxContextKey } from './quickInput.js';
 import { ILayoutService } from '../../layout/browser/layoutService.js';
 import { mainWindow } from '../../../base/browser/window.js';
 import { IInstantiationService } from '../../instantiation/common/instantiation.js';
 import { QuickInputTree } from './quickInputTree.js';
+import { IContextKeyService } from '../../contextkey/common/contextkey.js';
+import './quickInputActions.js';
 const $ = dom.$;
 let QuickInputController = QuickInputController_1 = class QuickInputController extends Disposable {
+    get currentQuickInput() { var _a; return (_a = this.controller) !== null && _a !== void 0 ? _a : undefined; }
     get container() { return this._container; }
-    constructor(options, layoutService, instantiationService) {
+    constructor(options, layoutService, instantiationService, contextKeyService) {
         super();
         this.options = options;
         this.layoutService = layoutService;
         this.instantiationService = instantiationService;
+        this.contextKeyService = contextKeyService;
         this.enabled = true;
         this.onDidAcceptEmitter = this._register(new Emitter());
         this.onDidCustomEmitter = this._register(new Emitter());
@@ -47,6 +51,9 @@ let QuickInputController = QuickInputController_1 = class QuickInputController e
         this.onShow = this.onShowEmitter.event;
         this.onHideEmitter = this._register(new Emitter());
         this.onHide = this.onHideEmitter.event;
+        this.inQuickInputContext = InQuickInputContextKey.bindTo(this.contextKeyService);
+        this.quickInputTypeContext = QuickInputTypeContextKey.bindTo(this.contextKeyService);
+        this.endOfQuickInputBoxContext = EndOfQuickInputBoxContextKey.bindTo(this.contextKeyService);
         this.idPrefix = options.idPrefix;
         this._container = options.container;
         this.styles = options.styles;
@@ -168,17 +175,33 @@ let QuickInputController = QuickInputController_1 = class QuickInputController e
         const focusTracker = dom.trackFocus(container);
         this._register(focusTracker);
         this._register(dom.addDisposableListener(container, dom.EventType.FOCUS, e => {
+            const ui = this.getUI();
+            if (dom.isAncestor(e.relatedTarget, ui.inputContainer)) {
+                const value = ui.inputBox.isSelectionAtEnd();
+                if (this.endOfQuickInputBoxContext.get() !== value) {
+                    this.endOfQuickInputBoxContext.set(value);
+                }
+            }
             // Ignore focus events within container
-            if (dom.isAncestor(e.relatedTarget, container)) {
+            if (dom.isAncestor(e.relatedTarget, ui.container)) {
                 return;
             }
-            this.previousFocusElement = e.relatedTarget instanceof HTMLElement ? e.relatedTarget : undefined;
+            this.inQuickInputContext.set(true);
+            this.previousFocusElement = dom.isHTMLElement(e.relatedTarget) ? e.relatedTarget : undefined;
         }, true));
         this._register(focusTracker.onDidBlur(() => {
             if (!this.getUI().ignoreFocusOut && !this.options.ignoreFocusOut()) {
                 this.hide(QuickInputHideReason.Blur);
             }
+            this.inQuickInputContext.set(false);
+            this.endOfQuickInputBoxContext.set(false);
             this.previousFocusElement = undefined;
+        }));
+        this._register(inputBox.onKeyDown(_ => {
+            const value = this.getUI().inputBox.isSelectionAtEnd();
+            if (this.endOfQuickInputBoxContext.get() !== value) {
+                this.endOfQuickInputBoxContext.set(value);
+            }
         }));
         this._register(dom.addDisposableListener(container, dom.EventType.FOCUS, (e) => {
             inputBox.setFocus();
@@ -443,6 +466,7 @@ let QuickInputController = QuickInputController_1 = class QuickInputController e
         ui.container.style.display = '';
         this.updateLayout();
         ui.inputBox.setFocus();
+        this.quickInputTypeContext.set(controller.type);
     }
     isVisible() {
         return !!this.ui && this.ui.container.style.display !== 'none';
@@ -583,6 +607,7 @@ let QuickInputController = QuickInputController_1 = class QuickInputController e
 QuickInputController.MAX_WIDTH = 600; // Max total width of quick input widget
 QuickInputController = QuickInputController_1 = __decorate([
     __param(1, ILayoutService),
-    __param(2, IInstantiationService)
+    __param(2, IInstantiationService),
+    __param(3, IContextKeyService)
 ], QuickInputController);
 export { QuickInputController };

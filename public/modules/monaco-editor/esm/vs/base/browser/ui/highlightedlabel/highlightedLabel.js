@@ -3,8 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 import * as dom from '../../dom.js';
+import { getBaseLayerHoverDelegate } from '../hover/hoverDelegate2.js';
 import { getDefaultHoverDelegate } from '../hover/hoverDelegateFactory.js';
-import { setupCustomHover } from '../hover/updatableHoverWidget.js';
 import { renderLabelWithIcons } from '../iconLabel/iconLabels.js';
 import { Disposable } from '../../../common/lifecycle.js';
 import * as objects from '../../../common/objects.js';
@@ -103,7 +103,7 @@ export class HighlightedLabel extends Disposable {
         else {
             if (!this.customHover && this.title !== '') {
                 const hoverDelegate = (_d = (_c = this.options) === null || _c === void 0 ? void 0 : _c.hoverDelegate) !== null && _d !== void 0 ? _d : getDefaultHoverDelegate('mouse');
-                this.customHover = this._register(setupCustomHover(hoverDelegate, this.domNode, this.title));
+                this.customHover = this._register(getBaseLayerHoverDelegate().setupUpdatableHover(hoverDelegate, this.domNode, this.title));
             }
             else if (this.customHover) {
                 this.customHover.update(this.title);

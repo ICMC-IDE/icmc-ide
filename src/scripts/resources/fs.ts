@@ -14,11 +14,10 @@ export default class Fs extends EventManager<FsEventMap> {
   }
 
   write(path: string, content: string): void {
-    const exists =
-      localStorage.getItem(FILE_STORAGE_PREFIX + path) !== undefined;
+    const exists = localStorage.getItem(FILE_STORAGE_PREFIX + path) !== null;
     localStorage.setItem(FILE_STORAGE_PREFIX + path, content);
 
-    if (exists) {
+    if (!exists) {
       this.emmit("create", path);
     }
 
@@ -34,6 +33,7 @@ export default class Fs extends EventManager<FsEventMap> {
     return Array.from(localStorage, (_, i) => localStorage.key(i))
       .filter((key) => typeof key === "string")
       .filter((key) => key.startsWith(FILE_STORAGE_PREFIX))
+      .sort()
       .map((key) => key.substring(FILE_STORAGE_PREFIX.length));
   }
 
@@ -42,6 +42,7 @@ export default class Fs extends EventManager<FsEventMap> {
       Array.from(localStorage, (_, i) => localStorage.key(i))
         .filter((key) => typeof key === "string")
         .filter((key) => key.startsWith(FILE_STORAGE_PREFIX))
+        .sort()
         .map((key) => [
           key.substring(FILE_STORAGE_PREFIX.length),
           localStorage.getItem(key)!,

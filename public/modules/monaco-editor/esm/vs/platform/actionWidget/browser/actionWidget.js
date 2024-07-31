@@ -66,9 +66,9 @@ let ActionWidgetService = class ActionWidgetService extends Disposable {
         var _a, _b;
         (_b = (_a = this._list) === null || _a === void 0 ? void 0 : _a.value) === null || _b === void 0 ? void 0 : _b.focusNext();
     }
-    hide() {
+    hide(didCancel) {
         var _a;
-        (_a = this._list.value) === null || _a === void 0 ? void 0 : _a.hide();
+        (_a = this._list.value) === null || _a === void 0 ? void 0 : _a.hide(didCancel);
         this._list.clear();
     }
     _renderWidget(element, list, actionBarActions) {
@@ -109,7 +109,7 @@ let ActionWidgetService = class ActionWidgetService extends Disposable {
         const width = (_a = this._list.value) === null || _a === void 0 ? void 0 : _a.layout(actionBarWidth);
         widget.style.width = `${width}px`;
         const focusTracker = renderDisposables.add(dom.trackFocus(element));
-        renderDisposables.add(focusTracker.onDidBlur(() => this.hide()));
+        renderDisposables.add(focusTracker.onDidBlur(() => this.hide(true)));
         return renderDisposables;
     }
     _createActionBar(className, actions) {
@@ -147,7 +147,7 @@ registerAction2(class extends Action2 {
         });
     }
     run(accessor) {
-        accessor.get(IActionWidgetService).hide();
+        accessor.get(IActionWidgetService).hide(true);
     }
 });
 registerAction2(class extends Action2 {

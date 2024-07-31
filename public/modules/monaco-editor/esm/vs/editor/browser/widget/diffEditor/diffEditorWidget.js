@@ -11,7 +11,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-import { $, getWindow, h } from '../../../../base/browser/dom.js';
+import { getWindow, h } from '../../../../base/browser/dom.js';
 import { findLast } from '../../../../base/common/arraysFind.js';
 import { onUnexpectedError } from '../../../../base/common/errors.js';
 import { Event } from '../../../../base/common/event.js';
@@ -25,13 +25,15 @@ import { StableEditorScrollState } from '../../stableEditorScroll.js';
 import { CodeEditorWidget } from '../codeEditor/codeEditorWidget.js';
 import { AccessibleDiffViewer, AccessibleDiffViewerModelFromEditors } from './components/accessibleDiffViewer.js';
 import { DiffEditorDecorations } from './components/diffEditorDecorations.js';
-import { DiffEditorSash } from './components/diffEditorSash.js';
+import { DiffEditorSash, SashLayout } from './components/diffEditorSash.js';
 import { DiffEditorViewZones } from './components/diffEditorViewZones/diffEditorViewZones.js';
+import { DiffEditorGutter } from './features/gutterFeature.js';
 import { HideUnchangedRegionsFeature } from './features/hideUnchangedRegionsFeature.js';
 import { MovedBlocksLinesFeature } from './features/movedBlocksLinesFeature.js';
 import { OverviewRulerFeature } from './features/overviewRulerFeature.js';
 import { RevertButtonsFeature } from './features/revertButtonsFeature.js';
-import { ObservableElementSizeObserver, applyStyle, applyViewZones, bindContextKey, readHotReloadableExport, translatePosition } from './utils.js';
+import { ObservableElementSizeObserver, applyStyle, applyViewZones, readHotReloadableExport, translatePosition } from './utils.js';
+import { bindContextKey } from '../../../../platform/observable/common/platformObservableUtils.js';
 import { Position } from '../../../common/core/position.js';
 import { Range } from '../../../common/core/range.js';
 import { EditorType } from '../../../common/editorCommon.js';
@@ -45,7 +47,6 @@ import { DiffEditorEditors } from './components/diffEditorEditors.js';
 import { DelegatingEditor } from './delegatingEditorImpl.js';
 import { DiffEditorOptions } from './diffEditorOptions.js';
 import { DiffEditorViewModel } from './diffEditorViewModel.js';
-import { DiffEditorGutter } from './features/gutterFeature.js';
 let DiffEditorWidget = class DiffEditorWidget extends DelegatingEditor {
     get onDidContentSizeChange() { return this._editors.onDidContentSizeChange; }
     constructor(_domElement, options, codeEditorWidgetOptions, _parentContextKeyService, _parentInstantiationService, codeEditorService, _accessibilitySignalService, _editorProgressService) {
@@ -57,7 +58,6 @@ let DiffEditorWidget = class DiffEditorWidget extends DelegatingEditor {
         this._accessibilitySignalService = _accessibilitySignalService;
         this._editorProgressService = _editorProgressService;
         this.elements = h('div.monaco-diff-editor.side-by-side', { style: { position: 'relative', height: '100%' } }, [
-            h('div.noModificationsOverlay@overlay', { style: { position: 'absolute', height: '100%', visibility: 'hidden', } }, [$('span', {}, 'No Changes')]),
             h('div.editor.original@original', { style: { position: 'absolute', height: '100%', } }),
             h('div.editor.modified@modified', { style: { position: 'absolute', height: '100%', } }),
             h('div.accessibleDiffViewer@accessibleDiffViewer', { style: { position: 'absolute', height: '100%' } }),
@@ -66,7 +66,7 @@ let DiffEditorWidget = class DiffEditorWidget extends DelegatingEditor {
         this._shouldDisposeDiffModel = false;
         this.onDidChangeModel = Event.fromObservableLight(this._diffModel);
         this._contextKeyService = this._register(this._parentContextKeyService.createScoped(this._domElement));
-        this._instantiationService = this._parentInstantiationService.createChild(new ServiceCollection([IContextKeyService, this._contextKeyService]));
+        this._instantiationService = this._register(this._parentInstantiationService.createChild(new ServiceCollection([IContextKeyService, this._contextKeyService])));
         this._boundarySashes = observableValue(this, undefined);
         this._accessibleDiffViewerShouldBeVisible = observableValue(this, false);
         this._accessibleDiffViewerVisible = derived(this, reader => this._options.onlyShowAccessibleDiffViewer.read(reader)
@@ -77,6 +77,12 @@ let DiffEditorWidget = class DiffEditorWidget extends DelegatingEditor {
             var _a, _b, _c, _d, _e;
             const fullWidth = this._rootSizeObserver.width.read(reader);
             const fullHeight = this._rootSizeObserver.height.read(reader);
+            if (this._rootSizeObserver.automaticLayout) {
+                this.elements.root.style.height = '100%';
+            }
+            else {
+                this.elements.root.style.height = fullHeight + 'px';
+            }
             const sash = this._sash.read(reader);
             const gutter = this._gutter.read(reader);
             const gutterWidth = (_a = gutter === null || gutter === void 0 ? void 0 : gutter.width.read(reader)) !== null && _a !== void 0 ? _a : 0;
@@ -137,13 +143,15 @@ let DiffEditorWidget = class DiffEditorWidget extends DelegatingEditor {
         this._overviewRulerPart = derivedDisposable(this, reader => !this._options.renderOverviewRuler.read(reader)
             ? undefined
             : this._instantiationService.createInstance(readHotReloadableExport(OverviewRulerFeature, reader), this._editors, this.elements.root, this._diffModel, this._rootSizeObserver.width, this._rootSizeObserver.height, this._layoutInfo.map(i => i.modifiedEditor))).recomputeInitiallyAndOnChange(this._store);
+        const dimensions = {
+            height: this._rootSizeObserver.height,
+            width: this._rootSizeObserver.width.map((w, reader) => { var _a, _b; return w - ((_b = (_a = this._overviewRulerPart.read(reader)) === null || _a === void 0 ? void 0 : _a.width) !== null && _b !== void 0 ? _b : 0); }),
+        };
+        this._sashLayout = new SashLayout(this._options, dimensions);
         this._sash = derivedDisposable(this, reader => {
             const showSash = this._options.renderSideBySide.read(reader);
             this.elements.root.classList.toggle('side-by-side', showSash);
-            return !showSash ? undefined : new DiffEditorSash(this._options, this.elements.root, {
-                height: this._rootSizeObserver.height,
-                width: this._rootSizeObserver.width.map((w, reader) => { var _a, _b; return w - ((_b = (_a = this._overviewRulerPart.read(reader)) === null || _a === void 0 ? void 0 : _a.width) !== null && _b !== void 0 ? _b : 0); }),
-            }, this._boundarySashes);
+            return !showSash ? undefined : new DiffEditorSash(this.elements.root, dimensions, this._options.enableSplitViewResizing, this._boundarySashes, this._sashLayout.sashLeft, () => this._sashLayout.resetSash());
         }).recomputeInitiallyAndOnChange(this._store);
         const unchangedRangesFeature = derivedDisposable(this, reader => /** @description UnchangedRangesFeature */ this._instantiationService.createInstance(readHotReloadableExport(HideUnchangedRegionsFeature, reader), this._editors, this._diffModel, this._options)).recomputeInitiallyAndOnChange(this._store);
         derivedDisposable(this, reader => /** @description DiffEditorDecorations */ this._instantiationService.createInstance(readHotReloadableExport(DiffEditorDecorations, reader), this._editors, this._diffModel, this._options, this)).recomputeInitiallyAndOnChange(this._store);
@@ -183,7 +191,7 @@ let DiffEditorWidget = class DiffEditorWidget extends DelegatingEditor {
         codeEditorService.addDiffEditor(this);
         this._gutter = derivedDisposable(this, reader => {
             return this._options.shouldRenderGutterMenu.read(reader)
-                ? this._instantiationService.createInstance(readHotReloadableExport(DiffEditorGutter, reader), this.elements.root, this._diffModel, this._editors)
+                ? this._instantiationService.createInstance(readHotReloadableExport(DiffEditorGutter, reader), this.elements.root, this._diffModel, this._editors, this._options, this._sashLayout, this._boundarySashes)
                 : undefined;
         });
         this._register(recomputeInitiallyAndOnChange(this._layoutInfo));
@@ -191,14 +199,6 @@ let DiffEditorWidget = class DiffEditorWidget extends DelegatingEditor {
             // This is to break the layout info <-> moved blocks lines part dependency cycle.
             this._movedBlocksLinesPart.set(value, undefined);
         });
-        this._register(applyStyle(this.elements.overlay, {
-            width: this._layoutInfo.map((i, r) => i.originalEditor.width + (this._options.renderSideBySide.read(r) ? 0 : i.modifiedEditor.width)),
-            visibility: derived(reader => /** @description visibility */ {
-                var _a, _b;
-                return (this._options.hideUnchangedRegions.read(reader) && ((_b = (_a = this._diffModel.read(reader)) === null || _a === void 0 ? void 0 : _a.diff.read(reader)) === null || _b === void 0 ? void 0 : _b.mappings.length) === 0)
-                    ? 'visible' : 'hidden';
-            }),
-        }));
         this._register(Event.runAndSubscribe(this._editors.modified.onDidChangeCursorPosition, e => this._handleCursorPositionChange(e, true)));
         this._register(Event.runAndSubscribe(this._editors.original.onDidChangeCursorPosition, e => this._handleCursorPositionChange(e, false)));
         const isInitializingDiff = this._diffModel.map(this, (m, reader) => {

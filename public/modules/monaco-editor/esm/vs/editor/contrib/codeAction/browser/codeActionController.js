@@ -39,17 +39,19 @@ import { registerThemingParticipant } from '../../../../platform/theme/common/th
 import { CodeActionKind, CodeActionTriggerSource } from '../common/types.js';
 import { CodeActionModel } from './codeActionModel.js';
 import { HierarchicalKind } from '../../../../base/common/hierarchicalKind.js';
+import { ITelemetryService } from '../../../../platform/telemetry/common/telemetry.js';
 const DECORATION_CLASS_NAME = 'quickfix-edit-highlight';
 let CodeActionController = CodeActionController_1 = class CodeActionController extends Disposable {
     static get(editor) {
         return editor.getContribution(CodeActionController_1.ID);
     }
-    constructor(editor, markerService, contextKeyService, instantiationService, languageFeaturesService, progressService, _commandService, _configurationService, _actionWidgetService, _instantiationService) {
+    constructor(editor, markerService, contextKeyService, instantiationService, languageFeaturesService, progressService, _commandService, _configurationService, _actionWidgetService, _instantiationService, _telemetryService) {
         super();
         this._commandService = _commandService;
         this._configurationService = _configurationService;
         this._actionWidgetService = _actionWidgetService;
         this._instantiationService = _instantiationService;
+        this._telemetryService = _telemetryService;
         this._activeCodeActions = this._register(new MutableDisposable());
         this._showDisabled = false;
         this._disposed = false;
@@ -71,6 +73,11 @@ let CodeActionController = CodeActionController_1 = class CodeActionController e
         super.dispose();
     }
     async showCodeActionsFromLightbulb(actions, at) {
+        this._telemetryService.publicLog2('codeAction.showCodeActionsFromLightbulb', {
+            codeActionListLength: actions.validActions.length,
+            codeActions: actions.validActions.map(action => action.action.title),
+            codeActionProviders: actions.validActions.map(action => { var _a, _b; return (_b = (_a = action.provider) === null || _a === void 0 ? void 0 : _a.displayName) !== null && _b !== void 0 ? _b : ''; }),
+        });
         if (actions.allAIFixes && actions.validActions.length === 1) {
             const actionItem = actions.validActions[0];
             const command = actionItem.action.command;
@@ -207,14 +214,22 @@ let CodeActionController = CodeActionController_1 = class CodeActionController e
         const anchor = Position.isIPosition(at) ? this.toCoords(at) : at;
         const delegate = {
             onSelect: async (action, preview) => {
-                this._applyCodeAction(action, /* retrigger */ true, !!preview, ApplyCodeActionReason.FromCodeActions);
-                this._actionWidgetService.hide();
+                this._applyCodeAction(action, /* retrigger */ true, !!preview, options.fromLightbulb ? ApplyCodeActionReason.FromAILightbulb : ApplyCodeActionReason.FromCodeActions);
+                this._actionWidgetService.hide(false);
                 currentDecorations.clear();
             },
-            onHide: () => {
+            onHide: (didCancel) => {
                 var _a;
                 (_a = this._editor) === null || _a === void 0 ? void 0 : _a.focus();
                 currentDecorations.clear();
+                // Telemetry for showing code actions here. only log on `showLightbulb`. Logs when code action list is quit out.
+                if (options.fromLightbulb && didCancel !== undefined) {
+                    this._telemetryService.publicLog2('codeAction.showCodeActionList.onHide', {
+                        codeActionListLength: actions.validActions.length,
+                        didCancel: didCancel,
+                        codeActions: actions.validActions.map(action => action.action.title),
+                    });
+                }
             },
             onHover: async (action, token) => {
                 var _a;
@@ -228,7 +243,9 @@ let CodeActionController = CodeActionController_1 = class CodeActionController e
                     const refactorKinds = [
                         CodeActionKind.RefactorExtract,
                         CodeActionKind.RefactorInline,
-                        CodeActionKind.RefactorRewrite
+                        CodeActionKind.RefactorRewrite,
+                        CodeActionKind.RefactorMove,
+                        CodeActionKind.Source
                     ];
                     canPreview = refactorKinds.some(refactorKind => refactorKind.contains(hierarchicalKind));
                 }
@@ -337,7 +354,8 @@ CodeActionController = CodeActionController_1 = __decorate([
     __param(6, ICommandService),
     __param(7, IConfigurationService),
     __param(8, IActionWidgetService),
-    __param(9, IInstantiationService)
+    __param(9, IInstantiationService),
+    __param(10, ITelemetryService)
 ], CodeActionController);
 export { CodeActionController };
 registerThemingParticipant((theme, collector) => {

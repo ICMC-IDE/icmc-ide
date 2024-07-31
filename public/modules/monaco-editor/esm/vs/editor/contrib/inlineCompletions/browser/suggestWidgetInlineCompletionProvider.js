@@ -13,7 +13,7 @@ import { SuggestController } from '../../suggest/browser/suggestController.js';
 import { observableValue, transaction } from '../../../../base/common/observable.js';
 import { SingleTextEdit } from '../../../common/core/textEdit.js';
 import { compareBy, numberComparator } from '../../../../base/common/arrays.js';
-import { findFirstMaxBy } from '../../../../base/common/arraysFind.js';
+import { findFirstMax } from '../../../../base/common/arraysFind.js';
 import { singleTextEditAugments, singleTextRemoveCommonPrefix } from './singleTextEdit.js';
 export class SuggestWidgetAdaptor extends Disposable {
     get selectedItem() {
@@ -68,7 +68,7 @@ export class SuggestWidgetAdaptor extends Disposable {
                         return { index, valid, prefixLength: suggestItemTextEdit.text.length, suggestItem };
                     })
                         .filter(item => item && item.valid && item.prefixLength > 0);
-                    const result = findFirstMaxBy(candidates, compareBy(s => s.prefixLength, numberComparator));
+                    const result = findFirstMax(candidates, compareBy(s => s.prefixLength, numberComparator));
                     return result ? result.index : -1;
                 }
             }));

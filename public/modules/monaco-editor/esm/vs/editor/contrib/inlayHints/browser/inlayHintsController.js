@@ -12,7 +12,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 var InlayHintsController_1;
-import { ModifierKeyEmitter } from '../../../../base/browser/dom.js';
+import { isHTMLElement, ModifierKeyEmitter } from '../../../../base/browser/dom.js';
 import { isNonEmptyArray } from '../../../../base/common/arrays.js';
 import { RunOnceScheduler } from '../../../../base/common/async.js';
 import { CancellationToken, CancellationTokenSource } from '../../../../base/common/cancellation.js';
@@ -306,7 +306,7 @@ let InlayHintsController = InlayHintsController_1 = class InlayHintsController {
     }
     _installContextMenu() {
         return this._editor.onContextMenu(async (e) => {
-            if (!(e.event.target instanceof HTMLElement)) {
+            if (!(isHTMLElement(e.event.target))) {
                 return;
             }
             const part = this._getInlayHintLabelPart(e);

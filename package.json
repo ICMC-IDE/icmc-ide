@@ -15,7 +15,7 @@
     "start": "serve -c serve.json",
     "dev": "concurrently \"npm:watch-build\" \"npm:start\"",
     "build-modules": "for module in mif assembler icmc-cc icmc-emulator; do wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/$module ; done",
-    "copy-public": "copyfiles -a -F -u 1 \"public/**/*\" dist",
+    "copy-public": "copyfiles -a -F -u 1 \"public/**/*\" dist && mkdir -p dist/styles",
     "clean": "rimraf dist",
     "lint": "eslint ./src"
   },

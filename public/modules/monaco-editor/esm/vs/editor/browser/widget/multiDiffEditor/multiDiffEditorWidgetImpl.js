@@ -13,9 +13,11 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 import { getWindow, h, scheduleAtNextAnimationFrame } from '../../../../base/browser/dom.js';
 import { SmoothScrollableElement } from '../../../../base/browser/ui/scrollbar/scrollableElement.js';
-import { findFirstMaxBy } from '../../../../base/common/arraysFind.js';
+import { compareBy, numberComparator } from '../../../../base/common/arrays.js';
+import { findFirstMax } from '../../../../base/common/arraysFind.js';
+import { BugIndicatingError } from '../../../../base/common/errors.js';
 import { Disposable, toDisposable } from '../../../../base/common/lifecycle.js';
-import { autorun, autorunWithStore, derived, derivedObservableWithCache, derivedWithStore, observableFromEvent, observableValue } from '../../../../base/common/observable.js';
+import { autorun, autorunWithStore, derived, derivedWithStore, observableFromEvent, observableValue } from '../../../../base/common/observable.js';
 import { disposableObservableValue, globalTransaction, transaction } from '../../../../base/common/observableInternal/base.js';
 import { Scrollable } from '../../../../base/common/scrollable.js';
 import './style.css';
@@ -28,6 +30,7 @@ import { IInstantiationService } from '../../../../platform/instantiation/common
 import { ServiceCollection } from '../../../../platform/instantiation/common/serviceCollection.js';
 import { DiffEditorItemTemplate, TemplateData } from './diffEditorItemTemplate.js';
 import { ObjectPool } from './objectPool.js';
+import { localize } from '../../../../nls.js';
 let MultiDiffEditorWidgetImpl = class MultiDiffEditorWidgetImpl extends Disposable {
     constructor(_element, _dimension, _viewModel, _workbenchUIElementFactory, _parentContextKeyService, _parentInstantiationService) {
         super();
@@ -37,7 +40,7 @@ let MultiDiffEditorWidgetImpl = class MultiDiffEditorWidgetImpl extends Disposab
         this._workbenchUIElementFactory = _workbenchUIElementFactory;
         this._parentContextKeyService = _parentContextKeyService;
         this._parentInstantiationService = _parentInstantiationService;
-        this._elements = h('div.monaco-component.multiDiffEditor', [
+        this._scrollableElements = h('div.scrollContent', [
             h('div@content', {
                 style: {
                     overflow: 'hidden',
@@ -45,31 +48,36 @@ let MultiDiffEditorWidgetImpl = class MultiDiffEditorWidgetImpl extends Disposab
             }),
             h('div.monaco-editor@overflowWidgetsDomNode', {}),
         ]);
-        this._sizeObserver = this._register(new ObservableElementSizeObserver(this._element, undefined));
-        this._objectPool = this._register(new ObjectPool((data) => {
-            const template = this._instantiationService.createInstance(DiffEditorItemTemplate, this._elements.content, this._elements.overflowWidgetsDomNode, this._workbenchUIElementFactory);
-            template.setData(data);
-            return template;
-        }));
         this._scrollable = this._register(new Scrollable({
             forceIntegerValues: false,
             scheduleAtNextAnimationFrame: (cb) => scheduleAtNextAnimationFrame(getWindow(this._element), cb),
             smoothScrollDuration: 100,
         }));
-        this._scrollableElement = this._register(new SmoothScrollableElement(this._elements.root, {
+        this._scrollableElement = this._register(new SmoothScrollableElement(this._scrollableElements.root, {
             vertical: 1 /* ScrollbarVisibility.Auto */,
             horizontal: 1 /* ScrollbarVisibility.Auto */,
             useShadows: false,
         }, this._scrollable));
+        this._elements = h('div.monaco-component.multiDiffEditor', {}, [
+            h('div', {}, [this._scrollableElement.getDomNode()]),
+            h('div.placeholder@placeholder', {}, [h('div', [localize('noChangedFiles', 'No Changed Files')])]),
+        ]);
+        this._sizeObserver = this._register(new ObservableElementSizeObserver(this._element, undefined));
+        this._objectPool = this._register(new ObjectPool((data) => {
+            const template = this._instantiationService.createInstance(DiffEditorItemTemplate, this._scrollableElements.content, this._scrollableElements.overflowWidgetsDomNode, this._workbenchUIElementFactory);
+            template.setData(data);
+            return template;
+        }));
         this.scrollTop = observableFromEvent(this._scrollableElement.onScroll, () => /** @description scrollTop */ this._scrollableElement.getScrollPosition().scrollTop);
         this.scrollLeft = observableFromEvent(this._scrollableElement.onScroll, () => /** @description scrollLeft */ this._scrollableElement.getScrollPosition().scrollLeft);
-        this._viewItems = derivedWithStore(this, (reader, store) => {
+        this._viewItemsInfo = derivedWithStore(this, (reader, store) => {
             const vm = this._viewModel.read(reader);
             if (!vm) {
-                return [];
+                return { items: [], getItem: _d => { throw new BugIndicatingError(); } };
             }
-            const items = vm.items.read(reader);
-            return items.map(d => {
+            const viewModels = vm.items.read(reader);
+            const map = new Map();
+            const items = viewModels.map(d => {
                 var _a;
                 const item = store.add(new VirtualizedViewItem(d, this._objectPool, this.scrollLeft, delta => {
                     this._scrollableElement.setScrollPosition({ scrollTop: this._scrollableElement.getScrollPosition().scrollTop + delta });
@@ -80,15 +88,16 @@ let MultiDiffEditorWidgetImpl = class MultiDiffEditorWidgetImpl extends Disposab
                         item.setViewState(data, tx);
                     });
                 }
+                map.set(d, item);
                 return item;
             });
+            return { items, getItem: d => map.get(d) };
         });
+        this._viewItems = this._viewItemsInfo.map(this, items => items.items);
         this._spaceBetweenPx = 0;
         this._totalHeight = this._viewItems.map(this, (items, reader) => items.reduce((r, i) => r + i.contentHeight.read(reader) + this._spaceBetweenPx, 0));
-        this.activeDiffItem = derived(this, reader => this._viewItems.read(reader).find(i => { var _a; return (_a = i.template.read(reader)) === null || _a === void 0 ? void 0 : _a.isFocused.read(reader); }));
-        this.lastActiveDiffItem = derivedObservableWithCache((reader, lastValue) => { var _a; return (_a = this.activeDiffItem.read(reader)) !== null && _a !== void 0 ? _a : lastValue; });
         this._contextKeyService = this._register(this._parentContextKeyService.createScoped(this._element));
-        this._instantiationService = this._parentInstantiationService.createChild(new ServiceCollection([IContextKeyService, this._contextKeyService]));
+        this._instantiationService = this._register(this._parentInstantiationService.createChild(new ServiceCollection([IContextKeyService, this._contextKeyService])));
         /** This accounts for documents that are not loaded yet. */
         this._lastDocStates = {};
         this._contextKeyService.createKey(EditorContextKeys.inMultiDiffEditor.key, true);
@@ -111,28 +120,26 @@ let MultiDiffEditorWidgetImpl = class MultiDiffEditorWidgetImpl extends Disposab
             }
         }));
         this._register(autorun((reader) => {
-            const lastActiveDiffItem = this.lastActiveDiffItem.read(reader);
-            transaction(tx => {
-                var _a;
-                (_a = this._viewModel.read(reader)) === null || _a === void 0 ? void 0 : _a.activeDiffItem.set(lastActiveDiffItem === null || lastActiveDiffItem === void 0 ? void 0 : lastActiveDiffItem.viewModel, tx);
-            });
-        }));
-        this._register(autorun((reader) => {
             /** @description Update widget dimension */
             const dimension = this._dimension.read(reader);
             this._sizeObserver.observe(dimension);
         }));
-        this._elements.content.style.position = 'relative';
+        this._register(autorun((reader) => {
+            /** @description Update widget dimension */
+            const items = this._viewItems.read(reader);
+            this._elements.placeholder.classList.toggle('visible', items.length === 0);
+        }));
+        this._scrollableElements.content.style.position = 'relative';
         this._register(autorun((reader) => {
             /** @description Update scroll dimensions */
             const height = this._sizeObserver.height.read(reader);
-            this._elements.root.style.height = `${height}px`;
+            this._scrollableElements.root.style.height = `${height}px`;
             const totalHeight = this._totalHeight.read(reader);
-            this._elements.content.style.height = `${totalHeight}px`;
+            this._scrollableElements.content.style.height = `${totalHeight}px`;
             const width = this._sizeObserver.width.read(reader);
             let scrollWidth = width;
             const viewItems = this._viewItems.read(reader);
-            const max = findFirstMaxBy(viewItems, i => i.maxScroll.read(reader).maxScroll);
+            const max = findFirstMax(viewItems, compareBy(i => i.maxScroll.read(reader).maxScroll, numberComparator));
             if (max) {
                 const maxScroll = max.maxScroll.read(reader);
                 scrollWidth = width + maxScroll.maxScroll;
@@ -144,7 +151,7 @@ let MultiDiffEditorWidgetImpl = class MultiDiffEditorWidgetImpl extends Disposab
                 scrollWidth,
             });
         }));
-        _element.replaceChildren(this._scrollableElement.getDomNode());
+        _element.replaceChildren(this._elements.root);
         this._register(toDisposable(() => {
             _element.replaceChildren();
         }));
@@ -184,7 +191,7 @@ let MultiDiffEditorWidgetImpl = class MultiDiffEditorWidgetImpl extends Disposab
             itemHeightSumBefore += itemHeight + this._spaceBetweenPx;
             itemContentHeightSumBefore += itemContentHeight + this._spaceBetweenPx;
         }
-        this._elements.content.style.transform = `translateY(${-(scrollTop + contentScrollOffsetToScrollOffset)}px)`;
+        this._scrollableElements.content.style.transform = `translateY(${-(scrollTop + contentScrollOffsetToScrollOffset)}px)`;
     }
 };
 MultiDiffEditorWidgetImpl = __decorate([
@@ -204,6 +211,8 @@ class VirtualizedViewItem extends Disposable {
         this.maxScroll = derived(this, reader => { var _a, _b; return (_b = (_a = this._templateRef.read(reader)) === null || _a === void 0 ? void 0 : _a.object.maxScroll.read(reader)) !== null && _b !== void 0 ? _b : { maxScroll: 0, scrollWidth: 0 }; });
         this.template = derived(this, reader => { var _a; return (_a = this._templateRef.read(reader)) === null || _a === void 0 ? void 0 : _a.object; });
         this._isHidden = observableValue(this, false);
+        this._isFocused = derived(this, reader => { var _a, _b; return (_b = (_a = this.template.read(reader)) === null || _a === void 0 ? void 0 : _a.isFocused.read(reader)) !== null && _b !== void 0 ? _b : false; });
+        this.viewModel.setIsFocused(this._isFocused, undefined);
         this._register(autorun((reader) => {
             var _a;
             const scrollLeft = this._scrollLeft.read(reader);

@@ -90,7 +90,7 @@ export function createWindows(globalState: GlobalState) {
 
   result["file-picker"] = new FilePickerWindow({
     style: {
-      left: `0.5rem`,
+      left: `4rem`,
       top: "0.5rem",
       width: "30ch",
       height: "480px",

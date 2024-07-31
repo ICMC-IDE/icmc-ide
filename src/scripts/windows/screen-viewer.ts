@@ -5,7 +5,7 @@ import { WindowConstructor } from "windows";
 
 export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
   #internalRegisters: Uint16Array | null = null;
-  #wc = 0;
+  #wc = -1;
 
   constructor({
     style,
@@ -49,7 +49,18 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
     }
 
     {
+      const [width, height] = configManager.getMany(
+        "screen-width",
+        "screen-height",
+      );
+
+      body.width = width;
+      body.height = height;
+
+      body.charmap = resources.get("charmap");
+
       body.tabIndex = 1;
+
       body.addEventListener("keydown", ({ keyCode }) => {
         if (this.#internalRegisters) {
           this.#internalRegisters[IREG_KB] = keyCode;
@@ -62,8 +73,6 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
         }
       });
     }
-
-    body.charmap = resources.get("charmap");
 
     super({
       title,
@@ -85,7 +94,7 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
       body.memory = vram;
     });
 
-    resources.subscribe("internalRegisters", (internalRegisters) => {
+    resources.subscribe("internal-registers", (internalRegisters) => {
       this.#internalRegisters = internalRegisters;
     });
 

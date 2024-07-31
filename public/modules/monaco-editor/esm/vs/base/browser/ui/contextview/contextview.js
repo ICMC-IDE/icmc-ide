@@ -117,7 +117,7 @@ export class ContextView extends Disposable {
         }
         // Show static box
         DOM.clearNode(this.view);
-        this.view.className = 'context-view';
+        this.view.className = 'context-view monaco-component';
         this.view.style.top = '0px';
         this.view.style.left = '0px';
         this.view.style.zIndex = `${2575 + ((_a = delegate.layer) !== null && _a !== void 0 ? _a : 0)}`;
@@ -157,7 +157,7 @@ export class ContextView extends Disposable {
         // Compute around
         let around;
         // Get the element's position and size (to anchor the view)
-        if (anchor instanceof HTMLElement) {
+        if (DOM.isHTMLElement(anchor)) {
             const elementPosition = DOM.getDomNodePagePosition(anchor);
             // In areas where zoom is applied to the element or its ancestors, we need to adjust the size of the element
             // e.g. The title bar has counter zoom behavior meaning it applies the inverse of zoom level.
