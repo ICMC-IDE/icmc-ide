@@ -179,6 +179,8 @@ self.addEventListener(
       const action = actions[type];
 
       if (action) {
+        // @ts-ignore
+        // FIXME
         message.content = action(content);
       } else {
         message.error = `Unknown request type '${type}' with id ${id}`;
