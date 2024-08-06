@@ -123,39 +123,48 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       style,
     });
 
-    configManager.subscribe("frequency", (frequency: number) => {
-      body.frequency = frequency;
+    const eventSubscriber = eventManager.getSubscriber();
+    const configSubscriber = configManager.getSubscriber();
+    const resourcesSubscriber = resources.getSubscriber();
+
+    this.onClose(() => {
+      eventSubscriber.unsubscribeAll();
+      configSubscriber.unsubscribeAll();
+      resourcesSubscriber.unsubscribeAll();
     });
 
-    configManager.subscribe("entry-file", (fileName: string) => {
-      body.entryFile = fileName;
-    });
-
-    eventManager.subscribe("render", () => {
+    eventSubscriber.subscribe("render", () => {
       body.render();
     });
 
-    resources.subscribe("fs", (fs) => {
-      fs.subscribe("create", () => {
+    configSubscriber.subscribe("frequency", (frequency: number) => {
+      body.frequency = frequency;
+    });
+    configSubscriber.subscribe("entry-file", (fileName: string) => {
+      body.entryFile = fileName;
+    });
+
+    resourcesSubscriber.subscribe("fs", (fs) => {
+      const fsSubscriber = fs.getSubscriber();
+      this.onClose(fsSubscriber.unsubscribeAll);
+
+      fsSubscriber.subscribe("create", () => {
         body.files = resources
           .get("fs")
           .files()
           .filter((filename) => /\.(asm|c)$/i.test(filename));
       });
-
-      fs.subscribe("delete", () => {
+      fsSubscriber.subscribe("delete", () => {
         body.files = resources
           .get("fs")
           .files()
           .filter((filename) => /\.(asm|c)$/i.test(filename));
       });
     });
-
-    resources.subscribe("registers", (registers) => {
+    resourcesSubscriber.subscribe("registers", (registers) => {
       body.registers = registers;
     });
-
-    resources.subscribe("internal-registers", (registers) => {
+    resourcesSubscriber.subscribe("internal-registers", (registers) => {
       body.internalRegisters = registers;
     });
   }

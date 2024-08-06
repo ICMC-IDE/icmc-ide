@@ -1,9 +1,11 @@
+import { EventHandler } from "types";
+
 const SIDES = ["n", "e", "s", "w"];
 const CORNERS = ["ne", "se", "sw", "nw"];
 
 let zIndex = 100;
 
-interface FensterProps<T extends HTMLElement> {
+interface FensterConstructor<T extends HTMLElement> {
   body: T;
   title: HTMLElement | DocumentFragment;
   style?: Record<string, string>;
@@ -17,6 +19,7 @@ export default class Fenster<T extends HTMLElement> {
   #dragger;
   #wrapper;
   #window;
+  #onCloseHandlers: EventHandler<void>[] = [];
 
   constructor({
     body,
@@ -25,7 +28,7 @@ export default class Fenster<T extends HTMLElement> {
     open,
     buttonsLeft,
     buttonsRight,
-  }: FensterProps<T>) {
+  }: FensterConstructor<T>) {
     const wrapper = (this.#wrapper = document.createElement("div"));
     const dragger = (this.#dragger = document.createElement("summary"));
     const window = (this.#window = document.createElement("details"));
@@ -88,10 +91,7 @@ export default class Fenster<T extends HTMLElement> {
       icon.name = "close";
       button.append(icon);
       button.addEventListener("click", () => {
-        this.#body.remove();
-        this.#dragger.remove();
-        this.#wrapper.remove();
-        this.#window.remove();
+        this.#close();
       });
 
       dragger.append(button);
@@ -231,6 +231,17 @@ export default class Fenster<T extends HTMLElement> {
     document.body.appendChild(wrapper);
   }
 
+  #close() {
+    for (const handler of this.#onCloseHandlers) {
+      handler();
+    }
+
+    this.#body.remove();
+    this.#dragger.remove();
+    this.#wrapper.remove();
+    this.#window.remove();
+  }
+
   resizeInline(targetWidth: number, left: number | null = null) {
     const originalBcr = this.#body.getBoundingClientRect();
 
@@ -285,5 +296,9 @@ export default class Fenster<T extends HTMLElement> {
     const value = force ?? this.#window.open;
     this.#window.open = !value;
     return this.#window.open;
+  }
+
+  onClose(handler: EventHandler<void>) {
+    this.#onCloseHandlers.push(handler);
   }
 }

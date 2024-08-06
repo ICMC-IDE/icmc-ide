@@ -3,7 +3,7 @@ import Fenster from "../fenster.js";
 import { WindowConstructor } from "windows";
 
 export default class LogViewerWindow extends Fenster<LogViewerElement> {
-  constructor({ style, globalState }: WindowConstructor) {
+  constructor({ style, globalState: { eventManager } }: WindowConstructor) {
     const body = document.createElement("log-viewer");
     const title = document.createDocumentFragment();
 
@@ -20,7 +20,11 @@ export default class LogViewerWindow extends Fenster<LogViewerElement> {
       style,
     });
 
-    globalState.eventManager.subscribe("error", (error) => {
+    const eventSubscriber = eventManager.getSubscriber();
+
+    this.onClose(eventSubscriber.unsubscribeAll);
+
+    eventSubscriber.subscribe("error", (error) => {
       // FIXME
       body.write(error);
     });

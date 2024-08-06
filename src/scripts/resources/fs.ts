@@ -1,12 +1,13 @@
 import EventManager from "../state/event.js";
+import { fetchAssets } from "./assets.js";
+
+const FILE_STORAGE_PREFIX = "file:";
 
 export interface FsEventMap {
   create: string;
   update: { path: string; content: string };
   delete: string;
 }
-
-const FILE_STORAGE_PREFIX = "file:";
 
 export default class Fs extends EventManager<FsEventMap> {
   read(path: string): string | null {
@@ -48,5 +49,17 @@ export default class Fs extends EventManager<FsEventMap> {
           localStorage.getItem(key)!,
         ]),
     );
+  }
+
+  async loadAssets(overwrite = false) {
+    const assets = await fetchAssets();
+    const files = this.files();
+
+    for (const asset in assets) {
+      if (!overwrite && files.includes(asset)) {
+        continue;
+      }
+      this.write(asset, assets[asset]);
+    }
   }
 }

@@ -3,10 +3,7 @@ import Fenster from "../fenster.js";
 import { WindowConstructor } from "windows";
 
 export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
-  constructor({
-    style,
-    globalState: { eventManager, resources },
-  }: WindowConstructor) {
+  constructor({ style, globalState: { resources } }: WindowConstructor) {
     const body = document.createElement("memory-editor");
     const title = document.createElement("span");
     const buttonsRight = [];
@@ -41,11 +38,14 @@ export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
       buttonsRight,
     });
 
-    resources.subscribe("ram", (ram) => {
+    const resourcesSubscriber = resources.getSubscriber();
+
+    this.onClose(resourcesSubscriber.unsubscribeAll);
+
+    resourcesSubscriber.subscribe("ram", (ram) => {
       body.ram = ram;
     });
-
-    resources.subscribe("symbols", (symbols) => {
+    resourcesSubscriber.subscribe("symbols", (symbols) => {
       body.symbols = symbols;
     });
   }

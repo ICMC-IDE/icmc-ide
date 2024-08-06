@@ -1,4 +1,26 @@
-export type EventHandler<T> = (value: T) => void;
+import { EventHandler, EventUnsubscriber } from "types";
+
+class EventSubscriber<EventMap, T extends EventManager<EventMap>> {
+  #eventManager: T;
+  #unsubscribers: EventUnsubscriber[] = [];
+
+  constructor(eventManager: T) {
+    this.#eventManager = eventManager;
+  }
+
+  subscribe<K extends keyof EventMap>(
+    event: K,
+    handler: EventHandler<EventMap[K]>,
+  ) {
+    this.#unsubscribers.push(this.#eventManager.subscribe(event, handler));
+  }
+
+  unsubscribeAll() {
+    for (const unsubscribe of this.#unsubscribers) {
+      unsubscribe();
+    }
+  }
+}
 
 export default class EventManager<EventMap> {
   #events: Partial<
@@ -8,12 +30,13 @@ export default class EventManager<EventMap> {
   subscribe<K extends keyof EventMap>(
     event: K,
     handler: EventHandler<EventMap[K]>,
-  ) {
+  ): EventUnsubscriber {
     if (!this.#events[event]) {
       this.#events[event] = [];
     }
 
     this.#events[event].push(handler as EventHandler<EventMap[keyof EventMap]>);
+    return () => this.unsubscribe(event, handler);
   }
 
   unsubscribe<K extends keyof EventMap>(
@@ -39,6 +62,10 @@ export default class EventManager<EventMap> {
         handler(value);
       }
     });
+  }
+
+  getSubscriber() {
+    return new EventSubscriber<EventMap, this>(this);
   }
 
   // add method to delete an event

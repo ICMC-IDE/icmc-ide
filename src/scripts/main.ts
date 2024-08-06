@@ -64,13 +64,15 @@ function openFile(filename: string) {
 }
 
 async function createCharmap() {
+  const fs = globalState.resources.get("fs");
+
   const result = await globalState.resources
     .get("main-worker")
-    .request("parse-mif", globalState.resources.get("charmap.mif")!);
+    .request("parse-mif", fs.read("charmap.mif")!);
 
   const charmap = CharMap.fromBytes(
     result,
-    globalState.resources.get("palette-8bit.json")!,
+    JSON.parse(fs.read("palette-8bit.json")!),
   );
 
   globalState.resources.set("charmap", charmap);

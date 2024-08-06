@@ -1,4 +1,4 @@
-import { ConfigMap } from "../state/config.js";
+import { GlobalConfigsMap } from "state/global.js";
 import ConfigEditorElement from "../elements/config-editor.js";
 import Fenster from "../fenster.js";
 import { WindowConstructor } from "windows";
@@ -15,7 +15,7 @@ export default class ConfigEditorWindow extends Fenster<ConfigEditorElement> {
 
     {
       body.addEventListener("change-config", ({ detail: { name, value } }) => {
-        configManager.set(name as keyof ConfigMap, value);
+        configManager.set(name as keyof GlobalConfigsMap, value);
       });
     }
 

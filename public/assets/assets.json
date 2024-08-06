@@ -2,8 +2,8 @@
   "charmap.mif",
   "example.asm",
   "example.c",
-  "giroto.asm",
-  "icmc.asm",
+  "syntax/giroto.asm",
+  "syntax/icmc.asm",
   "palette-4bit.json",
   "palette-8bit.json"
 ]

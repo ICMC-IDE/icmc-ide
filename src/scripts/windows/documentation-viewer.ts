@@ -16,10 +16,6 @@ export default class DocumentationViewerWindow extends Fenster<DocumentationView
 
     body.syntax = configManager.get("syntax")!;
 
-    configManager.subscribe("syntax", (value: string) => {
-      body.syntax = value;
-    });
-
     super({
       title,
       body,
@@ -27,5 +23,13 @@ export default class DocumentationViewerWindow extends Fenster<DocumentationView
     });
 
     this.toggleMinimize();
+
+    const configSubscriber = configManager.getSubscriber();
+
+    this.onClose(configSubscriber.unsubscribeAll);
+
+    configManager.subscribe("syntax", (value: string) => {
+      body.syntax = value;
+    });
   }
 }

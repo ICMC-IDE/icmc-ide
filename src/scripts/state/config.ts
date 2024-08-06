@@ -1,23 +1,15 @@
 import EventManager from "./event.js";
 
-export interface ConfigMap {
-  syntax: string;
-  "screen-width": number;
-  "screen-height": number;
-  frequency: number;
-  "entry-file": string;
-}
-
 const CONFIG_STORAGE_PREFIX = "config:";
 
-export default class ConfigManager extends EventManager<ConfigMap> {
-  #configs: Partial<ConfigMap> = {
-    syntax: "icmc",
-    "screen-width": 40,
-    "screen-height": 30,
-    frequency: 6,
-    "entry-file": "example.asm",
-  };
+export default class ConfigManager<ConfigMap> extends EventManager<ConfigMap> {
+  #configs: Partial<ConfigMap>;
+
+  constructor(defaults?: Partial<ConfigMap>) {
+    super();
+
+    this.#configs = defaults ?? ({} as ConfigMap);
+  }
 
   get<K extends keyof ConfigMap>(config: K) {
     return this.#configs[config] as ConfigMap[K];
@@ -67,7 +59,7 @@ export default class ConfigManager extends EventManager<ConfigMap> {
     }
   }
 
-  // add delete mothod to delete a config (from storage and/or memory)
+  // add delete method to delete a config (from storage and/or memory)
 }
 
 /*

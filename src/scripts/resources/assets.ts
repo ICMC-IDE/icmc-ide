@@ -1,9 +1,9 @@
-export async function fetchJson(path: string): Promise<any> {
+async function fetchJson(path: string) {
   const response = await fetch(path);
   return await response.json();
 }
 
-export async function fetchText(path: string): Promise<string> {
+async function fetchText(path: string) {
   const response = await fetch(path);
   return await response.text();
 }
@@ -12,16 +12,20 @@ export async function fetchAssets() {
   const assets = (await fetchJson("../assets/assets.json")) as Array<string>;
   const entries = assets.reduce(
     (acc, filename) => {
-      const extension = filename.split(".").at(-1);
+      // Refactor FS to store json objects
+
+      // const extension = filename.split(".").at(-1);
       const path = `../assets/${filename}`;
 
       acc.keys.push(filename);
 
-      if (extension === "json") {
-        acc.values.push(fetchJson(path));
-      } else {
-        acc.values.push(fetchText(path));
-      }
+      // if (extension === "json") {
+      //   acc.values.push(fetchJson(path));
+      // } else {
+      //   acc.values.push(fetchText(path));
+      // }
+
+      acc.values.push(fetchText(path));
 
       return acc;
     },

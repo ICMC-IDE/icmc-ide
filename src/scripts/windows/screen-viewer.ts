@@ -82,28 +82,35 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
       buttonsRight,
     });
 
-    configManager.subscribe("screen-width", (width: number) => {
-      body.width = width;
+    const eventSubscriber = eventManager.getSubscriber();
+    const configSubscriber = configManager.getSubscriber();
+    const resourcesSubscriber = resources.getSubscriber();
+
+    this.onClose(() => {
+      eventSubscriber.unsubscribeAll();
+      configSubscriber.unsubscribeAll();
+      resourcesSubscriber.unsubscribeAll();
     });
 
-    configManager.subscribe("screen-height", (height: number) => {
+    eventSubscriber.subscribe("render", () => {
+      this.render();
+    });
+
+    configSubscriber.subscribe("screen-width", (width: number) => {
+      body.width = width;
+    });
+    configSubscriber.subscribe("screen-height", (height: number) => {
       body.height = height;
     });
 
-    resources.subscribe("vram", (vram) => {
+    resourcesSubscriber.subscribe("vram", (vram) => {
       body.memory = vram;
     });
-
-    resources.subscribe("internal-registers", (internalRegisters) => {
+    resourcesSubscriber.subscribe("internal-registers", (internalRegisters) => {
       this.#internalRegisters = internalRegisters;
     });
-
-    resources.subscribe("charmap", (charmap) => {
+    resourcesSubscriber.subscribe("charmap", (charmap) => {
       body.charmap = charmap;
-    });
-
-    eventManager.subscribe("render", () => {
-      this.render();
     });
   }
 

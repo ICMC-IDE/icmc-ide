@@ -46,16 +46,25 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
       buttonsRight,
     });
 
-    configManager.subscribe("screen-width", (width: number) => {
-      body.width = width;
-    });
+    const eventSubscriber = eventManager.getSubscriber();
+    const configSubscriber = configManager.getSubscriber();
+    const resourcesSubscriber = resources.getSubscriber();
 
-    configManager.subscribe("screen-height", (height: number) => {
-      body.height = height;
+    this.onClose(() => {
+      eventSubscriber.unsubscribeAll();
+      configSubscriber.unsubscribeAll();
+      resourcesSubscriber.unsubscribeAll();
     });
 
     eventManager.subscribe("render", () => {
       body.render();
+    });
+
+    configManager.subscribe("screen-width", (width: number) => {
+      body.width = width;
+    });
+    configManager.subscribe("screen-height", (height: number) => {
+      body.height = height;
     });
 
     resources.subscribe("charmap", (charmap) => {

@@ -6,7 +6,7 @@ import { WindowConstructor } from "windows";
 export default class SourceEditorWindow extends Fenster<TextEditorElement> {
   #fs: Fs;
 
-  constructor({ style, globalState }: WindowConstructor) {
+  constructor({ style, globalState: { resources } }: WindowConstructor) {
     const body = document.createElement("text-editor");
     const title = document.createElement("span");
     const buttonsRight = [];
@@ -41,7 +41,7 @@ export default class SourceEditorWindow extends Fenster<TextEditorElement> {
       buttonsRight,
     });
 
-    this.#fs = globalState.resources.get("fs");
+    this.#fs = resources.get("fs");
   }
 
   setModel(model: monaco.editor.ITextModel, filename: string) {
