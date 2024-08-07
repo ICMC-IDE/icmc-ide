@@ -36,7 +36,7 @@ export default class MemoryEditorElement extends HTMLElement {
     fragment.appendChild(template.content.cloneNode(true));
 
     const elements = (this.#elements = fragment.querySelector("form")!
-      .elements as Elements);
+      .elements as unknown as Elements);
 
     for (let i = 0, mask = 0x8000; i < 16; i++, mask >>= 1) {
       elements.bit[i].addEventListener("click", () => {

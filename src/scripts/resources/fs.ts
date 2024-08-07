@@ -14,9 +14,9 @@ export default class Fs extends EventManager<FsEventMap> {
     return localStorage.getItem(FILE_STORAGE_PREFIX + path);
   }
 
-  readJSON(path: string): unknown | null {
+  readJSON<T>(path: string): T | null {
     const data = this.read(path);
-    return data === null ? null : JSON.parse(data);
+    return data === null ? null : <T>JSON.parse(data);
   }
 
   write(path: string, content: string): void {

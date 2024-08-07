@@ -3,7 +3,7 @@ import {
   HttpReader,
   TextReader,
   ZipWriter,
-} from "https://unpkg.com/@zip.js/zip.js/index.js";
+} from "../../modules/zip.js/index.js";
 
 import FilePickerElement from "../elements/file-picker.js";
 import Fenster from "../fenster.js";
@@ -41,7 +41,7 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
         await Promise.all([
           fs
             .files()
-            .map((path) => writer.add(path, new TextReader(fs.read(path)))),
+            .map((path) => writer.add(path, new TextReader(fs.read(path)!))),
         ]);
 
         const blob = await writer.close();
