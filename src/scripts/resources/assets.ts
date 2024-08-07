@@ -1,7 +1,4 @@
-async function fetchJson(path: string) {
-  const response = await fetch(path);
-  return await response.json();
-}
+import assets from "../../assets/assets.json" assert { type: "json" };
 
 async function fetchText(path: string) {
   const response = await fetch(path);
@@ -9,13 +6,12 @@ async function fetchText(path: string) {
 }
 
 export async function fetchAssets() {
-  const assets = (await fetchJson("../assets/assets.json")) as Array<string>;
-  const entries = assets.reduce(
+  const entries = (assets as Array<string>).reduce(
     (acc, filename) => {
       // Refactor FS to store json objects
 
       // const extension = filename.split(".").at(-1);
-      const path = `../assets/${filename}`;
+      const path = `../../assets/${filename}`;
 
       acc.keys.push(filename);
 

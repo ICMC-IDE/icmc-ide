@@ -7,8 +7,8 @@ import ConfigEditorWindow from "./config-editor.js";
 import SourceEditorWindow from "./source-editor.js";
 import DocumentationViewerWindow from "./documentation-viewer.js";
 import FilePickerWindow from "./file-picker.js";
-import { GlobalState } from "state/global.js";
-import { WindowConstructor } from "windows";
+import { GlobalState } from "../state/global.js";
+import { WindowConstructor } from "../types/windows";
 
 interface Windows {
   "state-editor": StateEditorWindow;

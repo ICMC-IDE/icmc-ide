@@ -1,4 +1,5 @@
 import EventManager from "../state/event.js";
+import TheWorker from "../workers/main.js?worker";
 
 interface MainWorkerEventMap extends WorkerEventMap {
   stop: void;
@@ -28,7 +29,7 @@ interface MainWorkerMessageMap {
 }
 
 export default class MainWorker extends EventManager<MainWorkerEventMap> {
-  #worker = new Worker("./scripts/worker/main.js", { type: "module" });
+  #worker = new TheWorker();
   #requests = new Map();
   #id = 0;
 

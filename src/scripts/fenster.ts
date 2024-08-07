@@ -1,4 +1,4 @@
-import { EventHandler } from "types";
+import { EventHandler } from "./types";
 
 const SIDES = ["n", "e", "s", "w"];
 const CORNERS = ["ne", "se", "sw", "nw"];

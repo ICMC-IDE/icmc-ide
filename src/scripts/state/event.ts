@@ -1,4 +1,4 @@
-import { EventHandler, EventUnsubscriber } from "types";
+import { EventHandler, EventUnsubscriber } from "../types";
 
 class EventSubscriber<EventMap, T extends EventManager<EventMap>> {
   #eventManager: T;

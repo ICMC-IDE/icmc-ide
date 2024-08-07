@@ -1,4 +1,4 @@
-import { WindowTypes } from "windows/mod";
+import { WindowTypes } from "../windows/mod";
 
 interface OpenWindowEvent {
   detail: WindowTypes;

@@ -1,3 +1,4 @@
+import * as monaco from "monaco-editor";
 import {
   createWindows,
   openWindow,

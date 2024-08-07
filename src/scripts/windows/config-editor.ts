@@ -1,4 +1,4 @@
-import { GlobalConfigsMap } from "state/global.js";
+import { GlobalConfigsMap } from "../state/global.js";
 import ConfigEditorElement from "../elements/config-editor.js";
 import Fenster from "../fenster.js";
 import { WindowConstructor } from "windows";

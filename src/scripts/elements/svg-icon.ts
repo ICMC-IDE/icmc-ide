@@ -1,7 +1,8 @@
-const cachedIcons: Record<string, XMLDocument> = {};
-const domParser = new DOMParser();
-
 export default class SvgIconElement extends HTMLElement {
+  #fragment = (
+    document.getElementById("svgIconTemplate") as HTMLTemplateElement
+  ).content.cloneNode(true) as DocumentFragment;
+
   constructor() {
     super();
 
@@ -11,16 +12,17 @@ export default class SvgIconElement extends HTMLElement {
     }
   }
 
-  async setIcon(name: string) {
-    const svg = cachedIcons[name] ?? (await this.fetchIcon(name));
-    const node = svg.documentElement.cloneNode(true);
-
-    this.replaceChildren(node);
+  connectedCallback() {
+    this.appendChild(this.#fragment);
   }
 
-  async fetchIcon(name: string) {
-    const response = await fetch(`./images/${name}.svg`);
-    return domParser.parseFromString(await response.text(), "image/svg+xml");
+  setIcon(name: string) {
+    (this.#fragment.querySelector("use") ??
+      this.querySelector("use"))!.setAttributeNS(
+      null,
+      "href",
+      `./images/icons.svg#${name}`,
+    );
   }
 
   set name(name: string) {

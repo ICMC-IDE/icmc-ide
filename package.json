@@ -7,14 +7,19 @@
   "contributors": [
     "Thiago Tavares <thiptav@gmail.com>"
   ],
+  "type": "module",
   "license": "GPL-3.0",
   "packageManager": "npm@10.8.1",
   "scripts": {
-    "build": "npm run copy-public && tsc -p tsconfig.json && lightningcss --minify --bundle --targets '>= 0.25%' src/styles/main.css -o dist/styles/main.css",
-    "watch-build": "npm run copy-public && ln -frs src/styles/main.css dist/styles/main.css && tsc -p tsconfig.json -w",
+    "build": "npm run copy-public && lightningcss --minify --bundle --targets '>= 0.25%' src/styles/main.css -o dist/styles/main.css && npm run build-js && npm run build-icons && npm run build-modules && npm run build-wasm",
+    "watch-build": "npm run copy-public && ln -frs src/styles/main.css dist/styles/main.css",
     "start": "serve -c serve.json",
-    "dev": "concurrently \"npm:watch-build\" \"npm:start\"",
-    "build-modules": "for module in mif assembler icmc-cc icmc-emulator; do wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/$module ; done",
+    "dev": "vite --config vite.config.js",
+    "preview": "vite --config vite.config.js preview",
+    "build-modules": "for module in mif assembler icmc-cc icmc-emulator; do wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/$module; done;",
+    "build-js": "npx rollup -c rollup.config.js",
+    "build-icons": "node ./build/icons.js",
+    "build-wasm": "cp public/modules/**/*.wasm dist/scripts/workers/",
     "copy-public": "copyfiles -a -F -u 1 \"public/**/*\" dist && mkdir -p dist/styles",
     "update": "git submodule update --init --recursive --remote; for module in mif assembler icmc-cc icmc-emulator; do cd ./modules/$module; cargo update; cd ../..; done",
     "clean": "rimraf dist; for module in mif assembler icmc-cc icmc-emulator; do cd ./modules/$module; cargo clean; cd ../..; done",
@@ -22,22 +27,17 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.5.0",
+    "@zip.js/zip.js": "^2.7.48",
     "chokidar": "^3.6.0",
     "concurrently": "^8.2.2",
     "copyfiles": "^2.4.1",
-    "eslint": "^9.7.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.2.1",
     "globals": "^15.8.0",
+    "lightningcss": "^1.26.0",
     "lightningcss-cli": "^1.25.1",
-    "prettier": "^3.3.3",
+    "linkedom": "^0.18.4",
+    "monaco-editor": "^0.50.0",
     "rimraf": "^5.0.9",
-    "serve": "^14.2.3",
-    "style-loader": "^4.0.0",
     "typescript": "^5.5.4",
-    "typescript-eslint": "^7.17.0"
-  },
-  "overrides": {
-    "eslint": "^9.7.0"
+    "vite": "^5.3.5"
   }
 }

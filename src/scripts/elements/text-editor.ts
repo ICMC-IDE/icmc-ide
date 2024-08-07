@@ -1,3 +1,7 @@
+import * as monaco from "monaco-editor";
+
+// import("./scripts/languages/main.js");
+
 export default class TextEditorElement extends HTMLElement {
   #editor: monaco.editor.IStandaloneCodeEditor | null = null;
   #observer: ResizeObserver | null = null;

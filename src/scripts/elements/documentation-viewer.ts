@@ -3,12 +3,6 @@ export default class DocumentationViewerElement extends HTMLElement {
     super();
   }
 
-  disconnectedCallback() {
-    while (this.lastElementChild) {
-      this.lastElementChild.remove();
-    }
-  }
-
   set syntax(value: string) {
     const documentationGirotoTemplate = document.getElementById(
       "documentationGirotoTemplate",

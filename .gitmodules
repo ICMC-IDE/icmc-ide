@@ -14,7 +14,3 @@
 	path = modules/icmc-cc
 	url = https://github.com/ICMC-IDE/icmc-cc
 	branch = main
-[submodule "public/modules/zip.js"]
-	path = public/modules/zip.js
-	url = https://github.com/gildas-lormeau/zip.js
-	branch = master

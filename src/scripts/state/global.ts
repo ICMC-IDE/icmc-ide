@@ -1,4 +1,4 @@
-import { FileManagerFile } from "types.js";
+import { FileManagerFile } from "../types";
 import ConfigManager from "./config.js";
 import EventManager from "./event.js";
 import CharMap from "../resources/charmap.js";

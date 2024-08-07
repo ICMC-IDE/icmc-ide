@@ -1,4 +1,4 @@
-import Fs from "resources/fs.js";
+import Fs from "../resources/fs.js";
 import TextEditorElement from "../elements/text-editor.js";
 import Fenster from "../fenster.js";
 import { WindowConstructor } from "windows";
