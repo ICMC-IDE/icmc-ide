@@ -1,5 +1,8 @@
 name: Rust
 
+defaults:
+  run:
+    shell: bash
 on:
   push:
     branches: ["main"]
