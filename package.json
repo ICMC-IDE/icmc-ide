@@ -16,8 +16,8 @@
     "dev": "concurrently \"npm:watch-build\" \"npm:start\"",
     "build-modules": "for module in mif assembler icmc-cc icmc-emulator; do wasm-pack build --target web --reference-types --weak-refs --release --no-pack modules/$module ; done",
     "copy-public": "copyfiles -a -F -u 1 \"public/**/*\" dist && mkdir -p dist/styles",
-    "update": "git submodule update --init --recursive --remote; for module in mif assembler icmc-cc icmc-emulator; do pushd ./modules/$module; cargo update; popd; done",
-    "clean": "rimraf dist; for module in mif assembler icmc-cc icmc-emulator; do pushd ./modules/$module; cargo clean; popd; done",
+    "update": "git submodule update --init --recursive --remote; for module in mif assembler icmc-cc icmc-emulator; do cd ./modules/$module; cargo update; cd ../..; done",
+    "clean": "rimraf dist; for module in mif assembler icmc-cc icmc-emulator; do cd ./modules/$module; cargo clean; cd ../..; done",
     "lint": "eslint ./src"
   },
   "devDependencies": {
