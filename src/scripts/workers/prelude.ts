@@ -1,7 +1,7 @@
-import initMif from "../../modules/mif/mif.js";
-import initAssembler from "../../modules/assembler/assembler.js";
-import initEmulator from "../../modules/icmc-emulator/icmc_emulator.js";
-import initCompiler from "../../modules/icmc-cc/icmc_cc.js";
+import initMif from "@icmc-ide/mif";
+import initAssembler from "@icmc-ide/assembler";
+import initEmulator from "@icmc-ide/icmc-emulator";
+import initCompiler from "@icmc-ide/icmc-cc";
 
 const mif = initMif();
 const assembler = initAssembler();
@@ -15,7 +15,7 @@ export const modules = {
   compiler: await compiler,
 };
 
-export { Mif, parseMif, Radix } from "../../modules/mif/mif.js";
-export { assemble } from "../../modules/assembler/assembler.js";
-export { Emulator, State } from "../../modules/icmc-emulator/icmc_emulator.js";
-export { Compiler } from "../../modules/icmc-cc/icmc_cc.js";
+export { Mif, parseMif, Radix } from "@icmc-ide/mif";
+export { assemble } from "@icmc-ide/assembler";
+export { Emulator, State } from "@icmc-ide/icmc-emulator";
+export { Compiler } from "@icmc-ide/icmc-cc";
