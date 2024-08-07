@@ -1,11 +1,22 @@
 import {
-  parseMif,
-  Emulator,
-  State,
-  Assembler,
-  modules,
+  assemble,
   Compiler,
+  Emulator,
+  Mif,
+  modules,
+  parseMif,
+  Radix,
+  State,
 } from "./prelude.js";
+
+type Actions = typeof actions;
+
+type Message<T extends keyof Actions> =
+  | {
+      id: number;
+      error: string;
+    }
+  | { id: number; content: Actions[T] };
 
 function getEmulatorMemories(emulator: Emulator) {
   const buffer = modules.emulator.memory.buffer;
@@ -94,12 +105,6 @@ setInterval(function () {
   lastCheck = now;
 }, 1000);
 
-interface Message {
-  id: number;
-  error?: string;
-  content?: ReturnType<(typeof actions)[keyof typeof actions]>;
-}
-
 const fs = {
   _files: {} as Record<string, string>,
 
@@ -135,8 +140,12 @@ function build({
     fs.write((entry += ".asm"), asm);
   }
 
-  const assembly = Assembler.assemble(fs, `syntax/${syntax}.asm:${entry}`);
+  const assembly = assemble(fs, entry, `syntax/${syntax}.toml`);
+
   emulator.load(assembly.binary());
+
+  console.log(Mif.encodeUint16Array(assembly.binary(), Radix.Uns, Radix.Bin));
+  console.log(assembly.symbols());
 
   const result = {
     mif: assembly.mif(),
@@ -164,29 +173,39 @@ function setFrequency(value: number) {
 
 self.addEventListener(
   "message",
-  function ({
+  <T extends keyof Actions>({
     data: { type, id, content },
   }: {
     data: {
-      type: keyof typeof actions;
+      type: T;
       id: number;
-      content: Parameters<(typeof actions)[keyof typeof actions]>;
+      content: Parameters<Actions[T]>[0];
     };
-  }) {
-    const message: Message = { id };
+  }) => {
+    let message: Message<T>;
 
     try {
-      const action = actions[type];
+      const action = actions[type] as Actions[T];
 
       if (action) {
         // @ts-ignore
         // FIXME
-        message.content = action(content);
+        message = {
+          id,
+          // @ts-ignore
+          content: action(content),
+        };
       } else {
-        message.error = `Unknown request type '${type}' with id ${id}`;
+        message = {
+          id,
+          error: `Unknown request type '${type}' with id ${id}`,
+        };
       }
     } catch (error: unknown) {
-      message.error = error!.toString();
+      message = {
+        id,
+        error: error!.toString(),
+      };
     }
 
     self.postMessage({

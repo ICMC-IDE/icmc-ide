@@ -70,10 +70,7 @@ async function createCharmap() {
     .get("main-worker")
     .request("parse-mif", fs.read("charmap.mif")!);
 
-  const charmap = CharMap.fromBytes(
-    result,
-    JSON.parse(fs.read("palette-8bit.json")!),
-  );
+  const charmap = CharMap.fromBytes(result, fs.readJSON("palette/8bit.json")!);
 
   globalState.resources.set("charmap", charmap);
 }

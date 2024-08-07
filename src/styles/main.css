@@ -26,6 +26,19 @@
 
     --white: oklch(from var(--source-color) 87.5% c h);
 
+    --blue-5: oklch(from var(--blue-4) calc(l / 1.2) c h);
+    --blue-4: oklch(from var(--blue-3) calc(l / 1.2) c h);
+    --blue-3: oklch(from var(--blue-2) calc(l / 1.2) c h);
+    --blue-2: oklch(from var(--blue-1) calc(l / 1.2) c h);
+    --blue-1: oklch(from var(--blue0) calc(l / 1.2) c h);
+
+    --blue0: oklch(50% 0.05 260 / 1);
+
+    --blue1: oklch(from var(--blue0) calc(l * 1.2) c h);
+    --blue2: oklch(from var(--blue1) calc(l * 1.2) c h);
+    --blue3: oklch(from var(--blue2) calc(l * 1.2) c h);
+    --blue4: oklch(from var(--blue3) calc(l * 1.2) c h);
+    --blue5: oklch(from var(--blue4) calc(l * 1.2) c h);
     /* font-size: 12px; */
   }
 
@@ -33,6 +46,7 @@
     box-sizing: border-box;
     font-size: inherit;
     color: inherit;
+    margin: 0;
   }
 
   body {
@@ -74,14 +88,18 @@
   }
 
   input:focus {
+    outline: none;
+    /*
     outline: 0.125em solid var(--gray5);
     outline-offset: 0.125em;
+    */
   }
 
   fieldset {
     margin-inline: -0.5em;
     padding: 0.5em;
-    border: solid 1px var(--gray1);
+    border-block: solid 1px var(--gray1);
+    border-inline: none;
     background-color: var(--gray-1);
 
     & select,
@@ -93,7 +111,7 @@
 
     & legend {
       background-color: inherit;
-      border: inherit;
+      border: solid 1px var(--gray1);
       padding: 0.25em;
     }
   }
@@ -167,12 +185,12 @@
         outline: 3px solid #808080;
         outline-offset: 0.125rem;
       }
-      */
 
       &::-moz-range-thumb {
         outline: 0.125em solid var(--gray5);
         outline-offset: 0.125em;
       }
+      */
     }
   }
 }
@@ -205,9 +223,9 @@
 
     padding: 0.25em;
     min-width: calc(8em + 1em * max(var(--width), 32) + 0.75em);
-    min-height: calc(8em + 1em * max(var(--height), 32) + 0.75em);
+    min-height: calc(8em + 1em * max(var(--row-height), 32) + 0.75em);
     max-width: calc(8em + 1em * max(var(--width), 32) + 0.75em);
-    max-height: calc(8em + 1em * max(var(--height), 32) + 0.75em);
+    max-height: calc(8em + 1em * max(var(--row-height), 32) + 0.75em);
 
     & > canvas {
       image-rendering: pixelated;
@@ -225,7 +243,7 @@
 
     & > screen-viewer {
       min-width: calc(1em * var(--width));
-      min-height: calc(1em * var(--height));
+      min-height: calc(1em * var(--row-height));
 
       & > div {
         flex-grow: 1;
@@ -298,6 +316,11 @@
       grid-template-columns: repeat(4, 1fr);
       flex-direction: row;
       gap: 0.25em;
+      align-items: center;
+
+      & span {
+        padding: 0.25em;
+      }
 
       & select,
       & input[type="range"] {
@@ -326,16 +349,104 @@
   }
 
   memory-editor {
-    overflow: auto;
     flex-grow: 1;
     contain: strict;
 
-    min-width: calc(9 * (5ch + 1em) - 1ch);
-    max-width: calc(17 * (5ch + 1em) - 1ch);
+    display: grid;
+    grid-template-columns: 1fr auto;
 
+    min-width: fit-content;
     min-height: 10em;
 
+    min-width: calc(9 * (5ch + 1em) - 1ch + 16.5em + 2px);
+
+    & main {
+      overflow: auto;
+
+      min-width: calc(9 * (5ch + 1em) - 1ch);
+      /*max-width: calc(17 * (5ch + 1em) - 1ch);*/
+    }
+
+    & aside {
+      border-left: solid 1px var(--gray2);
+      padding-block: 0.25em;
+
+      & form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25em;
+      }
+
+      & label,
+      & .label {
+        margin-top: calc(0.75em + 1px);
+        display: grid;
+        background-color: var(--gray-1);
+        border-block: solid 1px var(--gray1);
+        flex-grow: 1;
+
+        padding-top: 1em;
+
+        position: relative;
+
+        & + label,
+        & + .label {
+          border-left: solid 1px var(--gray1);
+        }
+
+        & span {
+          padding: 0.25em;
+          background-color: var(--gray-1);
+          border: solid 1px var(--gray1);
+
+          position: absolute;
+          left: 0.25em;
+          top: 0;
+          translate: 0 -50%;
+
+          & + * {
+            border: none;
+            background-color: inherit;
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+
+      & div {
+        display: flex;
+
+        & .binary {
+          padding: calc(0.25em + 1px);
+          display: grid;
+          grid-template-columns: repeat(16, auto);
+          flex-grow: 1;
+        }
+      }
+    }
+
+    & input[type="checkbox"] {
+      appearance: none;
+
+      background-color: var(--gray0);
+      border: solid 1px var(--gray1);
+      border-radius: none;
+      aspect-ratio: 1;
+      min-width: 1em;
+
+      margin: -1px;
+
+      &:checked {
+        background-color: var(--gray4);
+        /* border: solid 1px var(--gray5); */
+      }
+    }
+
     & .memory {
+      --bytes-per-column: 8;
+      --ascii-width: calc(1ch + 0.5em);
+      --hex-width: calc(4ch + 0.5em);
+
       padding: inherit;
       user-select: none;
 
@@ -349,23 +460,97 @@
       }
 
       & .region {
-        display: flex;
+        --rows: round(up, calc(var(--length) / var(--bytes-per-column)));
+
+        display: grid;
+        gap: 0 0.25em;
         background-color: var(--gray-1);
-        overflow: hidden;
-        gap: 0.25em;
+        grid-template-columns:
+          var(--hex-width) calc(var(--hex-width) * var(--bytes-per-column))
+          calc(var(--ascii-width) * var(--bytes-per-column));
+        grid-template-rows: 1fr;
+        height: calc(var(--rows) * 1.5em);
         container-type: inline-size;
         container-name: region;
+        contain: strict;
+      }
+
+      & .address,
+      & .hex,
+      & .ascii {
+        contain: strict;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(var(--rows), 1.5em);
+
+        & span {
+          contain: strict;
+          padding: 0.25em;
+          height: 1.5em;
+          line-height: 1;
+        }
+      }
+
+      & .address,
+      & .hex {
+        & span {
+          width: var(--hex-width);
+        }
+      }
+
+      & .ascii,
+      & .hex {
+        & > div {
+          contain: strict;
+          display: grid;
+        }
+
+        & span {
+          &.hover {
+            background-color: var(--gray2);
+          }
+
+          &.selected {
+            border-bottom: solid 1px var(--blue0);
+          }
+
+          &.pc,
+          &.sp {
+            padding-bottom: 0.125em;
+            border-bottom: solid 0.125em;
+          }
+
+          &.pc {
+            border-bottom-color: #569cd6;
+          }
+
+          &.sp {
+            border-bottom-color: #cc6666;
+          }
+        }
+      }
+
+      & .ascii {
+        & > div {
+          grid-template-columns: repeat(8, var(--ascii-width));
+        }
+
+        & span {
+          width: var(--ascii-width);
+        }
+      }
+
+      & .hex {
+        & > div {
+          grid-template-columns: repeat(8, var(--hex-width));
+        }
       }
 
       & .address {
-        display: grid;
-        grid-template-columns: 1fr;
         background-color: var(--gray0);
-
-        & span {
-          padding: 0.25em;
-        }
       }
+
+      /*
 
       & .hex {
         position: relative;
@@ -418,8 +603,6 @@
 
       & .ascii,
       & .hex {
-        display: grid;
-
         & span {
           padding: 0.25em;
 
@@ -442,6 +625,7 @@
           }
         }
       }
+      */
     }
   }
 
@@ -460,6 +644,7 @@
   }
 
   documentation-viewer {
+    max-height: 100vh;
     color: #d4d4d4;
     overflow: auto;
 
@@ -515,23 +700,35 @@
     min-width: fit-content;
     min-height: 10em;
     overflow: auto;
+    padding: 0.25em;
 
     flex-grow: 1;
 
-    & div {
+    &,
+    & .folder,
+    & .file {
       display: flex;
-      flex-direction: row-reverse;
-      background-color: var(--gray1);
-      border-bottom: solid 1px var(--gray2);
+      gap: 0.25em;
+    }
 
-      & button {
-        margin: -1px;
-        background-color: var(--gray1);
+    &,
+    & .folder {
+      flex-direction: column;
+    }
 
-        &:first-child {
-          flex-grow: 1;
-          order: 100;
-        }
+    & .folder {
+      & .folder,
+      & .file {
+        margin-left: 0.5em;
+      }
+    }
+
+    & button {
+      border: solid 1px var(--gray3);
+      background-color: var(--gray2);
+
+      &:first-child {
+        flex-grow: 1;
       }
     }
   }

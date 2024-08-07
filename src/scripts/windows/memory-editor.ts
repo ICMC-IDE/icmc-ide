@@ -40,7 +40,7 @@ export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
 
     const resourcesSubscriber = resources.getSubscriber();
 
-    this.onClose(resourcesSubscriber.unsubscribeAll);
+    this.onClose(() => resourcesSubscriber.unsubscribeAll());
 
     resourcesSubscriber.subscribe("ram", (ram) => {
       body.ram = ram;

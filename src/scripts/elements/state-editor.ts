@@ -156,7 +156,7 @@ export default class StateEditorElement extends HTMLElement {
     this.#elements.buttons.play.style.display = value ? "none" : "";
   }
 
-  set files(fileNames: string[]) {
+  set files(filenames: string[]) {
     const select = this.#elements.buttons.file;
     const value = select.value;
 
@@ -164,19 +164,19 @@ export default class StateEditorElement extends HTMLElement {
       select.lastElementChild.remove();
     }
 
-    for (const fileName of fileNames) {
-      if (!fileName.match(/\.c$|\.asm/i)) continue;
+    for (const filename of filenames) {
+      if (!filename.match(/\.c$|\.asm/i)) continue;
 
       const option = document.createElement("option");
-      option.value = fileName;
-      option.innerText = fileName;
-      option.selected = fileName === value;
+      option.value = filename;
+      option.innerText = filename;
+      option.selected = filename === value;
       select.appendChild(option);
     }
   }
 
-  set entryFile(fileName: string) {
-    this.#elements.buttons.file.value = fileName;
+  set entryFile(filename: string) {
+    this.#elements.buttons.file.value = filename;
   }
 }
 

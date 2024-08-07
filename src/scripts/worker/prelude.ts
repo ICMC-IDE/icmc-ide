@@ -15,7 +15,7 @@ export const modules = {
   compiler: await compiler,
 };
 
-export { parseMif } from "../../modules/mif/mif.js";
-export { Assembler } from "../../modules/assembler/assembler.js";
+export { Mif, parseMif, Radix } from "../../modules/mif/mif.js";
+export { assemble } from "../../modules/assembler/assembler.js";
 export { Emulator, State } from "../../modules/icmc-emulator/icmc_emulator.js";
 export { Compiler } from "../../modules/icmc-cc/icmc_cc.js";

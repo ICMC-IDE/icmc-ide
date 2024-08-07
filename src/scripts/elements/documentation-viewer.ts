@@ -10,10 +10,6 @@ export default class DocumentationViewerElement extends HTMLElement {
   }
 
   set syntax(value: string) {
-    while (this.lastElementChild) {
-      this.lastElementChild.remove();
-    }
-
     const documentationGirotoTemplate = document.getElementById(
       "documentationGirotoTemplate",
     ) as HTMLTemplateElement;
@@ -23,10 +19,12 @@ export default class DocumentationViewerElement extends HTMLElement {
 
     switch (value) {
       case "giroto":
-        this.appendChild(documentationGirotoTemplate.content.cloneNode(true));
+        this.replaceChildren(
+          documentationGirotoTemplate.content.cloneNode(true),
+        );
         break;
       case "icmc":
-        this.appendChild(documentationIcmcTemplate.content.cloneNode(true));
+        this.replaceChildren(documentationIcmcTemplate.content.cloneNode(true));
         break;
     }
   }

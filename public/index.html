@@ -13,6 +13,59 @@
 <body>
   <div id="root"></div>
 
+  <template id="memoryEditorTemplate">
+    <main></main>
+    <aside>
+        <form onsubmit="return false;">
+      <div>
+        <label>
+          <span>Address</span>
+          <input name="address" type="text" value="0xFF00" disabled>
+        </label>
+      </div>
+      <div>
+        <label>
+          <span>Instruction</span>
+          <input name="instruction" type="text" value="-" disabled>
+        </label>
+      </div>
+      <div>
+        <label>
+          <span>Signed</span>
+          <input name="signed" type="number" step="1" min="-32768" max="32767">
+        </label>
+        <label>
+          <span>Unsigned</span>
+          <input name="unsigned" type="number" step="1" min="0" max="36536">
+        </label>
+      </div>
+      <div>
+        <div class="label">
+          <span>Binary</span>
+          <div class="binary">
+            <input name="bit" title="Bit 15 (32768)" type="checkbox">
+            <input name="bit" title="Bit 14 (16384)" type="checkbox">
+            <input name="bit" title="Bit 13 (8192)" type="checkbox">
+            <input name="bit" title="Bit 12 (4096)" type="checkbox">
+            <input name="bit" title="Bit 11 (2048)" type="checkbox">
+            <input name="bit" title="Bit 10 (1024)" type="checkbox">
+            <input name="bit" title="Bit 9 (512)" type="checkbox">
+            <input name="bit" title="Bit 8 (256)" type="checkbox">
+            <input name="bit" title="Bit 7 (128)" type="checkbox">
+            <input name="bit" title="Bit 6 (64)" type="checkbox">
+            <input name="bit" title="Bit 5 (32)" type="checkbox">
+            <input name="bit" title="Bit 4 (16)" type="checkbox">
+            <input name="bit" title="Bit 3 (8)" type="checkbox">
+            <input name="bit" title="Bit 2 (4)" type="checkbox">
+            <input name="bit" title="Bit 1 (2)" type="checkbox">
+            <input name="bit" title="Bit 0 (1)" type="checkbox">
+          </div>
+        </div>
+      </div>
+        </form>
+    </aside>
+  </template>
+
   <template id="dockTemplate">
     <aside>
       <button data-window="file-picker" title="File picker"><svg-icon name="files"></svg-icon></button>
@@ -75,8 +128,8 @@
           <label class="register"><span>IR:</span><input type="text" value="0000" /></label>
         </div>
         <div>
-            <label class="register"><span>KB:</span><input type="text" value="0000" /></label>
-            <label class="register"><span>WC:</span><input type="text" value="0000" /></label>
+          <label class="register"><span>KB:</span><input type="text" value="0000" /></label>
+          <label class="register"><span>WC:</span><input type="text" value="0000" /></label>
         </div>
       </form>
     </fieldset>
@@ -1424,8 +1477,8 @@
     });
 
     require(["vs/editor/editor.main"], () => {
-       import("./scripts/languages/asm.js");
-       import("./scripts/languages/mif.js");
+      import("./scripts/languages/asm.js");
+      import("./scripts/languages/mif.js");
     });
   </script>
 </body>

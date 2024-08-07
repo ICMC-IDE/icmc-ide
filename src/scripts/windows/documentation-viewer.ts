@@ -26,7 +26,7 @@ export default class DocumentationViewerWindow extends Fenster<DocumentationView
 
     const configSubscriber = configManager.getSubscriber();
 
-    this.onClose(configSubscriber.unsubscribeAll);
+    this.onClose(() => configSubscriber.unsubscribeAll());
 
     configManager.subscribe("syntax", (value: string) => {
       body.syntax = value;

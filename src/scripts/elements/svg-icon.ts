@@ -15,16 +15,11 @@ export default class SvgIconElement extends HTMLElement {
     const svg = cachedIcons[name] ?? (await this.fetchIcon(name));
     const node = svg.documentElement.cloneNode(true);
 
-    while (this.lastElementChild) {
-      this.lastElementChild.remove();
-    }
-
-    this.appendChild(node);
+    this.replaceChildren(node);
   }
 
   async fetchIcon(name: string) {
     const response = await fetch(`./images/${name}.svg`);
-
     return domParser.parseFromString(await response.text(), "image/svg+xml");
   }
 

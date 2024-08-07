@@ -1,0 +1,511 @@
+[metadata]
+name = "ICMC"
+type = "instruction-set"
+
+[symbols]
+r0 = { value = 0, tags = ["reg"] }
+r1 = { value = 1, tags = ["reg"] }
+r2 = { value = 2, tags = ["reg"] }
+r3 = { value = 3, tags = ["reg"] }
+r4 = { value = 4, tags = ["reg"] }
+r5 = { value = 5, tags = ["reg"] }
+r6 = { value = 6, tags = ["reg"] }
+r7 = { value = 7, tags = ["reg"] }
+
+fr = { value = 1, tags = ["fr"] }
+sp = { value = 1, tags = ["sp"] }
+
+[[instructions.store]]
+value = 0b11000100000000000000000000000000
+length = 32
+arguments = [
+    { type = "ptr16", index = 0, offset = 0, length = 16 },
+    { type = "reg", index = 1, offset = 23, length = 3 },
+]
+documentation = "*address = rx"
+
+[[instructions.storei]]
+value = 0b1111010000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+]
+documentation = "*rx = ry"
+
+[[instructions.load]]
+value = 0b11000000000000000000000000000000
+length = 32
+arguments = [
+    { type = "reg", index = 0, offset = 23, length = 3 },
+    { type = "ptr16", index = 1, offset = 0, length = 16 },
+]
+documentation = "rx = *address"
+
+[[instructions.loadi]]
+value = 0b1111000000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+]
+documentation = "rx = *ry"
+
+[[instructions.loadn]]
+value = 0b11100000000000000000000000000000
+length = 32
+arguments = [
+    { type = "reg", index = 0, offset = 23, length = 3 },
+    { type = "i16", index = 1, offset = 0, length = 16 },
+]
+documentation = "rx = number"
+
+# Move
+[[instructions.mov]]
+value = 0b1100110000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+]
+documentation = "rx = ry"
+
+[[instructions.mov]]
+value = 0b1100110000000001
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "sp", index = 1, offset = 0, length = 1 },
+]
+documentation = "rx = sp"
+
+[[instructions.mov]]
+value = 0b1100110000000011
+length = 16
+arguments = [
+    { type = "sp", index = 0, offset = 0, length = 1 },
+    { type = "reg", index = 1, offset = 7, length = 3 },
+]
+documentation = "sp = rx"
+
+# ULA
+[[instructions.add]]
+value = 0b1000000000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+    { type = "reg", index = 2, offset = 1, length = 3 },
+]
+documentation = ""
+
+[[instructions.addc]]
+value = 0b1000000000000001
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+    { type = "reg", index = 2, offset = 1, length = 3 },
+]
+documentation = ""
+
+[[instructions.sub]]
+value = 0b1000010000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+    { type = "reg", index = 2, offset = 1, length = 3 },
+]
+documentation = ""
+
+[[instructions.subc]]
+value = 0b1000010000000001
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+    { type = "reg", index = 2, offset = 1, length = 3 },
+]
+documentation = ""
+
+[[instructions.mul]]
+value = 0b1000100000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+    { type = "reg", index = 2, offset = 1, length = 3 },
+]
+documentation = ""
+
+[[instructions.mulc]]
+value = 0b1000100000000001
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+    { type = "reg", index = 2, offset = 1, length = 3 },
+]
+documentation = ""
+
+[[instructions.div]]
+value = 0b1000110000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+    { type = "reg", index = 2, offset = 1, length = 3 },
+]
+documentation = ""
+
+[[instructions.divc]]
+value = 0b1000110000000001
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+    { type = "reg", index = 2, offset = 1, length = 3 },
+]
+documentation = ""
+
+[[instructions.mod]]
+value = 0b1001010000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+    { type = "reg", index = 2, offset = 1, length = 3 },
+]
+documentation = ""
+
+[[instructions.inc]]
+value = 0b1001000000000000
+length = 16
+arguments = [{ type = "reg", index = 0, offset = 7, length = 3 }]
+documentation = ""
+
+[[instructions.dec]]
+value = 0b1001000001000000
+length = 16
+arguments = [{ type = "reg", index = 0, offset = 7, length = 3 }]
+documentation = ""
+
+# ARITH
+[[instructions.and]]
+value = 0b0100100000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+    { type = "reg", index = 2, offset = 1, length = 3 },
+]
+documentation = ""
+
+[[instructions.or]]
+value = 0b0100110000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+    { type = "reg", index = 2, offset = 1, length = 3 },
+]
+documentation = ""
+
+[[instructions.xor]]
+value = 0b0101000000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+    { type = "reg", index = 2, offset = 1, length = 3 },
+]
+documentation = ""
+
+[[instructions.not]]
+value = 0b0101010000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+]
+documentation = ""
+
+[[instructions.rotl]]
+value = 0b0100000001000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "u4", index = 1, offset = 0, length = 4 },
+]
+
+[[instructions.rotr]]
+value = 0b0100000001100000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "u4", index = 1, offset = 0, length = 4 },
+]
+
+[[instructions.shiftl0]]
+value = 0b0100000000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "u4", index = 1, offset = 0, length = 4 },
+]
+
+[[instructions.shiftl1]]
+value = 0b0100000000010000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "u4", index = 1, offset = 0, length = 4 },
+]
+
+[[instructions.shiftr0]]
+value = 0b0100000000100000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "u4", index = 1, offset = 0, length = 4 },
+]
+
+[[instructions.shiftr1]]
+value = 0b0100000000110000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "u4", index = 1, offset = 0, length = 4 },
+]
+
+[[instructions.cmp]]
+value = 0b0101100000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+]
+
+# IO
+[[instructions.inchar]]
+value = 0b1101010000000000
+length = 16
+arguments = [{ type = "reg", index = 0, offset = 7, length = 3 }]
+
+[[instructions.outchar]]
+value = 0b1100100000000000
+length = 16
+arguments = [
+    { type = "reg", index = 0, offset = 7, length = 3 },
+    { type = "reg", index = 1, offset = 4, length = 3 },
+]
+
+# Jump
+[[instructions.jmp]]
+value = 0b00001000000000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jeq]]
+value = 0b00001000010000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jne]]
+value = 0b00001000100000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jz]]
+value = 0b00001000110000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jnz]]
+value = 0b00001001000000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jc]]
+value = 0b00001001010000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jnc]]
+value = 0b00001001100000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jgr]]
+value = 0b00001001110000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jle]]
+value = 0b00001010000000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jeg]]
+value = 0b00001010010000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jel]]
+value = 0b00001010100000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jov]]
+value = 0b00001010110000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jnov]]
+value = 0b00001011000000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jn]]
+value = 0b00001011010000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.jdz]]
+value = 0b00001011100000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+# Call
+[[instructions.call]]
+value = 0b00001100000000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.ceq]]
+value = 0b00001100010000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.cne]]
+value = 0b00001100100000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.cz]]
+value = 0b00001100110000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.cnz]]
+value = 0b00001101000000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.cc]]
+value = 0b00001101010000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.cnc]]
+value = 0b00001101100000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.cgr]]
+value = 0b00001101110000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.cle]]
+value = 0b00001110000000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.ceg]]
+value = 0b00001110010000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.cel]]
+value = 0b00001110100000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.cov]]
+value = 0b00001110110000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.cnov]]
+value = 0b00001111000000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.cn]]
+value = 0b00001111010000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.cdz]]
+value = 0b00001111100000000000000000000000
+length = 32
+arguments = [{ type = "ptr16", index = 0, offset = 0, length = 16 }]
+
+[[instructions.rts]]
+value = 0b0001000000000000
+length = 16
+arguments = []
+
+# Stack
+[[instructions.push]]
+value = 0b0001010000000000
+length = 16
+arguments = [{ type = "reg", index = 0, offset = 7, length = 3 }]
+
+[[instructions.push]]
+value = 0b0001010000000000
+length = 16
+arguments = [{ type = "fr", index = 0, offset = 6, length = 1 }]
+
+[[instructions.pop]]
+value = 0b0001100000000000
+length = 16
+arguments = [{ type = "reg", index = 0, offset = 7, length = 3 }]
+
+[[instructions.pop]]
+value = 0b0001100000000000
+length = 16
+arguments = [{ type = "fr", index = 0, offset = 6, length = 1 }]
+
+# Control
+[[instructions.clearc]]
+value = 0b0010000000000000
+length = 16
+arguments = []
+
+[[instructions.setc]]
+value = 0b0010000000000000
+length = 16
+arguments = []
+
+[[instructions.halt]]
+value = 0b0011110000000000
+length = 16
+arguments = []
+
+[[instructions.nop]]
+value = 0b0000000000000000
+length = 16
+arguments = []
+
+[[instructions.noop]]
+value = 0b0000000000000000
+length = 16
+arguments = []
+
+[[instructions.breakp]]
+value = 0b0011100000000000
+length = 16
+arguments = []

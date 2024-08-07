@@ -17,17 +17,19 @@ export default class FilePickerElement extends HTMLElement {
     this.#update();
   }
 
-  #generateFile(fileName: string) {
+  #generateFile(filename: string, path: string) {
     const div = document.createElement("div");
+
+    div.classList.add("file");
 
     {
       const button = document.createElement("button");
 
-      button.innerText = fileName;
+      button.innerText = filename;
       div.append(button);
 
       button.addEventListener("click", () => {
-        this.dispatchEvent(new CustomEvent("open-file", { detail: fileName }));
+        this.dispatchEvent(new CustomEvent("open-file", { detail: path }));
       });
     }
 
@@ -53,9 +55,7 @@ export default class FilePickerElement extends HTMLElement {
       icon.name = "remove";
       button.append(icon);
       button.addEventListener("click", () => {
-        this.dispatchEvent(
-          new CustomEvent("delete-file", { detail: fileName }),
-        );
+        this.dispatchEvent(new CustomEvent("delete-file", { detail: path }));
       });
       button.title = "Delete";
 
@@ -65,18 +65,86 @@ export default class FilePickerElement extends HTMLElement {
     return div;
   }
 
-  #update() {
-    while (this.lastElementChild) {
-      this.lastElementChild.remove();
+  #generateFolder(filename: string) {
+    const div = document.createElement("div");
+
+    div.classList.add("folder");
+
+    {
+      const button = document.createElement("button");
+
+      button.innerText = filename;
+      div.append(button);
     }
 
-    for (const filename of this.#filenames) {
-      this.appendChild(this.#generateFile(filename));
+    return div;
+  }
+
+  #buildFileTree(paths: string[]) {
+    type FileNode = {
+      node: HTMLElement;
+      children: Record<string, FileNode>;
+    };
+
+    const fileTree: FileNode = {
+      node: this,
+      children: {},
+    };
+
+    for (const path of paths) {
+      const realPath = this.#resolvePath(path);
+      const filename = realPath.pop()!;
+
+      let currentDir = fileTree;
+
+      for (const subdir of realPath) {
+        let nextDir = fileTree.children[subdir];
+
+        if (!nextDir) {
+          nextDir = {
+            node: this.#generateFolder(subdir),
+            children: {},
+          };
+
+          fileTree.children[subdir] = nextDir;
+
+          currentDir.node.appendChild(nextDir.node);
+        }
+
+        currentDir = nextDir;
+      }
+
+      currentDir.node.appendChild(this.#generateFile(filename, path));
     }
+
+    return fileTree.node;
+  }
+
+  #resolvePath(path: string) {
+    const stack: string[] = [];
+
+    path.split("/").forEach((filename: string) => {
+      if (filename == "..") {
+        stack.pop();
+      } else if (filename == ".") {
+        //
+      } else if (filename == "") {
+        //
+      } else {
+        stack.push(filename);
+      }
+    });
+
+    return stack;
+  }
+
+  #update() {
+    this.replaceChildren();
+    this.#buildFileTree(this.#filenames);
   }
 
   set files(filenames: string[]) {
-    this.#filenames = filenames;
+    this.#filenames = filenames.sort();
 
     if (this.isConnected) {
       this.#update();
