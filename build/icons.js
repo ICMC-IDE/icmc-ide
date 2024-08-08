@@ -27,5 +27,5 @@ for (const [iconName, request] of files) {
   defs.appendChild(symbol);
 }
 
-await fs.mkdir("./dist/images", { recursive: true });
-await fs.writeFile("./dist/images/icons.svg", document.toString());
+await fs.mkdir("./public/images", { recursive: true });
+await fs.writeFile("./public/images/icons.svg", document.toString());

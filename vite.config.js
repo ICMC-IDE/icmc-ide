@@ -10,6 +10,8 @@ const packages = [
 for (const _package of packages) {
 }
 
+let konsole = console;
+
 /** @type {import("vite").UserConfig} */
 export default {
   build: {
@@ -27,17 +29,7 @@ export default {
     format: "es",
   },
   optimizeDeps: {
-    extensions: [".wasm"],
-    esbuildOptions: {
-      plugins: [
-        {
-          name: "foo",
-          setup(...args) {
-            console.log(args);
-          },
-        },
-      ],
-    },
+    noDiscovery: true,
   },
   plugins: [],
 };

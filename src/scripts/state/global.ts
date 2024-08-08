@@ -55,7 +55,7 @@ configManager.loadAll();
 const resources = new ResourceManager<GlobalResourcesMap>();
 const fs = new Fs();
 const mainWorker = new MainWorker();
-await Promise.all([fs.loadAssets() /*mainWorker.isReady*/]);
+await Promise.all([fs.loadAssets(), mainWorker.isReady]);
 resources.set("fs", fs);
 resources.set("main-worker", mainWorker);
 

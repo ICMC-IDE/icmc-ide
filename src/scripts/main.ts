@@ -8,7 +8,7 @@ import globalState, { GlobalState } from "./state/global.js";
 import CharMap from "./resources/charmap.js";
 
 async function main() {
-  // await createCharmap();
+  await createCharmap();
   createDock(globalState);
   createWindows(globalState);
 
