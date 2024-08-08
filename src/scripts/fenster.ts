@@ -91,7 +91,7 @@ export default class Fenster<T extends HTMLElement> {
         move: (event) => {
           this.#position.x += event.dx;
           this.#position.y += event.dy;
-          window.style.transform = `translate(${this.#position.x}px, ${this.#position.y}px)`;
+          wrapper.style.transform = `translate(${this.#position.x}px, ${this.#position.y}px)`;
         },
       },
     });
@@ -109,7 +109,7 @@ export default class Fenster<T extends HTMLElement> {
             height: `${event.rect.height}px`,
           });
 
-          window.style.transform = `translate(${this.#position.x}px, ${this.#position.y}px)`;
+          wrapper.style.transform = `translate(${this.#position.x}px, ${this.#position.y}px)`;
         },
       },
     });
