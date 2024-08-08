@@ -10,7 +10,7 @@ on:
     branches: ["main"]
 
 env:
-  REGISTRY_TOKEN: ${{ env.REGISTRY_TOKEN }}
+  REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
 
 jobs:
   build:
