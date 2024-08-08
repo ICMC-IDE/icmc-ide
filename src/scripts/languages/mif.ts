@@ -1,4 +1,4 @@
-/// <reference types="../../../public/modules/monaco-editor/monaco.d.ts" />
+import * as monaco from "monaco-editor";
 
 monaco.languages.register({
   id: "mif",

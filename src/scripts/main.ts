@@ -1,4 +1,5 @@
 import * as monaco from "monaco-editor";
+import MonacoWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import {
   createWindows,
   openWindow,
@@ -6,6 +7,12 @@ import {
 } from "./windows/mod.js";
 import globalState, { GlobalState } from "./state/global.js";
 import CharMap from "./resources/charmap.js";
+
+self.MonacoEnvironment = {
+  getWorker(workerId, label) {
+    return new MonacoWorker({ name: label });
+  },
+};
 
 async function main() {
   await createCharmap();

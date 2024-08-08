@@ -1,17 +1,3 @@
-import wasmPack from "vite-plugin-wasm-pack";
-
-const packages = [
-  "@icmc-ide/mif",
-  "@icmc-ide/assembler",
-  "@icmc-ide/icmc-cc",
-  "@icmc-ide/icmc-emulator",
-];
-
-for (const _package of packages) {
-}
-
-let konsole = console;
-
 /** @type {import("vite").UserConfig} */
 export default {
   build: {
@@ -31,5 +17,4 @@ export default {
   optimizeDeps: {
     noDiscovery: true,
   },
-  plugins: [],
 };
