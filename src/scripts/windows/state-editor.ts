@@ -1,11 +1,12 @@
 import StateEditorElement from "../elements/state-editor.js";
 import Fenster from "../fenster.js";
-import { WindowConstructor } from "windows";
+import { WindowConstructor } from "../types/windows.js";
 
 export default class StateEditorWindow extends Fenster<StateEditorElement> {
   constructor({
     style,
-    globalState: { configManager, eventManager, resources },
+    globalState,
+    globalState: { configManager, eventManager, resourceManager },
   }: WindowConstructor) {
     const body = document.createElement("state-editor");
     const title = document.createElement("span");
@@ -21,15 +22,16 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       });
 
       body.addEventListener("change-file", ({ detail: fileName }) => {
-        configManager.set("entry-file", fileName);
+        console.log(fileName);
+        configManager.set("entryFile", fileName);
       });
 
       body.addEventListener("build", () => {
-        const fs = resources.get("fs");
+        const fs = resourceManager.get("fs");
         const files = fs.all();
-        const [entry, syntax] = configManager.getMany("entry-file", "syntax");
+        const [entry, syntax] = configManager.getMany("entryFile", "syntax");
 
-        resources
+        resourceManager
           .get("main-worker")
           .request("build", {
             files,
@@ -46,13 +48,13 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
               asm,
               mif,
             }) => {
-              const fs = resources.get("fs");
+              const fs = resourceManager.get("fs");
 
-              resources.set("ram", ram);
-              resources.set("vram", vram);
-              resources.set("registers", registers);
-              resources.set("internal-registers", internalRegisters);
-              resources.set("symbols", symbols);
+              resourceManager.set("ram", ram);
+              resourceManager.set("vram", vram);
+              resourceManager.set("registers", registers);
+              resourceManager.set("internal-registers", internalRegisters);
+              resourceManager.set("symbols", symbols);
 
               fs.write(entry!.replace(/\.[^.]+$/, ".mif"), mif);
 
@@ -68,7 +70,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       });
 
       body.addEventListener("play", () => {
-        resources
+        resourceManager
           .get("main-worker")
           .request("play", undefined)
           .then(() => {})
@@ -79,7 +81,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       });
 
       body.addEventListener("stop", () => {
-        resources
+        resourceManager
           .get("main-worker")
           .request("stop", undefined)
           .then(() => {})
@@ -90,7 +92,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       });
 
       body.addEventListener("next", () => {
-        resources
+        resourceManager
           .get("main-worker")
           .request("next", undefined)
           .then(() => {})
@@ -101,7 +103,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       });
 
       body.addEventListener("reset", () => {
-        resources
+        resourceManager
           .get("main-worker")
           .request("reset", undefined)
           .then(() => {})
@@ -111,7 +113,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
           .finally(() => {});
       });
 
-      body.files = resources
+      body.files = resourceManager
         .get("fs")
         .files()
         .filter((filename) => /\.(asm|c)$/i.test(filename));
@@ -121,16 +123,17 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       title,
       body,
       style,
+      globalState,
     });
 
     const eventSubscriber = eventManager.getSubscriber();
     const configSubscriber = configManager.getSubscriber();
-    const resourcesSubscriber = resources.getSubscriber();
+    const resourceSubscriber = resourceManager.getSubscriber();
 
     this.onClose(() => {
       eventSubscriber.unsubscribeAll();
       configSubscriber.unsubscribeAll();
-      resourcesSubscriber.unsubscribeAll();
+      resourceSubscriber.unsubscribeAll();
     });
 
     eventSubscriber.subscribe("render", () => {
@@ -140,31 +143,31 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
     configSubscriber.subscribe("frequency", (frequency: number) => {
       body.frequency = frequency;
     });
-    configSubscriber.subscribe("entry-file", (fileName: string) => {
+    configSubscriber.subscribe("entryFile", (fileName: string) => {
       body.entryFile = fileName;
     });
 
-    resourcesSubscriber.subscribe("fs", (fs) => {
+    resourceSubscriber.subscribe("fs", (fs) => {
       const fsSubscriber = fs.getSubscriber();
       this.onClose(fsSubscriber.unsubscribeAll);
 
       fsSubscriber.subscribe("create", () => {
-        body.files = resources
+        body.files = resourceManager
           .get("fs")
           .files()
           .filter((filename) => /\.(asm|c)$/i.test(filename));
       });
       fsSubscriber.subscribe("delete", () => {
-        body.files = resources
+        body.files = resourceManager
           .get("fs")
           .files()
           .filter((filename) => /\.(asm|c)$/i.test(filename));
       });
     });
-    resourcesSubscriber.subscribe("registers", (registers) => {
+    resourceSubscriber.subscribe("registers", (registers) => {
       body.registers = registers;
     });
-    resourcesSubscriber.subscribe("internal-registers", (registers) => {
+    resourceSubscriber.subscribe("internal-registers", (registers) => {
       body.internalRegisters = registers;
     });
   }

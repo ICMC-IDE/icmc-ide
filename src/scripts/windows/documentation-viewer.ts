@@ -1,6 +1,6 @@
 import DocumentationViewerElement from "../elements/documentation-viewer.js";
 import Fenster from "../fenster.js";
-import { WindowConstructor } from "windows";
+import { WindowConstructor } from "../types/windows.js";
 
 export default class DocumentationViewerWindow extends Fenster<DocumentationViewerElement> {
   constructor({ style, globalState: { configManager } }: WindowConstructor) {

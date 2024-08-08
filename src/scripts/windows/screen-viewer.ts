@@ -1,7 +1,7 @@
 import ScreenViewerElement from "../elements/screen-viewer.js";
 import { IREG_KB, IREG_WC } from "../enums.js";
 import Fenster from "../fenster.js";
-import { WindowConstructor } from "windows";
+import { WindowConstructor } from "../types/windows.js";
 
 export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
   #internalRegisters: Uint16Array | null = null;
@@ -9,7 +9,8 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
 
   constructor({
     style,
-    globalState: { configManager, eventManager, resources },
+    globalState,
+    globalState: { configManager, eventManager, resourceManager },
   }: WindowConstructor) {
     const body = document.createElement("screen-viewer");
     const title = document.createElement("span");
@@ -50,14 +51,14 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
 
     {
       const [width, height] = configManager.getMany(
-        "screen-width",
-        "screen-height",
+        "screenWidth",
+        "screenHeight",
       );
 
       body.width = width!;
       body.height = height!;
 
-      body.charmap = resources.get("charmap");
+      body.charmap = resourceManager.get("charmap");
 
       body.tabIndex = 1;
 
@@ -80,36 +81,37 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
       style,
       buttonsLeft,
       buttonsRight,
+      globalState,
     });
 
     const eventSubscriber = eventManager.getSubscriber();
     const configSubscriber = configManager.getSubscriber();
-    const resourcesSubscriber = resources.getSubscriber();
+    const resourceSubscriber = resourceManager.getSubscriber();
 
     this.onClose(() => {
       eventSubscriber.unsubscribeAll();
       configSubscriber.unsubscribeAll();
-      resourcesSubscriber.unsubscribeAll();
+      resourceSubscriber.unsubscribeAll();
     });
 
     eventSubscriber.subscribe("render", () => {
       this.render();
     });
 
-    configSubscriber.subscribe("screen-width", (width: number) => {
+    configSubscriber.subscribe("screenWidth", (width: number) => {
       body.width = width;
     });
-    configSubscriber.subscribe("screen-height", (height: number) => {
+    configSubscriber.subscribe("screenHeight", (height: number) => {
       body.height = height;
     });
 
-    resourcesSubscriber.subscribe("vram", (vram) => {
+    resourceSubscriber.subscribe("vram", (vram) => {
       body.memory = vram;
     });
-    resourcesSubscriber.subscribe("internal-registers", (internalRegisters) => {
+    resourceSubscriber.subscribe("internal-registers", (internalRegisters) => {
       this.#internalRegisters = internalRegisters;
     });
-    resourcesSubscriber.subscribe("charmap", (charmap) => {
+    resourceSubscriber.subscribe("charmap", (charmap) => {
       body.charmap = charmap;
     });
   }

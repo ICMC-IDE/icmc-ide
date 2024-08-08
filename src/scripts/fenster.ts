@@ -1,7 +1,11 @@
 import { EventHandler } from "./types";
-
-const SIDES = ["n", "e", "s", "w"];
-const CORNERS = ["ne", "se", "sw", "nw"];
+import "@interactjs/auto-start";
+import "@interactjs/actions/drag";
+import "@interactjs/actions/resize";
+import "@interactjs/modifiers";
+import "@interactjs/snappers";
+import interact from "@interactjs/interact";
+import { GlobalState } from "./state/global";
 
 let zIndex = 100;
 
@@ -12,9 +16,11 @@ interface FensterConstructor<T extends HTMLElement> {
   open?: boolean;
   buttonsLeft?: HTMLElement[];
   buttonsRight?: HTMLElement[];
+  globalState: GlobalState;
 }
 
 export default class Fenster<T extends HTMLElement> {
+  #position = { x: 0, y: 0 };
   #body;
   #dragger;
   #wrapper;
@@ -28,6 +34,7 @@ export default class Fenster<T extends HTMLElement> {
     open,
     buttonsLeft,
     buttonsRight,
+    globalState: { configManager },
   }: FensterConstructor<T>) {
     const wrapper = (this.#wrapper = document.createElement("div"));
     const dragger = (this.#dragger = document.createElement("summary"));
@@ -50,6 +57,62 @@ export default class Fenster<T extends HTMLElement> {
     wrapper.classList.add("wrapper");
     dragger.classList.add("dragger");
     window.classList.add("window");
+
+    // TODO: IMPROVE THIS !!!!!
+    const snap = interact.modifiers.snap({
+      targets: [
+        interact.snappers.grid({
+          x: configManager.get("gridWidth"),
+          y: configManager.get("gridHeight"),
+        }),
+      ],
+      range: Infinity,
+      relativePoints: [{ x: 0, y: 0 }],
+    });
+
+    configManager.subscribe("gridWidth", () => {
+      const snapGrid = interact.snappers.grid({
+        x: configManager.get("gridWidth"),
+        y: configManager.get("gridHeight"),
+      });
+      snap.options.targets = [snapGrid];
+    });
+    configManager.subscribe("gridHeight", () => {
+      const snapGrid = interact.snappers.grid({
+        x: configManager.get("gridWidth"),
+        y: configManager.get("gridHeight"),
+      });
+      snap.options.targets = [snapGrid];
+    });
+
+    interact(dragger).draggable({
+      modifiers: [snap],
+      listeners: {
+        move: (event) => {
+          this.#position.x += event.dx;
+          this.#position.y += event.dy;
+          window.style.transform = `translate(${this.#position.x}px, ${this.#position.y}px)`;
+        },
+      },
+    });
+
+    interact(window).resizable({
+      modifiers: [snap],
+      edges: { top: true, left: true, bottom: true, right: true },
+      listeners: {
+        move: (event) => {
+          this.#position.x += event.deltaRect.left;
+          this.#position.y += event.deltaRect.top;
+
+          Object.assign(body.style, {
+            width: `${event.rect.width}px`,
+            height: `${event.rect.height}px`,
+          });
+
+          window.style.transform = `translate(${this.#position.x}px, ${this.#position.y}px)`;
+        },
+      },
+    });
 
     window.open = open ?? true;
 
@@ -100,134 +163,17 @@ export default class Fenster<T extends HTMLElement> {
     window.append(dragger, body);
     wrapper.append(window);
 
-    let x: number, y: number;
-    let offsetX: number, offsetY: number;
-    let originalWidth: number, originalHeight: number;
-
-    const resizerPointerMove = (event: PointerEvent) => {
-      if (event.buttons !== 1) return;
-      event.preventDefault();
-      const target = event.target as HTMLElement;
-
-      const dir = target.dataset.resizeDir;
-
-      const boundsWindow = window.getBoundingClientRect();
-      const boundsBody = body.getBoundingClientRect();
-
-      for (const char of dir!) {
-        switch (char) {
-          case "w":
-            this.resizeInline(
-              originalWidth +
-                (x - event.x) -
-                (boundsWindow.width - boundsBody.width),
-              event.x - offsetX,
-            );
-            break;
-          case "s":
-            this.resizeBlock(
-              originalHeight +
-                (event.y - y) -
-                (boundsWindow.height - boundsBody.height),
-            );
-            break;
-          case "e":
-            this.resizeInline(
-              originalWidth +
-                (event.x - x) -
-                (boundsWindow.width - boundsBody.width),
-            );
-            break;
-          case "n":
-            this.resizeBlock(
-              originalHeight +
-                (y - event.y) -
-                (boundsWindow.height - boundsBody.height),
-              event.y - offsetY,
-            );
-            break;
-        }
-      }
-    };
-
     wrapper.addEventListener("pointerdown", function () {
       if (+this.style.zIndex < zIndex) {
         this.style.zIndex = (++zIndex).toString();
       }
     });
 
-    const resizerPointerDown = function (event: PointerEvent) {
-      event.preventDefault();
-      const target = event.target as HTMLElement;
-
-      target.setPointerCapture(event.pointerId);
-
-      const boundsWindow = window.getBoundingClientRect();
-      const boundsBody = body.getBoundingClientRect();
-
-      x = event.x;
-      y = event.y;
-
-      offsetX = x - boundsWindow.left;
-      offsetY = y - boundsWindow.top;
-
-      originalWidth = boundsBody.width;
-      originalHeight = boundsWindow.height;
-    };
-
-    const draggerPointerDown = function (event: PointerEvent) {
-      event.preventDefault();
-      const target = event.target as HTMLElement;
-
-      target.setPointerCapture(event.pointerId);
-
-      const boundsWindow = window.getBoundingClientRect();
-
-      x = event.x;
-      y = event.y;
-
-      offsetX = x - boundsWindow.left;
-      offsetY = y - boundsWindow.top;
-    };
-
-    const draggerPointerMove = function (event: PointerEvent) {
-      if (event.buttons !== 1) return;
-      event.preventDefault();
-
-      wrapper.style.left = `${event.x - offsetX}px`;
-      wrapper.style.top = `${event.y - offsetY}px`;
-    };
-
-    const draggerClick = function (event: MouseEvent) {
+    dragger.addEventListener("click", (event) => {
       event.preventDefault();
       return false;
-    };
+    });
 
-    for (const side of SIDES) {
-      const dragger = document.createElement("div");
-      dragger.classList.add("mover");
-      dragger.classList.add(side);
-      dragger.dataset.resizeDir = side;
-      dragger.addEventListener("pointermove", resizerPointerMove);
-      dragger.addEventListener("pointerdown", resizerPointerDown);
-      wrapper.append(dragger);
-    }
-
-    for (const corner of CORNERS) {
-      const dragger = document.createElement("div");
-      dragger.classList.add("mover");
-      dragger.classList.add(corner);
-      dragger.dataset.resizeDir = corner;
-      dragger.addEventListener("pointermove", resizerPointerMove);
-      dragger.addEventListener("pointerdown", resizerPointerDown);
-      wrapper.append(dragger);
-    }
-
-    dragger.addEventListener("pointerdown", draggerPointerDown);
-    dragger.addEventListener("pointermove", draggerPointerMove);
-    dragger.addEventListener("click", draggerClick);
-
-    // document.getElementById("root")!.appendChild(wrapper);
     document.body.appendChild(wrapper);
   }
 
@@ -240,48 +186,6 @@ export default class Fenster<T extends HTMLElement> {
     this.#dragger.remove();
     this.#wrapper.remove();
     this.#window.remove();
-  }
-
-  resizeInline(targetWidth: number, left: number | null = null) {
-    const originalBcr = this.#body.getBoundingClientRect();
-
-    this.#body.style.width = `${targetWidth}px`;
-
-    const newBcr = this.#body.getBoundingClientRect();
-    const diff = newBcr.width - originalBcr.width;
-
-    if (diff === 0) return;
-
-    const diffTarget = targetWidth - newBcr.width;
-
-    if (left == null) {
-      left = this.#window.getBoundingClientRect().left;
-    } else if (diff !== diffTarget) {
-      left += diffTarget;
-    }
-
-    this.#wrapper.style.left = `${left}px`;
-  }
-
-  resizeBlock(targetHeight: number, top: number | null = null) {
-    const originalBcr = this.#body.getBoundingClientRect();
-
-    this.#body.style.height = `${targetHeight}px`;
-
-    const newBcr = this.#body.getBoundingClientRect();
-    const diff = newBcr.height - originalBcr.height;
-
-    if (diff === 0) return;
-
-    const diffTarget = targetHeight - newBcr.height;
-
-    if (top == null) {
-      top = this.#window.getBoundingClientRect().top;
-    } else if (diff !== diffTarget) {
-      top += diffTarget;
-    }
-
-    this.#wrapper.style.top = `${top}px`;
   }
 
   getClientRect() {

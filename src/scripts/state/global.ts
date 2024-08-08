@@ -9,7 +9,7 @@ import MainWorker from "../resources/main-worker.js";
 export interface GlobalState {
   eventManager: EventManager<GlobalEventsMap>;
   configManager: ConfigManager<GlobalConfigsMap>;
-  resources: ResourceManager<GlobalResourcesMap>;
+  resourceManager: ResourceManager<GlobalresourceManagerMap>;
 }
 
 export interface GlobalEventsMap {
@@ -22,13 +22,15 @@ export interface GlobalEventsMap {
 
 export interface GlobalConfigsMap {
   syntax: string;
-  "screen-width": number;
-  "screen-height": number;
+  screenWidth: number;
+  screenHeight: number;
   frequency: number;
-  "entry-file": string;
+  entryFile: string;
+  gridWidth: number;
+  gridHeight: number;
 }
 
-export interface GlobalResourcesMap {
+export interface GlobalresourceManagerMap {
   "example.c": string;
   "example.asm": string;
   charmap: CharMap;
@@ -45,22 +47,24 @@ const eventManager = new EventManager<GlobalEventsMap>();
 
 const configManager = new ConfigManager<GlobalConfigsMap>({
   syntax: "icmc",
-  "screen-width": 40,
-  "screen-height": 30,
+  screenWidth: 40,
+  screenHeight: 30,
   frequency: 6,
-  "entry-file": "example.asm",
+  entryFile: "example.asm",
+  gridWidth: 30,
+  gridHeight: 30,
 });
 configManager.loadAll();
 
-const resources = new ResourceManager<GlobalResourcesMap>();
+const resourceManager = new ResourceManager<GlobalresourceManagerMap>();
 const fs = new Fs();
 const mainWorker = new MainWorker();
 await Promise.all([fs.loadAssets(), mainWorker.isReady]);
-resources.set("fs", fs);
-resources.set("main-worker", mainWorker);
+resourceManager.set("fs", fs);
+resourceManager.set("main-worker", mainWorker);
 
 export default <GlobalState>{
   eventManager,
   configManager,
-  resources,
+  resourceManager,
 };

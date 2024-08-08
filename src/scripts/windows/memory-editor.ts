@@ -1,9 +1,13 @@
 import MemoryEditorElement from "../elements/memory-editor.js";
 import Fenster from "../fenster.js";
-import { WindowConstructor } from "windows";
+import { WindowConstructor } from "../types/windows.js";
 
 export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
-  constructor({ style, globalState: { resources } }: WindowConstructor) {
+  constructor({
+    style,
+    globalState,
+    globalState: { resourceManager },
+  }: WindowConstructor) {
     const body = document.createElement("memory-editor");
     const title = document.createElement("span");
     const buttonsRight = [];
@@ -36,16 +40,17 @@ export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
       body,
       style,
       buttonsRight,
+      globalState,
     });
 
-    const resourcesSubscriber = resources.getSubscriber();
+    const resourceSubscriber = resourceManager.getSubscriber();
 
-    this.onClose(() => resourcesSubscriber.unsubscribeAll());
+    this.onClose(() => resourceSubscriber.unsubscribeAll());
 
-    resourcesSubscriber.subscribe("ram", (ram) => {
+    resourceSubscriber.subscribe("ram", (ram) => {
       body.ram = ram;
     });
-    resourcesSubscriber.subscribe("symbols", (symbols) => {
+    resourceSubscriber.subscribe("symbols", (symbols) => {
       body.symbols = symbols;
     });
   }

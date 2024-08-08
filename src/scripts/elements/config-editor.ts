@@ -49,7 +49,12 @@ export default class ConfigEditorElement extends HTMLElement {
       let value;
       const target = event.target as HTMLInputElement;
 
-      if (target.name === "screenWidth" || target.name === "screenHeight") {
+      if (
+        target.name === "screenWidth" ||
+        target.name === "screenHeight" ||
+        target.name === "gridWidth" ||
+        target.name === "gridHeight"
+      ) {
         value = target.valueAsNumber | 0;
       } else if (target.name) {
         value = target.value;

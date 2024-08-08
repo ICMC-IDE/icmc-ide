@@ -9,7 +9,7 @@ import globalState, { GlobalState } from "./state/global.js";
 import CharMap from "./resources/charmap.js";
 
 self.MonacoEnvironment = {
-  getWorker(workerId, label) {
+  getWorker(label) {
     return new MonacoWorker({ name: label });
   },
 };
@@ -53,7 +53,7 @@ function openFile(filename: string) {
     }
 
     return monaco.editor.createModel(
-      globalState.resources.get("fs").read(filename)!,
+      globalState.resourceManager.get("fs").read(filename)!,
       language,
     );
   })();
@@ -72,9 +72,9 @@ function openFile(filename: string) {
 }
 
 async function createCharmap() {
-  const fs = globalState.resources.get("fs");
+  const fs = globalState.resourceManager.get("fs");
 
-  const result = await globalState.resources
+  const result = await globalState.resourceManager
     .get("main-worker")
     .request("parse-mif", fs.read("charmap.mif")!);
 
@@ -83,7 +83,7 @@ async function createCharmap() {
     fs.readJSON<string[]>("palette/8bit.json")!,
   );
 
-  globalState.resources.set("charmap", charmap);
+  globalState.resourceManager.set("charmap", charmap);
 }
 
 main().catch((error) => console.error(error));

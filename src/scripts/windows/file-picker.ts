@@ -2,7 +2,7 @@ import { BlobWriter, TextReader, ZipWriter } from "@zip.js/zip.js";
 
 import FilePickerElement from "../elements/file-picker.js";
 import Fenster from "../fenster.js";
-import { WindowConstructor } from "windows";
+import { WindowConstructor } from "../types/windows";
 import Fs from "../resources/fs.js";
 
 export default class StateEditorWindow extends Fenster<FilePickerElement> {
@@ -10,7 +10,8 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
 
   constructor({
     style,
-    globalState: { eventManager, resources },
+    globalState,
+    globalState: { eventManager, resourceManager },
   }: WindowConstructor) {
     const body = document.createElement("file-picker");
     const title = document.createElement("span");
@@ -75,7 +76,7 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
     }
 
     // maybe we should pass fs to file-picker intead of updating it through the window?
-    const fs = resources.get("fs");
+    const fs = resourceManager.get("fs");
     body.files = fs.files();
 
     body.addEventListener("open-file", ({ detail: filename }) => {
@@ -90,6 +91,7 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
       body,
       style,
       buttonsRight,
+      globalState,
     });
 
     const fsSubscriber = fs.getSubscriber();

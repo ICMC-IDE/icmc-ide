@@ -3,18 +3,18 @@ import EventManager from "./event.js";
 export default class ResourceManager<
   ResourceMap,
 > extends EventManager<ResourceMap> {
-  #resources: Partial<ResourceMap> = {};
+  #resourceManager: Partial<ResourceMap> = {};
 
   get<K extends keyof ResourceMap>(config: K) {
-    return this.#resources[config] as ResourceMap[K];
+    return this.#resourceManager[config] as ResourceMap[K];
   }
 
   getMany<K extends keyof ResourceMap>(...args: K[]) {
-    return args.map((key) => this.#resources[key]);
+    return args.map((key) => this.#resourceManager[key]);
   }
 
   set<K extends keyof ResourceMap>(config: K, value: ResourceMap[K]) {
-    this.emmit(config, (this.#resources[config] = value));
+    this.emmit(config, (this.#resourceManager[config] = value));
   }
 
   update<K extends keyof ResourceMap>(
@@ -23,7 +23,7 @@ export default class ResourceManager<
   ) {
     this.emmit(
       config,
-      (this.#resources[config] = func(this.#resources[config]!)),
+      (this.#resourceManager[config] = func(this.#resourceManager[config]!)),
     );
   }
 }

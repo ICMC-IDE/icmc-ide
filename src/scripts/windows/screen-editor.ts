@@ -1,11 +1,11 @@
-import { WindowConstructor } from "windows";
+import { WindowConstructor } from "../types/windows.js";
 import ScreenEditorElement from "../elements/screen-editor.js";
 import Fenster from "../fenster.js";
 
 export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
   constructor({
     style,
-    globalState: { configManager, eventManager, resources },
+    globalState: { configManager, eventManager, resourceManager },
   }: WindowConstructor) {
     const body = document.createElement("screen-editor");
     const title = document.createDocumentFragment();
@@ -37,7 +37,7 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
       buttonsRight.push(button);
     }
 
-    body.charmap = resources.get("charmap");
+    body.charmap = resourceManager.get("charmap");
 
     super({
       title,
@@ -48,26 +48,26 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
 
     const eventSubscriber = eventManager.getSubscriber();
     const configSubscriber = configManager.getSubscriber();
-    const resourcesSubscriber = resources.getSubscriber();
+    const resourceSubscriber = resourceManager.getSubscriber();
 
     this.onClose(() => {
       eventSubscriber.unsubscribeAll();
       configSubscriber.unsubscribeAll();
-      resourcesSubscriber.unsubscribeAll();
+      resourceSubscriber.unsubscribeAll();
     });
 
     eventManager.subscribe("render", () => {
       body.render();
     });
 
-    configManager.subscribe("screen-width", (width: number) => {
+    configManager.subscribe("screenWidth", (width: number) => {
       body.width = width;
     });
-    configManager.subscribe("screen-height", (height: number) => {
+    configManager.subscribe("screenHeight", (height: number) => {
       body.height = height;
     });
 
-    resources.subscribe("charmap", (charmap) => {
+    resourceManager.subscribe("charmap", (charmap) => {
       body.charmap = charmap;
     });
 
