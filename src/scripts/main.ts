@@ -19,7 +19,7 @@ async function main() {
   createDock(globalState);
   createWindows(globalState);
 
-  globalState.eventManager.subscribe("open-file", openFile);
+  globalState.eventManager.subscribe("openFile", openFile);
 
   function draw() {
     globalState.eventManager.emmit("render", undefined);
@@ -34,7 +34,7 @@ const modelCache: Record<string, monaco.editor.ITextModel> = {};
 function createDock(globalState: GlobalState) {
   const dock = document.createElement("apps-dock");
 
-  dock.addEventListener("open-window", ({ detail: type }) => {
+  dock.addEventListener("openWindow", ({ detail: type }) => {
     const window = openWindow(type, { globalState });
     window.toggleMinimize(false);
   });
@@ -53,7 +53,7 @@ function openFile(filename: string) {
     }
 
     return monaco.editor.createModel(
-      globalState.resourceManager.get("fs").read(filename)!,
+      globalState.resourceManager.get("userFs").read(filename)!,
       language,
     );
   })();
@@ -72,10 +72,10 @@ function openFile(filename: string) {
 }
 
 async function createCharmap() {
-  const fs = globalState.resourceManager.get("fs");
+  const fs = globalState.resourceManager.get("internalFs");
 
   const result = await globalState.resourceManager
-    .get("main-worker")
+    .get("mainWorker")
     .request("parse-mif", fs.read("charmap.mif")!);
 
   const charmap = CharMap.fromBytes(

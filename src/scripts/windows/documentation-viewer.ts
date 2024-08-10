@@ -3,7 +3,11 @@ import Fenster from "../fenster.js";
 import { WindowConstructor } from "../types/windows.js";
 
 export default class DocumentationViewerWindow extends Fenster<DocumentationViewerElement> {
-  constructor({ style, globalState: { configManager } }: WindowConstructor) {
+  constructor({
+    style,
+    globalState,
+    globalState: { configManager },
+  }: WindowConstructor) {
     const title = document.createDocumentFragment();
     const body = document.createElement("documentation-viewer");
 
@@ -20,6 +24,7 @@ export default class DocumentationViewerWindow extends Fenster<DocumentationView
       title,
       body,
       style,
+      globalState,
     });
 
     this.toggleMinimize();

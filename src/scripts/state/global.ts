@@ -9,13 +9,13 @@ import MainWorker from "../resources/main-worker.js";
 export interface GlobalState {
   eventManager: EventManager<GlobalEventsMap>;
   configManager: ConfigManager<GlobalConfigsMap>;
-  resourceManager: ResourceManager<GlobalresourceManagerMap>;
+  resourceManager: ResourceManager<GlobalResourcesMap>;
 }
 
 export interface GlobalEventsMap {
-  "delete-file": FileManagerFile;
-  "open-file": FileManagerFile;
-  "open-window": string;
+  deleteFile: FileManagerFile;
+  openFile: FileManagerFile;
+  openWindow: string;
   error: Error;
   render: void;
 }
@@ -30,17 +30,16 @@ export interface GlobalConfigsMap {
   gridHeight: number;
 }
 
-export interface GlobalresourceManagerMap {
-  "example.c": string;
-  "example.asm": string;
+export interface GlobalResourcesMap {
   charmap: CharMap;
-  fs: Fs;
+  internalFs: Fs;
+  userFs: Fs;
   registers: Uint16Array;
-  "internal-registers": Uint16Array;
+  internalRegisters: Uint16Array;
   ram: Uint16Array;
   vram: Uint16Array;
   symbols: string;
-  "main-worker": MainWorker;
+  mainWorker: MainWorker;
 }
 
 const eventManager = new EventManager<GlobalEventsMap>();
@@ -56,12 +55,18 @@ const configManager = new ConfigManager<GlobalConfigsMap>({
 });
 configManager.loadAll();
 
-const resourceManager = new ResourceManager<GlobalresourceManagerMap>();
-const fs = new Fs();
+const resourceManager = new ResourceManager<GlobalResourcesMap>();
+const internalFs = new Fs("internal");
+const userFs = new Fs("user");
 const mainWorker = new MainWorker();
-await Promise.all([fs.loadAssets(), mainWorker.isReady]);
-resourceManager.set("fs", fs);
-resourceManager.set("main-worker", mainWorker);
+await Promise.all([
+  internalFs.loadAssets(),
+  userFs.loadAssets(),
+  mainWorker.isReady,
+]);
+resourceManager.set("internalFs", internalFs);
+resourceManager.set("userFs", userFs);
+resourceManager.set("mainWorker", mainWorker);
 
 export default <GlobalState>{
   eventManager,

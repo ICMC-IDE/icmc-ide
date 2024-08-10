@@ -21,7 +21,7 @@ export default class DockElement extends HTMLElement {
     fragment.querySelectorAll("button[data-window]").forEach((element) => {
       element.addEventListener("click", () => {
         this.dispatchEvent(
-          new CustomEvent("open-window", {
+          new CustomEvent("openWindow", {
             detail: (element as HTMLElement).dataset.window,
           }),
         );
@@ -42,6 +42,6 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    "open-window": OpenWindowEvent;
+    "openWindow": OpenWindowEvent;
   }
 }

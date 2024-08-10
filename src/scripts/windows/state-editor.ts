@@ -27,12 +27,13 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       });
 
       body.addEventListener("build", () => {
-        const fs = resourceManager.get("fs");
-        const files = fs.all();
+        const userFs = resourceManager.get("userFs");
+        const internalFs = resourceManager.get("internalFs");
+        const files = { ...userFs.all(), ...internalFs.all() };
         const [entry, syntax] = configManager.getMany("entryFile", "syntax");
 
         resourceManager
-          .get("main-worker")
+          .get("mainWorker")
           .request("build", {
             files,
             entry,
@@ -48,12 +49,12 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
               asm,
               mif,
             }) => {
-              const fs = resourceManager.get("fs");
+              const fs = resourceManager.get("internalFs");
 
               resourceManager.set("ram", ram);
               resourceManager.set("vram", vram);
               resourceManager.set("registers", registers);
-              resourceManager.set("internal-registers", internalRegisters);
+              resourceManager.set("internalRegisters", internalRegisters);
               resourceManager.set("symbols", symbols);
 
               fs.write(entry!.replace(/\.[^.]+$/, ".mif"), mif);
@@ -71,7 +72,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
 
       body.addEventListener("play", () => {
         resourceManager
-          .get("main-worker")
+          .get("mainWorker")
           .request("play", undefined)
           .then(() => {})
           .catch((error) => {
@@ -82,7 +83,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
 
       body.addEventListener("stop", () => {
         resourceManager
-          .get("main-worker")
+          .get("mainWorker")
           .request("stop", undefined)
           .then(() => {})
           .catch((error) => {
@@ -93,7 +94,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
 
       body.addEventListener("next", () => {
         resourceManager
-          .get("main-worker")
+          .get("mainWorker")
           .request("next", undefined)
           .then(() => {})
           .catch((error) => {
@@ -104,7 +105,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
 
       body.addEventListener("reset", () => {
         resourceManager
-          .get("main-worker")
+          .get("mainWorker")
           .request("reset", undefined)
           .then(() => {})
           .catch((error) => {
@@ -114,7 +115,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       });
 
       body.files = resourceManager
-        .get("fs")
+        .get("userFs")
         .files()
         .filter((filename) => /\.(asm|c)$/i.test(filename));
     }
@@ -147,19 +148,19 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       body.entryFile = fileName;
     });
 
-    resourceSubscriber.subscribe("fs", (fs) => {
+    resourceSubscriber.subscribe("userFs", (fs) => {
       const fsSubscriber = fs.getSubscriber();
       this.onClose(fsSubscriber.unsubscribeAll);
 
       fsSubscriber.subscribe("create", () => {
         body.files = resourceManager
-          .get("fs")
+          .get("userFs")
           .files()
           .filter((filename) => /\.(asm|c)$/i.test(filename));
       });
       fsSubscriber.subscribe("delete", () => {
         body.files = resourceManager
-          .get("fs")
+          .get("userFs")
           .files()
           .filter((filename) => /\.(asm|c)$/i.test(filename));
       });
@@ -167,7 +168,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
     resourceSubscriber.subscribe("registers", (registers) => {
       body.registers = registers;
     });
-    resourceSubscriber.subscribe("internal-registers", (registers) => {
+    resourceSubscriber.subscribe("internalRegisters", (registers) => {
       body.internalRegisters = registers;
     });
   }

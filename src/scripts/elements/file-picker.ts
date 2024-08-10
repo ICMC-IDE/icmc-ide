@@ -29,7 +29,7 @@ export default class FilePickerElement extends HTMLElement {
       div.append(button);
 
       button.addEventListener("click", () => {
-        this.dispatchEvent(new CustomEvent("open-file", { detail: path }));
+        this.dispatchEvent(new CustomEvent("openFile", { detail: path }));
       });
     }
 
@@ -55,7 +55,7 @@ export default class FilePickerElement extends HTMLElement {
       icon.name = "remove";
       button.append(icon);
       button.addEventListener("click", () => {
-        this.dispatchEvent(new CustomEvent("delete-file", { detail: path }));
+        this.dispatchEvent(new CustomEvent("deleteFile", { detail: path }));
       });
       button.title = "Delete";
 
@@ -160,7 +160,7 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    "open-file": OpenFileEvent;
-    "delete-file": DeleteFileEvent;
+    "openFile": OpenFileEvent;
+    "deleteFile": DeleteFileEvent;
   }
 }

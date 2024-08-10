@@ -108,7 +108,7 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
     resourceSubscriber.subscribe("vram", (vram) => {
       body.memory = vram;
     });
-    resourceSubscriber.subscribe("internal-registers", (internalRegisters) => {
+    resourceSubscriber.subscribe("internalRegisters", (internalRegisters) => {
       this.#internalRegisters = internalRegisters;
     });
     resourceSubscriber.subscribe("charmap", (charmap) => {
