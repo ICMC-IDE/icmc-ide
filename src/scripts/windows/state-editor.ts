@@ -17,18 +17,18 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
     }
 
     {
-      body.addEventListener("change-frequency", ({ detail: frequency }) => {
+      body.addEventListener("changeFrequency", ({ detail: frequency }) => {
         configManager.set("frequency", frequency);
       });
 
-      body.addEventListener("change-file", ({ detail: fileName }) => {
+      body.addEventListener("changeFile", ({ detail: fileName }) => {
         console.log(fileName);
         configManager.set("entryFile", fileName);
       });
 
       body.addEventListener("build", () => {
-        const userFs = resourceManager.get("userFs");
-        const internalFs = resourceManager.get("internalFs");
+        const userFs = resourceManager.get("fs").user;
+        const internalFs = resourceManager.get("fs").internal;
         const files = { ...userFs.all(), ...internalFs.all() };
         const [entry, syntax] = configManager.getMany("entryFile", "syntax");
 
@@ -46,10 +46,10 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
               symbols,
               registers,
               internalRegisters,
-              asm,
+              // asm,
               mif,
             }) => {
-              const fs = resourceManager.get("internalFs");
+              const fs = resourceManager.get("fs").internal;
 
               resourceManager.set("ram", ram);
               resourceManager.set("vram", vram);
@@ -59,9 +59,10 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
 
               fs.write(entry!.replace(/\.[^.]+$/, ".mif"), mif);
 
-              if (asm) {
-                fs.write(entry!.replace(/\.[^.]+$/, ".asm"), asm);
-              }
+              // TODO: Write asm to fs
+              // if (asm) {
+              //   fs.write(entry!.replace(/\.[^.]+$/, ".asm"), asm);
+              // }
             },
           )
           .catch((error) => {
@@ -115,8 +116,8 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       });
 
       body.files = resourceManager
-        .get("userFs")
-        .files()
+        .get("fs")
+        .user.files()
         .filter((filename) => /\.(asm|c)$/i.test(filename));
     }
 
@@ -148,20 +149,20 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       body.entryFile = fileName;
     });
 
-    resourceSubscriber.subscribe("userFs", (fs) => {
-      const fsSubscriber = fs.getSubscriber();
+    resourceSubscriber.subscribe("fs", (fs) => {
+      const fsSubscriber = fs.user.getSubscriber();
       this.onClose(fsSubscriber.unsubscribeAll);
 
       fsSubscriber.subscribe("create", () => {
         body.files = resourceManager
-          .get("userFs")
-          .files()
+          .get("fs")
+          .user.files()
           .filter((filename) => /\.(asm|c)$/i.test(filename));
       });
       fsSubscriber.subscribe("delete", () => {
         body.files = resourceManager
-          .get("userFs")
-          .files()
+          .get("fs")
+          .user.files()
           .filter((filename) => /\.(asm|c)$/i.test(filename));
       });
     });

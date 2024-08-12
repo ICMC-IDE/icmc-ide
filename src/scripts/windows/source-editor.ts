@@ -47,7 +47,7 @@ export default class SourceEditorWindow extends Fenster<TextEditorElement> {
       globalState,
     });
 
-    this.#fs = resourceManager.get("fs");
+    this.#fs = resourceManager.get("fs").user;
   }
 
   setModel(model: monaco.editor.ITextModel, filename: string) {

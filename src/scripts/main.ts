@@ -53,7 +53,7 @@ function openFile(filename: string) {
     }
 
     return monaco.editor.createModel(
-      globalState.resourceManager.get("userFs").read(filename)!,
+      globalState.resourceManager.get("fs").user.read(filename)!,
       language,
     );
   })();
@@ -72,7 +72,7 @@ function openFile(filename: string) {
 }
 
 async function createCharmap() {
-  const fs = globalState.resourceManager.get("internalFs");
+  const fs = globalState.resourceManager.get("fs").internal;
 
   const result = await globalState.resourceManager
     .get("mainWorker")

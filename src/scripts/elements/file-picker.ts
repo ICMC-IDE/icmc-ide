@@ -68,6 +68,11 @@ export default class FilePickerElement extends HTMLElement {
   #generateFolder(filename: string) {
     const div = document.createElement("div");
 
+    div.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+      console.log("contextmenu");
+    });
+
     div.classList.add("folder");
 
     {
@@ -160,7 +165,7 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    "openFile": OpenFileEvent;
-    "deleteFile": DeleteFileEvent;
+    openFile: OpenFileEvent;
+    deleteFile: DeleteFileEvent;
   }
 }

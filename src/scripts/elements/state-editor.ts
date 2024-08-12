@@ -188,8 +188,8 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    "change-frequency": ChangeFrequencyEvent;
-    "change-file": ChangeFileEvent;
+    changeFrequency: ChangeFrequencyEvent;
+    changeFile: ChangeFileEvent;
     build: { detail: void };
     next: { detail: void };
     play: { detail: void };

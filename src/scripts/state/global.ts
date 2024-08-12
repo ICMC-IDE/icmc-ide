@@ -32,8 +32,10 @@ export interface GlobalConfigsMap {
 
 export interface GlobalResourcesMap {
   charmap: CharMap;
-  internalFs: Fs;
-  userFs: Fs;
+  fs: {
+    internal: Fs;
+    user: Fs;
+  };
   registers: Uint16Array;
   internalRegisters: Uint16Array;
   ram: Uint16Array;
@@ -64,8 +66,7 @@ await Promise.all([
   userFs.loadAssets(),
   mainWorker.isReady,
 ]);
-resourceManager.set("internalFs", internalFs);
-resourceManager.set("userFs", userFs);
+resourceManager.set("fs", { internal: internalFs, user: userFs });
 resourceManager.set("mainWorker", mainWorker);
 
 export default <GlobalState>{

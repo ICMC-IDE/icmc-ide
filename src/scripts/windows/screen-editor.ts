@@ -5,6 +5,7 @@ import Fenster from "../fenster.js";
 export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
   constructor({
     style,
+    globalState,
     globalState: { configManager, eventManager, resourceManager },
   }: WindowConstructor) {
     const body = document.createElement("screen-editor");
@@ -44,6 +45,7 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
       body,
       style,
       buttonsRight,
+      globalState,
     });
 
     const eventSubscriber = eventManager.getSubscriber();
