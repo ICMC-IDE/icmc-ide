@@ -15,11 +15,7 @@ export default class ConfigEditorWindow extends Fenster<ConfigEditorElement> {
 
     {
       body.addEventListener("change-config", ({ detail: { name, value } }) => {
-        console.log(name, value);
         globalState.configManager.set(name as keyof GlobalConfigsMap, value);
-        console.log(
-          globalState.configManager.get(name as keyof GlobalConfigsMap),
-        );
       });
     }
 
@@ -29,7 +25,5 @@ export default class ConfigEditorWindow extends Fenster<ConfigEditorElement> {
       style,
       globalState,
     });
-
-    this.toggleMinimize();
   }
 }

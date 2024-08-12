@@ -10,7 +10,7 @@ import FilePickerWindow from "./file-picker.js";
 import { GlobalState } from "../state/global.js";
 import { WindowConstructor } from "../types/windows";
 
-interface Windows {
+export interface Windows {
   "state-editor": StateEditorWindow;
   "memory-editor": MemoryEditorWindow;
   "screen-viewer": ScreenViewerWindow;

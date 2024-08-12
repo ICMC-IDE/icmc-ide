@@ -27,8 +27,6 @@ export default class DocumentationViewerWindow extends Fenster<DocumentationView
       globalState,
     });
 
-    this.toggleMinimize();
-
     const configSubscriber = configManager.getSubscriber();
 
     this.onClose(() => configSubscriber.unsubscribeAll());

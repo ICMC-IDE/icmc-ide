@@ -27,6 +27,8 @@ export default class Fenster<T extends HTMLElement> {
   #window;
   #onCloseHandlers: EventHandler<void>[] = [];
 
+  isOpen = true;
+
   constructor({
     body,
     title,
@@ -163,10 +165,8 @@ export default class Fenster<T extends HTMLElement> {
     window.append(dragger, body);
     wrapper.append(window);
 
-    wrapper.addEventListener("pointerdown", function () {
-      if (+this.style.zIndex < zIndex) {
-        this.style.zIndex = (++zIndex).toString();
-      }
+    wrapper.addEventListener("pointerdown", () => {
+      this.focus();
     });
 
     dragger.addEventListener("click", (event) => {
@@ -178,6 +178,8 @@ export default class Fenster<T extends HTMLElement> {
   }
 
   #close() {
+    this.isOpen = false;
+
     for (const handler of this.#onCloseHandlers) {
       handler();
     }
@@ -186,6 +188,14 @@ export default class Fenster<T extends HTMLElement> {
     this.#dragger.remove();
     this.#wrapper.remove();
     this.#window.remove();
+  }
+
+  focus() {
+    const wrapper = this.#wrapper;
+
+    if (+wrapper.style.zIndex < zIndex) {
+      wrapper.style.zIndex = (++zIndex).toString();
+    }
   }
 
   getClientRect() {

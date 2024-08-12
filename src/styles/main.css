@@ -855,3 +855,31 @@
   contain: strict;
   position: relative;
 }
+
+#loading {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+
+  align-content: center;
+  justify-content: center;
+  background-color: var(--gray0);
+
+  & svg-icon {
+    font-size: 2rem;
+
+    animation: 1.5s rotate infinite linear;
+    transform-origin: center center;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

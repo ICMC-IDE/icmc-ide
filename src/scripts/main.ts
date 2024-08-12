@@ -4,6 +4,7 @@ import {
   createWindows,
   openWindow,
   SourceEditorWindow,
+  Windows,
 } from "./windows/mod.js";
 import globalState, { GlobalState } from "./state/global.js";
 import CharMap from "./resources/charmap.js";
@@ -16,8 +17,8 @@ self.MonacoEnvironment = {
 
 async function main() {
   await createCharmap();
-  createDock(globalState);
-  createWindows(globalState);
+  const windows = createWindows(globalState);
+  createDock(globalState, windows);
 
   globalState.eventManager.subscribe("openFile", openFile);
 
@@ -31,12 +32,18 @@ async function main() {
 
 const modelCache: Record<string, monaco.editor.ITextModel> = {};
 
-function createDock(globalState: GlobalState) {
+function createDock(globalState: GlobalState, windows: Partial<Windows>) {
   const dock = document.createElement("apps-dock");
 
   dock.addEventListener("openWindow", ({ detail: type }) => {
-    const window = openWindow(type, { globalState });
-    window.toggleMinimize(false);
+    let win = windows[type];
+
+    if (win === undefined || !win.isOpen) {
+      win = windows[type] = openWindow(type, { globalState });
+    }
+
+    win.toggleMinimize(false);
+    win.focus();
   });
 
   document.body.prepend(dock);
@@ -60,15 +67,16 @@ function openFile(filename: string) {
 
   const editor = new SourceEditorWindow({
     style: {
-      left: "0.5rem",
-      top: "0.5rem",
+      left: "5em",
+      top: "1em",
       width: "50ch",
-      height: "50rem",
+      height: "50em",
     },
     globalState,
   });
 
   editor.setModel(modelCache[filename], filename);
+  editor.focus();
 }
 
 async function createCharmap() {
@@ -87,3 +95,4 @@ async function createCharmap() {
 }
 
 await main();
+document.getElementById("loading")!.remove();

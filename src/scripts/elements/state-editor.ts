@@ -148,10 +148,7 @@ export default class StateEditorElement extends HTMLElement {
   setFiles(filenames: string[]) {
     const select = this.#elements.buttons.file;
     const value = select.value;
-
-    while (select.lastElementChild) {
-      select.lastElementChild.remove();
-    }
+    const options = [];
 
     for (const filename of filenames) {
       if (!filename.match(/\.c$|\.asm/i)) continue;
@@ -160,8 +157,10 @@ export default class StateEditorElement extends HTMLElement {
       option.value = filename;
       option.innerText = filename;
       option.selected = filename === value;
-      select.appendChild(option);
+      options.push(option);
     }
+
+    select.replaceChildren(...options);
   }
 
   setEntryFile(filename: string) {

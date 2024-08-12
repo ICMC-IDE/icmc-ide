@@ -5,6 +5,16 @@ const TEMPLATE = document.getElementById(
   "screenEditorTemplate",
 )! as HTMLTemplateElement;
 
+function calcXY(event: PointerEvent) {
+  const canvas = event.currentTarget as HTMLCanvasElement;
+
+  const rect = canvas.getBoundingClientRect();
+  const x = (((event.clientX - rect.left) / rect.width) * canvas.width) | 0;
+  const y = (((event.clientY - rect.top) / rect.height) * canvas.height) | 0;
+
+  return [x, y];
+}
+
 export default class ScreenEditorElement extends HTMLElement {
   static observedAttributes = ["width", "height"];
 
@@ -21,8 +31,6 @@ export default class ScreenEditorElement extends HTMLElement {
     super();
 
     const fragment = this.#fragment;
-    customElements.upgrade(fragment);
-
     const viewers = fragment.querySelectorAll("screen-viewer");
 
     this.#chars = viewers[0] as ScreenViewerElement;
@@ -31,45 +39,25 @@ export default class ScreenEditorElement extends HTMLElement {
     this.#colors = fragment.querySelector("canvas")! as HTMLCanvasElement;
 
     this.#colors.addEventListener("pointerdown", (event: PointerEvent) => {
-      const canvas = event.currentTarget as HTMLCanvasElement;
-
-      const rect = canvas.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / 16) | 0;
-      const y = ((event.clientY - rect.top) / 16) | 0;
-
+      const [x, y] = calcXY(event);
       this.pickColor(8 * y + x);
     });
 
     // FIXME
     this.#coloredChar.addEventListener("pointerdown", (event: PointerEvent) => {
-      const canvas = event.currentTarget as HTMLCanvasElement;
-
-      const rect = canvas.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / 16) | 0;
-      const y = ((event.clientY - rect.top) / 16) | 0;
-
+      const [x, y] = calcXY(event);
       this.#charmap!.togglePixel(x % 8, 8 * this.#char + y);
     });
 
     this.#chars.addEventListener("pointerdown", (event: PointerEvent) => {
-      const canvas = event.currentTarget as HTMLCanvasElement;
-
-      const rect = canvas.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / 16) | 0;
-      const y = ((event.clientY - rect.top) / 16) | 0;
-
+      const [x, y] = calcXY(event);
       this.pickChar(32 * y + x);
     });
 
     this.#screen.addEventListener("pointerdown", (event: PointerEvent) => {
-      const canvas = event.currentTarget as HTMLCanvasElement;
-
-      const rect = canvas.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / 16) | 0;
-      const y = ((event.clientY - rect.top) / 16) | 0;
-
+      const [x, y] = calcXY(event);
       this.#screen.updateCell(
-        canvas.width * y + x,
+        (event.target as HTMLCanvasElement).width * y + x,
         this.#char | (this.#color << 8),
       );
     });
@@ -80,7 +68,6 @@ export default class ScreenEditorElement extends HTMLElement {
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    // debugger;
     console.log("[ATTR CHG]", name, oldValue, newValue);
   }
 
@@ -123,6 +110,7 @@ export default class ScreenEditorElement extends HTMLElement {
     this.#generatePalette(value.colorPalette());
 
     customElements.whenDefined("screen-viewer").then(() => {
+      console.log("ScreenEditorElement::setCharmap[2]");
       this.#screen.setCharmap(value);
       this.#chars.setCharmap(value);
       this.#coloredChar.setCharmap(value);
@@ -132,17 +120,20 @@ export default class ScreenEditorElement extends HTMLElement {
   setWidth(value: number) {
     this.style.setProperty("--width", value.toString());
 
-    if (this.#screen) {
-      this.#screen.setWidth(value);
-    }
+    customElements.whenDefined("screen-viewer").then(() => {
+      console.log("ScreenEditorElement::setWidth[2]");
+      console.log(this.#screen);
+      // this.#screen.setWidth(value);
+    });
   }
 
   setHeight(value: number) {
     this.style.setProperty("--height", value.toString());
 
-    if (this.#screen) {
-      this.#screen.setHeight(value);
-    }
+    customElements.whenDefined("screen-viewer").then(() => {
+      console.log("ScreenEditorElement::setHeight[2]");
+      // this.#screen.setHeight(value);
+    });
   }
 }
 

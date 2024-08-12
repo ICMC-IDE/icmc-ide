@@ -64,8 +64,6 @@ export default class MemoryEditorElement extends HTMLElement {
 
       this.updatePanel();
     });
-
-    console.log(this.#elements);
   }
 
   connectedCallback() {
