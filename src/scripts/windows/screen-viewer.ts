@@ -55,10 +55,10 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
         "screenHeight",
       );
 
-      body.width = width!;
-      body.height = height!;
+      body.setWidth(width!);
+      body.setHeight(height!);
 
-      body.charmap = resourceManager.get("charmap");
+      body.setCharmap(resourceManager.get("charmap"));
 
       body.tabIndex = 1;
 
@@ -99,10 +99,10 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
     });
 
     configSubscriber.subscribe("screenWidth", (width: number) => {
-      body.width = width;
+      body.setWidth(width);
     });
     configSubscriber.subscribe("screenHeight", (height: number) => {
-      body.height = height;
+      body.setHeight(height);
     });
 
     resourceSubscriber.subscribe("vram", (vram) => {
@@ -112,7 +112,7 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
       this.#internalRegisters = internalRegisters;
     });
     resourceSubscriber.subscribe("charmap", (charmap) => {
-      body.charmap = charmap;
+      body.setCharmap(charmap);
     });
   }
 

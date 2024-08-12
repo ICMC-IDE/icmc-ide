@@ -43,9 +43,9 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
       "screenHeight",
     );
 
-    body.width = width!;
-    body.height = height!;
-    body.charmap = resourceManager.get("charmap");
+    body.setWidth(width!);
+    body.setHeight(height!);
+    body.setCharmap(resourceManager.get("charmap"));
 
     super({
       title,
@@ -70,14 +70,14 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
     });
 
     configManager.subscribe("screenWidth", (width: number) => {
-      body.width = width;
+      body.setWidth(width);
     });
     configManager.subscribe("screenHeight", (height: number) => {
-      body.height = height;
+      body.setHeight(height);
     });
 
     resourceManager.subscribe("charmap", (charmap) => {
-      body.charmap = charmap;
+      body.setCharmap(charmap);
     });
   }
 }

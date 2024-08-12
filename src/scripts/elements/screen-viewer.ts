@@ -7,8 +7,8 @@ export default class ScreenViewerElement extends HTMLElement {
 
   #width: number = 1;
   #height: number = 1;
-  shouldUpdate = false;
 
+  shouldUpdate = false;
   memory = new Uint16Array(0x10000);
 
   #fragment = new DocumentFragment();
@@ -21,12 +21,16 @@ export default class ScreenViewerElement extends HTMLElement {
 
     const width = this.getAttribute("width");
     if (width !== null) {
-      this.width = parseInt(width);
+      this.setWidth(parseInt(width));
     }
 
     const height = this.getAttribute("height");
     if (height !== null) {
-      this.height = parseInt(height);
+      this.setHeight(parseInt(height));
+    }
+
+    if (this.charmap) {
+      this.setCharmap(this.charmap);
     }
 
     div.appendChild(this.#canvas);
@@ -74,25 +78,17 @@ export default class ScreenViewerElement extends HTMLElement {
     this.shouldUpdate = true;
   }
 
-  get width() {
-    return this.#width;
-  }
-
-  set width(value) {
+  setWidth(value: number) {
     this.#width = value;
     this.#resize();
   }
 
-  get height() {
-    return this.#height;
-  }
-
-  set height(value) {
+  setHeight(value: number) {
     this.#height = value;
     this.#resize();
   }
 
-  set charmap(value: CharMap) {
+  setCharmap(value: CharMap) {
     if (!this.#renderer) {
       this.#renderer = new Renderer(
         this.#canvas,

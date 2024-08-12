@@ -118,40 +118,31 @@ export default class ScreenEditorElement extends HTMLElement {
     }
   }
 
-  set charmap(value: CharMap) {
+  setCharmap(value: CharMap) {
     this.#charmap = value;
-    this.#screen.charmap = value;
-    this.#chars.charmap = value;
-    this.#coloredChar.charmap = value;
     this.#generatePalette(value.colorPalette);
+
+    customElements.whenDefined("screen-viewer").then(() => {
+      this.#screen.setCharmap(value);
+      this.#chars.setCharmap(value);
+      this.#coloredChar.setCharmap(value);
+    });
   }
 
-  // set colorPalette(palette) {
-  //   this.#generatePalette(palette);
-  // }
-
-  set width(value) {
+  setWidth(value: number) {
     this.style.setProperty("--width", value.toString());
 
     if (this.#screen) {
-      this.#screen.width = value;
+      this.#screen.setWidth(value);
     }
   }
 
-  get width() {
-    return this.#screen.width;
-  }
-
-  set height(value) {
+  setHeight(value: number) {
     this.style.setProperty("--height", value.toString());
 
     if (this.#screen) {
-      this.#screen.height = value;
+      this.#screen.setHeight(value);
     }
-  }
-
-  get height() {
-    return this.#screen.height;
   }
 }
 
