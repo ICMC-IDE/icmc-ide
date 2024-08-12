@@ -1,6 +1,6 @@
 import EventManager from "../state/event.js";
 
-const FILE_STORAGE_PREFIX = "file:";
+const FILE_STORAGE_PREFIX = "file";
 const ASSETS_DIR = "assets";
 const ASSETS_LIST_PATH = ASSETS_DIR + "/assets.json";
 
