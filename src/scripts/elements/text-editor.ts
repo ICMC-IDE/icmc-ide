@@ -1,11 +1,9 @@
 import * as monaco from "monaco-editor";
 
-// import("./scripts/languages/main.js");
-
 export default class TextEditorElement extends HTMLElement {
-  #editor: monaco.editor.IStandaloneCodeEditor | null = null;
-  #observer: ResizeObserver | null = null;
-  #model: monaco.editor.ITextModel | null = null;
+  #editor?: monaco.editor.IStandaloneCodeEditor;
+  #observer?: ResizeObserver;
+  #model?: monaco.editor.ITextModel;
 
   constructor() {
     super();
@@ -25,7 +23,7 @@ export default class TextEditorElement extends HTMLElement {
     this.#observer.observe(this);
   }
 
-  set model(model: monaco.editor.ITextModel) {
+  setModel(model: monaco.editor.ITextModel) {
     if (this.#editor) {
       this.#editor.setModel(model);
     } else {

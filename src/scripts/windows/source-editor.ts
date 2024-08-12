@@ -25,7 +25,7 @@ export default class SourceEditorWindow extends Fenster<TextEditorElement> {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.name = "export";
+      icon.setIcon("export");
       button.append(icon, "Export");
       buttonsRight.push(button);
     }
@@ -34,7 +34,7 @@ export default class SourceEditorWindow extends Fenster<TextEditorElement> {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.name = "import";
+      icon.setIcon("import");
       button.append(icon, "Import");
       buttonsRight.push(button);
     }
@@ -54,6 +54,6 @@ export default class SourceEditorWindow extends Fenster<TextEditorElement> {
     model.onDidChangeContent(() => {
       this.#fs.write(filename, model.getValue());
     });
-    this.body.model = model;
+    this.body.setModel(model);
   }
 }

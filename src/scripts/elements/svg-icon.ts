@@ -1,7 +1,9 @@
+const TEMPLATE = document.getElementById(
+  "svgIconTemplate",
+) as HTMLTemplateElement;
+
 export default class SvgIconElement extends HTMLElement {
-  #fragment = (
-    document.getElementById("svgIconTemplate") as HTMLTemplateElement
-  ).content.cloneNode(true) as DocumentFragment;
+  #fragment = TEMPLATE.content.cloneNode(true) as DocumentFragment;
 
   constructor() {
     super();
@@ -23,10 +25,6 @@ export default class SvgIconElement extends HTMLElement {
       "href",
       `./images/icons.svg#${name}`,
     );
-  }
-
-  set name(name: string) {
-    this.setIcon(name);
   }
 }
 

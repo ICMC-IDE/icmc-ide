@@ -26,7 +26,7 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.name = "download";
+      icon.setIcon("download");
       button.appendChild(icon);
       buttonsRight.push(button);
 
@@ -58,7 +58,7 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.name = "upload";
+      icon.setIcon("upload");
       button.appendChild(icon);
       buttonsRight.push(button);
 
@@ -77,7 +77,7 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
 
     // maybe we should pass fs to file-picker intead of updating it through the window?
     const fs = resourceManager.get("fs").user;
-    body.files = fs.files();
+    body.setFiles(fs.files());
 
     body.addEventListener("openFile", ({ detail: filename }) => {
       eventManager.emmit("openFile", filename);
@@ -101,11 +101,11 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
     this.onClose(() => fsSubscriber.unsubscribeAll());
 
     fsSubscriber.subscribe("create", () => {
-      body.files = fs.files();
+      body.setFiles(fs.files());
     });
 
     fsSubscriber.subscribe("delete", () => {
-      body.files = fs.files();
+      body.setFiles(fs.files());
     });
   }
 }

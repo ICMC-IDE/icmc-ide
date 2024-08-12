@@ -3,7 +3,7 @@ import Renderer from "../renderer.js";
 
 export default class ScreenViewerElement extends HTMLElement {
   #canvas = document.createElement("canvas");
-  #renderer: Renderer | undefined;
+  #renderer?: Renderer;
 
   #width: number = 1;
   #height: number = 1;
@@ -27,10 +27,6 @@ export default class ScreenViewerElement extends HTMLElement {
     const height = this.getAttribute("height");
     if (height !== null) {
       this.setHeight(parseInt(height));
-    }
-
-    if (this.charmap) {
-      this.setCharmap(this.charmap);
     }
 
     div.appendChild(this.#canvas);
@@ -97,7 +93,7 @@ export default class ScreenViewerElement extends HTMLElement {
         this.#height,
       );
     } else {
-      this.#renderer.charmap = value;
+      this.#renderer.setCharmap(value);
     }
 
     this.shouldUpdate = true;
@@ -105,7 +101,7 @@ export default class ScreenViewerElement extends HTMLElement {
     value.subscribe(() => {
       this.shouldUpdate = true;
       // TODO: Change this
-      this.#renderer!.charmap = this.#renderer!.charmap;
+      this.#renderer!.setCharmap(this.#renderer!.charmap());
     });
   }
 }

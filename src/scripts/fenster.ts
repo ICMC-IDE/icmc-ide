@@ -122,7 +122,7 @@ export default class Fenster<T extends HTMLElement> {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.name = "minimize";
+      icon.setIcon("minimize");
       button.append(icon);
       title.appendChild(button);
 
@@ -131,7 +131,7 @@ export default class Fenster<T extends HTMLElement> {
       });
 
       window.addEventListener("toggle", () => {
-        icon.name = window.open ? "minimize" : "unminimize";
+        icon.setIcon(window.open ? "minimize" : "unminimize");
       });
 
       dragger.append(button);
@@ -151,7 +151,7 @@ export default class Fenster<T extends HTMLElement> {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.name = "close";
+      icon.setIcon("close");
       button.append(icon);
       button.addEventListener("click", () => {
         this.#close();

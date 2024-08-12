@@ -4,19 +4,15 @@ interface OpenWindowEvent {
   detail: WindowTypes;
 }
 
+const TEMPLATE = document.getElementById("dockTemplate") as HTMLTemplateElement;
+
 export default class DockElement extends HTMLElement {
-  #fragment: DocumentFragment;
+  #fragment = TEMPLATE.content.cloneNode(true) as DocumentFragment;
 
   constructor() {
     super();
 
-    const template = document.getElementById(
-      "dockTemplate",
-    ) as HTMLTemplateElement;
-
-    const fragment = (this.#fragment = template.content.cloneNode(
-      true,
-    ) as DocumentFragment);
+    const fragment = this.#fragment;
 
     fragment.querySelectorAll("button[data-window]").forEach((element) => {
       element.addEventListener("click", () => {
@@ -42,6 +38,6 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    "openWindow": OpenWindowEvent;
+    openWindow: OpenWindowEvent;
   }
 }

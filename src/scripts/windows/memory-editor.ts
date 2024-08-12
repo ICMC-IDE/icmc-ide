@@ -21,7 +21,7 @@ export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.name = "export";
+      icon.setIcon("export");
       button.append(icon, "Export");
       buttonsRight.push(button);
     }
@@ -30,7 +30,7 @@ export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.name = "import";
+      icon.setIcon("import");
       button.append(icon, "Import");
       buttonsRight.push(button);
     }
@@ -48,10 +48,10 @@ export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
     this.onClose(() => resourceSubscriber.unsubscribeAll());
 
     resourceSubscriber.subscribe("ram", (ram) => {
-      body.ram = ram;
+      body.setRam(ram);
     });
     resourceSubscriber.subscribe("symbols", (symbols) => {
-      body.symbols = symbols;
+      body.setSymbols(symbols);
     });
   }
 }

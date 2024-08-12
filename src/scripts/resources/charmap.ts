@@ -45,11 +45,11 @@ export default class CharMap extends OffscreenCanvas {
     });
   }
 
-  get data() {
+  data() {
     return this.#context!.getImageData(0, 0, this.width, this.height);
   }
 
-  get colorPalette() {
+  colorPalette() {
     return this.#colorPalette;
   }
 

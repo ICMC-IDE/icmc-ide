@@ -3,7 +3,7 @@ export default class DocumentationViewerElement extends HTMLElement {
     super();
   }
 
-  set syntax(value: string) {
+  setSyntax(value: string) {
     const documentationGirotoTemplate = document.getElementById(
       "documentationGirotoTemplate",
     ) as HTMLTemplateElement;

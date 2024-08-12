@@ -140,16 +140,15 @@ export default class Renderer {
     this.#setOrtho(width, height);
   }
 
-  get charmap() {
+  charmap() {
     return this.#charmap!;
   }
 
-  set charmap(value: CharMap) {
+  setCharmap(value: CharMap) {
     this.#setCharmap(value);
   }
 
   #setCharmap(charmap: CharMap) {
-    console.log(charmap.data);
     const gl = this.#gl;
 
     gl.bindTexture(gl.TEXTURE_2D, this.#charmapTex!);
@@ -162,7 +161,7 @@ export default class Renderer {
       0,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
-      charmap.data,
+      charmap.data(),
     );
 
     if (

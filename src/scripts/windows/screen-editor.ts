@@ -24,7 +24,7 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.name = "export";
+      icon.setIcon("export");
       button.append(icon, "Export CharMap");
       buttonsRight.push(button);
     }
@@ -33,7 +33,7 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.name = "import";
+      icon.setIcon("import");
       button.append(icon, "Import CharMap");
       buttonsRight.push(button);
     }

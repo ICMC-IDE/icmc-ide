@@ -1,49 +1,30 @@
-/*
-const FREQUENCIES = [
-  "1 Hz",
-  "10 Hz",
-  "100 Hz",
-  "1 kHz",
-  "10 kHz",
-  "100 kHz",
-  "1 MHz",
-  "10 MHz",
-  "100 MHz",
-  "FAST!",
-];
-*/
+const TEMPLATE = document.getElementById(
+  "configEditorTemplate",
+) as HTMLTemplateElement;
 
-interface ChangeConfigEvent {
+interface ChangeConfigMap {
+  screenWidth: number;
+  screenHeight: number;
+  gridWidth: number;
+  gridHeight: number;
+  syntax: string;
+}
+
+interface ChangeConfigEvent<K extends keyof ChangeConfigMap> {
   detail: {
-    name: string;
-    value: any;
+    name: K;
+    value: ChangeConfigMap[K];
   };
 }
 
 export default class ConfigEditorElement extends HTMLElement {
-  // #elements;
+  #fragment = TEMPLATE.content.cloneNode(true) as DocumentFragment;
 
   constructor() {
     super();
-  }
 
-  connectedCallback() {
-    const configEditorTemplate = document.getElementById(
-      "configEditorTemplate",
-    ) as HTMLTemplateElement;
-    this.appendChild(configEditorTemplate.content.cloneNode(true));
-
-    const form = this.querySelector("form")!;
-
-    // this.#elements = form.elements;
-
-    /*
-    for (const field in config) {
-      if (this.#elements[field]) {
-        this.#elements[field].value = config[field].get();
-      }
-    }
-    */
+    const fragment = this.#fragment;
+    const form = fragment.querySelector("form")!;
 
     form.addEventListener("input", (event) => {
       let value;
@@ -70,6 +51,10 @@ export default class ConfigEditorElement extends HTMLElement {
       );
     });
   }
+
+  connectedCallback() {
+    this.appendChild(this.#fragment);
+  }
 }
 
 customElements.define("config-editor", ConfigEditorElement);
@@ -80,6 +65,6 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    "change-config": ChangeConfigEvent;
+    "change-config": ChangeConfigEvent<keyof ChangeConfigMap>;
   }
 }

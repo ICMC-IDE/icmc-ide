@@ -18,7 +18,7 @@ export default class DocumentationViewerWindow extends Fenster<DocumentationView
       title.appendChild(span);
     }
 
-    body.syntax = configManager.get("syntax")!;
+    body.setSyntax(configManager.get("syntax")!);
 
     super({
       title,
@@ -34,7 +34,7 @@ export default class DocumentationViewerWindow extends Fenster<DocumentationView
     this.onClose(() => configSubscriber.unsubscribeAll());
 
     configManager.subscribe("syntax", (value: string) => {
-      body.syntax = value;
+      body.setSyntax(value);
     });
   }
 }

@@ -114,10 +114,12 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
           .finally(() => {});
       });
 
-      body.files = resourceManager
-        .get("fs")
-        .user.files()
-        .filter((filename) => /\.(asm|c)$/i.test(filename));
+      body.setFiles(
+        resourceManager
+          .get("fs")
+          .user.files()
+          .filter((filename) => /\.(asm|c)$/i.test(filename)),
+      );
     }
 
     super({
@@ -142,10 +144,10 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
     });
 
     configSubscriber.subscribe("frequency", (frequency: number) => {
-      body.frequency = frequency;
+      body.setFrequency(frequency);
     });
     configSubscriber.subscribe("entryFile", (fileName: string) => {
-      body.entryFile = fileName;
+      body.setEntryFile(fileName);
     });
 
     resourceSubscriber.subscribe("fs", (fs) => {
@@ -153,16 +155,20 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       this.onClose(fsSubscriber.unsubscribeAll);
 
       fsSubscriber.subscribe("create", () => {
-        body.files = resourceManager
-          .get("fs")
-          .user.files()
-          .filter((filename) => /\.(asm|c)$/i.test(filename));
+        body.setFiles(
+          resourceManager
+            .get("fs")
+            .user.files()
+            .filter((filename) => /\.(asm|c)$/i.test(filename)),
+        );
       });
       fsSubscriber.subscribe("delete", () => {
-        body.files = resourceManager
-          .get("fs")
-          .user.files()
-          .filter((filename) => /\.(asm|c)$/i.test(filename));
+        body.setFiles(
+          resourceManager
+            .get("fs")
+            .user.files()
+            .filter((filename) => /\.(asm|c)$/i.test(filename)),
+        );
       });
     });
     resourceSubscriber.subscribe("registers", (registers) => {

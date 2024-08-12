@@ -1,6 +1,10 @@
 import CharMap from "../resources/charmap";
 import ScreenViewerElement from "./screen-viewer";
 
+const TEMPLATE = document.getElementById(
+  "screenEditorTemplate",
+)! as HTMLTemplateElement;
+
 export default class ScreenEditorElement extends HTMLElement {
   static observedAttributes = ["width", "height"];
 
@@ -8,21 +12,16 @@ export default class ScreenEditorElement extends HTMLElement {
   #screen: ScreenViewerElement;
   #colors: HTMLCanvasElement;
   #coloredChar: ScreenViewerElement;
-  #charmap: CharMap | undefined;
+  #charmap?: CharMap;
   #char = 65;
   #color = 0;
-  #fragment: DocumentFragment;
+  #fragment = TEMPLATE.content.cloneNode(true) as DocumentFragment;
 
   constructor() {
     super();
 
-    const screenEditorTemplate = document.getElementById(
-      "screenEditorTemplate",
-    )! as HTMLTemplateElement;
-
-    const fragment = (this.#fragment = screenEditorTemplate.content.cloneNode(
-      true,
-    ) as DocumentFragment);
+    const fragment = this.#fragment;
+    customElements.upgrade(fragment);
 
     const viewers = fragment.querySelectorAll("screen-viewer");
 
@@ -82,6 +81,7 @@ export default class ScreenEditorElement extends HTMLElement {
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     // debugger;
+    console.log("[ATTR CHG]", name, oldValue, newValue);
   }
 
   render() {
@@ -120,7 +120,7 @@ export default class ScreenEditorElement extends HTMLElement {
 
   setCharmap(value: CharMap) {
     this.#charmap = value;
-    this.#generatePalette(value.colorPalette);
+    this.#generatePalette(value.colorPalette());
 
     customElements.whenDefined("screen-viewer").then(() => {
       this.#screen.setCharmap(value);

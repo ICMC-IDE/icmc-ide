@@ -250,7 +250,7 @@ export default class MemoryEditorElement extends HTMLElement {
     }
   }
 
-  set pc(offset: number) {
+  setPc(offset: number) {
     if (offset === this.#pc) return;
 
     {
@@ -272,7 +272,7 @@ export default class MemoryEditorElement extends HTMLElement {
     this.#pc = offset;
   }
 
-  set sp(offset: number) {
+  setSp(offset: number) {
     if (offset === this.#sp) return;
 
     {
@@ -294,7 +294,7 @@ export default class MemoryEditorElement extends HTMLElement {
     this.#sp = offset;
   }
 
-  set ram(memory: Uint16Array) {
+  setRam(memory: Uint16Array) {
     this.#memory = memory;
     this.#smemory = new Int16Array(
       memory.buffer,
@@ -303,7 +303,7 @@ export default class MemoryEditorElement extends HTMLElement {
     );
   }
 
-  set symbols(symbols: string) {
+  setSymbols(symbols: string) {
     const labels: [string, number][] = symbols
       .split("\n")
       .filter((line) => line.includes("="))

@@ -33,25 +33,20 @@ interface StateEditorElements {
   internalRegisters: HTMLInputElement[];
 }
 
+const TEMPLATE = document.getElementById(
+  "stateViewTemplate",
+) as HTMLTemplateElement;
+
 export default class StateEditorElement extends HTMLElement {
   #elements: StateEditorElements;
-  // #running = false;
-  #frequency = 6;
-  #fragment: DocumentFragment;
-
+  #fragment = TEMPLATE.content.cloneNode(true) as DocumentFragment;
   registers: Uint16Array = new Uint16Array(8);
   internalRegisters: Uint16Array = new Uint16Array(64);
 
   constructor() {
     super();
 
-    const stateViewTemplate = document.getElementById(
-      "stateViewTemplate",
-    ) as HTMLTemplateElement;
-    const fragment = (this.#fragment = stateViewTemplate.content.cloneNode(
-      true,
-    ) as DocumentFragment);
-
+    const fragment = this.#fragment;
     const forms = fragment.querySelectorAll("form");
 
     this.#elements = {
@@ -131,13 +126,7 @@ export default class StateEditorElement extends HTMLElement {
     }
   }
 
-  get frequency() {
-    return 10 ** this.#frequency;
-  }
-
-  set frequency(value) {
-    this.#frequency = value;
-
+  setFrequency(value: number) {
     if (!this.#elements.buttons) return;
 
     (
@@ -149,14 +138,14 @@ export default class StateEditorElement extends HTMLElement {
     }
   }
 
-  set running(value: boolean) {
+  setRunning(value: boolean) {
     // this.#running = value;
 
     this.#elements.buttons.stop.style.display = value ? "" : "none";
     this.#elements.buttons.play.style.display = value ? "none" : "";
   }
 
-  set files(filenames: string[]) {
+  setFiles(filenames: string[]) {
     const select = this.#elements.buttons.file;
     const value = select.value;
 
@@ -175,7 +164,7 @@ export default class StateEditorElement extends HTMLElement {
     }
   }
 
-  set entryFile(filename: string) {
+  setEntryFile(filename: string) {
     this.#elements.buttons.file.value = filename;
   }
 }

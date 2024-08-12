@@ -86,4 +86,4 @@ async function createCharmap() {
   globalState.resourceManager.set("charmap", charmap);
 }
 
-main().catch((error) => console.error(error));
+await main();

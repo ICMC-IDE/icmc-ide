@@ -52,7 +52,7 @@ export default class FilePickerElement extends HTMLElement {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.name = "remove";
+      icon.setIcon("remove");
       button.append(icon);
       button.addEventListener("click", () => {
         this.dispatchEvent(new CustomEvent("deleteFile", { detail: path }));
@@ -148,7 +148,7 @@ export default class FilePickerElement extends HTMLElement {
     this.#buildFileTree(this.#filenames);
   }
 
-  set files(filenames: string[]) {
+  setFiles(filenames: string[]) {
     this.#filenames = filenames.sort();
 
     if (this.isConnected) {
