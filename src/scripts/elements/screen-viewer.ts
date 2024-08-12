@@ -19,6 +19,16 @@ export default class ScreenViewerElement extends HTMLElement {
     const fragment = this.#fragment;
     const div = document.createElement("div");
 
+    const width = this.getAttribute("width");
+    if (width !== null) {
+      this.width = parseInt(width);
+    }
+
+    const height = this.getAttribute("height");
+    if (height !== null) {
+      this.height = parseInt(height);
+    }
+
     div.appendChild(this.#canvas);
     fragment.appendChild(div);
   }
@@ -69,8 +79,6 @@ export default class ScreenViewerElement extends HTMLElement {
   }
 
   set width(value) {
-    if (value == this.#width) return;
-
     this.#width = value;
     this.#resize();
   }
@@ -80,8 +88,6 @@ export default class ScreenViewerElement extends HTMLElement {
   }
 
   set height(value) {
-    if (value == this.#height) return;
-
     this.#height = value;
     this.#resize();
   }

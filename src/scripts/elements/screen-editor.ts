@@ -2,6 +2,8 @@ import CharMap from "../resources/charmap";
 import ScreenViewerElement from "./screen-viewer";
 
 export default class ScreenEditorElement extends HTMLElement {
+  static observedAttributes = ["width", "height"];
+
   #chars: ScreenViewerElement;
   #screen: ScreenViewerElement;
   #colors: HTMLCanvasElement;
@@ -76,6 +78,10 @@ export default class ScreenEditorElement extends HTMLElement {
 
   connectedCallback() {
     this.appendChild(this.#fragment); // this.#fragment becomes an empty array after being appended. so there is no problem doing it multiple times
+  }
+
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    // debugger;
   }
 
   render() {

@@ -38,6 +38,13 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
       buttonsRight.push(button);
     }
 
+    const [width, height] = configManager.getMany(
+      "screenWidth",
+      "screenHeight",
+    );
+
+    body.width = width!;
+    body.height = height!;
     body.charmap = resourceManager.get("charmap");
 
     super({
@@ -72,7 +79,5 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
     resourceManager.subscribe("charmap", (charmap) => {
       body.charmap = charmap;
     });
-
-    this.toggleMinimize();
   }
 }
