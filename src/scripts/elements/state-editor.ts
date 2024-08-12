@@ -64,7 +64,7 @@ export default class StateEditorElement extends HTMLElement {
 
     this.#elements.buttons.frequency.addEventListener("input", ({ target }) => {
       this.dispatchEvent(
-        new CustomEvent("change-frequency", {
+        new CustomEvent("changeFrequency", {
           detail: (target! as HTMLInputElement).valueAsNumber,
         }),
       );
@@ -72,7 +72,7 @@ export default class StateEditorElement extends HTMLElement {
 
     this.#elements.buttons.file.addEventListener("input", ({ target }) => {
       this.dispatchEvent(
-        new CustomEvent("change-file", {
+        new CustomEvent("changeFile", {
           detail: (target! as HTMLSelectElement).value,
         }),
       );

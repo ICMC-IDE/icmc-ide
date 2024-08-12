@@ -22,7 +22,6 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
       });
 
       body.addEventListener("changeFile", ({ detail: fileName }) => {
-        console.log(fileName);
         configManager.set("entryFile", fileName);
       });
 
