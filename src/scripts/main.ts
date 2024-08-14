@@ -20,7 +20,7 @@ async function main() {
   const windows = createWindows(globalState);
   createDock(globalState, windows);
 
-  globalState.eventManager.subscribe("openFile", openFile);
+  globalState.eventManager.subscribe("fileOpen", openFile);
 
   function draw() {
     globalState.eventManager.emmit("render", undefined);
@@ -35,7 +35,7 @@ const modelCache: Record<string, monaco.editor.ITextModel> = {};
 function createDock(globalState: GlobalState, windows: Partial<Windows>) {
   const dock = document.createElement("apps-dock");
 
-  dock.addEventListener("openWindow", ({ detail: type }) => {
+  dock.addEventListener("windowOpen", ({ detail: type }) => {
     let win = windows[type];
 
     if (win === undefined || !win.isOpen) {

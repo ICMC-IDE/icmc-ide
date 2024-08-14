@@ -79,10 +79,10 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
     const fs = resourceManager.get("fs").user;
     body.setFiles(fs.files());
 
-    body.addEventListener("openFile", ({ detail: filename }) => {
-      eventManager.emmit("openFile", filename);
+    body.addEventListener("fileOpen", ({ detail: filename }) => {
+      eventManager.emmit("fileOpen", filename);
     });
-    body.addEventListener("deleteFile", ({ detail: filename }) => {
+    body.addEventListener("fileDelete", ({ detail: filename }) => {
       fs.delete(filename);
     });
 

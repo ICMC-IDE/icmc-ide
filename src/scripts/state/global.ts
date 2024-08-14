@@ -13,9 +13,9 @@ export interface GlobalState {
 }
 
 export interface GlobalEventsMap {
-  deleteFile: FileManagerFile;
-  openFile: FileManagerFile;
-  openWindow: string;
+  fileDelete: FileManagerFile;
+  fileOpen: FileManagerFile;
+  windowOpen: string;
   error: Error;
   render: void;
 }

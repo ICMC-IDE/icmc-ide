@@ -1,6 +1,6 @@
 import { WindowTypes } from "../windows/mod";
 
-interface OpenWindowEvent {
+interface WindowOpenEvent {
   detail: WindowTypes;
 }
 
@@ -17,7 +17,7 @@ export default class DockElement extends HTMLElement {
     fragment.querySelectorAll("button[data-window]").forEach((element) => {
       element.addEventListener("click", () => {
         this.dispatchEvent(
-          new CustomEvent("openWindow", {
+          new CustomEvent("windowOpen", {
             detail: (element as HTMLElement).dataset.window,
           }),
         );
@@ -38,6 +38,6 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    openWindow: OpenWindowEvent;
+    windowOpen: WindowOpenEvent;
   }
 }
