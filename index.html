@@ -1474,6 +1474,14 @@
     <canvas width="8" height="32"></canvas>
   </template>
 
+  <div id="fileContextMenu" class="wrapper" style="display: none; z-index: 16777271;">
+    <form onsubmit="return false;">
+      <button name="open"> Open </button>
+      <button name="rename"> Rename </button>
+      <button name="delete"> Delete </button>
+    </form>
+  </div>
+
   <script src="/src/scripts/elements/main.ts" type="module" defer></script>
   <script src="/src/scripts/main.ts" type="module" defer></script>
   <script src="/src/scripts/languages/main.ts" type="module" defer></script>
