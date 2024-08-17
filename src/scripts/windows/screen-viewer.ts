@@ -26,7 +26,7 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.setIcon("toggle-full-screen");
+      icon.setIcon("expand");
       button.append(icon);
       button.addEventListener("click", () => {
         body.requestFullscreen().catch((error) => {
@@ -41,7 +41,7 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.setIcon("erase");
+      icon.setIcon("clearCash");
       button.append(icon, "Clear");
       button.addEventListener("click", () => {
         body.clear();

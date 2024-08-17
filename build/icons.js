@@ -3,7 +3,7 @@ import fs from "fs/promises";
 
 const domParser = new DOMParser();
 const rawIcon =
-  '<?xml version="1.0" encoding="utf-8" ?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"></svg>';
+  '<?xml version="1.0" encoding="utf-8" ?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"></svg>';
 
 const filenames = await fs.readdir("./src/images/icons/");
 const files = filenames.map((filename) => [

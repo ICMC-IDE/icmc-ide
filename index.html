@@ -15,129 +15,130 @@
   <div id="loading"><svg-icon name="loading"></svg-icon></div>
 
   <template id="svgIconTemplate">
-      <svg viewBox="0 0 30 30"><use></use></svg>
+      <svg viewBox="0 0 16 16"><use></use></svg>
   </template>
 
-  <template id="memoryEditorTemplate">
-    <main></main>
-    <aside>
+    <template id="memoryEditorTemplate">
+      <main></main>
+      <aside>
         <form onsubmit="return false;">
-      <div>
-        <label>
-          <span>Address</span>
-          <input name="address" type="text" value="0xFF00" disabled>
-        </label>
-      </div>
-      <div>
-        <label>
-          <span>Instruction</span>
-          <input name="instruction" type="text" value="-" disabled>
-        </label>
-      </div>
-      <div>
-        <label>
-          <span>Signed</span>
-          <input name="signed" type="number" step="1" min="-32768" max="32767">
-        </label>
-        <label>
-          <span>Unsigned</span>
-          <input name="unsigned" type="number" step="1" min="0" max="36536">
-        </label>
-      </div>
-      <div>
-        <div class="label">
-          <span>Binary</span>
-          <div class="binary">
-            <input name="bit" title="Bit 15 (32768)" type="checkbox">
-            <input name="bit" title="Bit 14 (16384)" type="checkbox">
-            <input name="bit" title="Bit 13 (8192)" type="checkbox">
-            <input name="bit" title="Bit 12 (4096)" type="checkbox">
-            <input name="bit" title="Bit 11 (2048)" type="checkbox">
-            <input name="bit" title="Bit 10 (1024)" type="checkbox">
-            <input name="bit" title="Bit 9 (512)" type="checkbox">
-            <input name="bit" title="Bit 8 (256)" type="checkbox">
-            <input name="bit" title="Bit 7 (128)" type="checkbox">
-            <input name="bit" title="Bit 6 (64)" type="checkbox">
-            <input name="bit" title="Bit 5 (32)" type="checkbox">
-            <input name="bit" title="Bit 4 (16)" type="checkbox">
-            <input name="bit" title="Bit 3 (8)" type="checkbox">
-            <input name="bit" title="Bit 2 (4)" type="checkbox">
-            <input name="bit" title="Bit 1 (2)" type="checkbox">
-            <input name="bit" title="Bit 0 (1)" type="checkbox">
-          </div>
-        </div>
-      </div>
+          <fieldset class="hspan2">
+            <legend>Address</legend>
+            <input name="address" type="text" value="0xFF00" disabled>
+          </fieldset>
+          <fieldset class="hspan2">
+            <legend>Instruction</legend>
+            <input name="instruction" type="text" value="-" disabled>
+          </fieldset>
+          <fieldset>
+            <legend>Hex</legend>
+            <input name="hex" type="text" value="FFFF" disabled>
+          </fieldset>
+          <fieldset>
+            <legend>Octal</legend>
+            <input name="octal" type="text" value="177777" disabled>
+          </fieldset>
+          <fieldset>
+            <legend>Signed</legend>
+            <input name="signed" type="number" step="1" min="-32768" max="32767">
+          </fieldset>
+          <fieldset>
+            <legend>Unsigned</legend>
+            <input name="unsigned" type="number" step="1" min="0" max="36536">
+          </fieldset>
+          <fieldset class="hspan2">
+            <legend>Binary</legend>
+            <div class="binary">
+              <input name="bit" title="Bit 15 (32768)" type="checkbox">
+              <input name="bit" title="Bit 14 (16384)" type="checkbox">
+              <input name="bit" title="Bit 13 (8192)" type="checkbox">
+              <input name="bit" title="Bit 12 (4096)" type="checkbox">
+              <input name="bit" title="Bit 11 (2048)" type="checkbox">
+              <input name="bit" title="Bit 10 (1024)" type="checkbox">
+              <input name="bit" title="Bit 9 (512)" type="checkbox">
+              <input name="bit" title="Bit 8 (256)" type="checkbox">
+              <input name="bit" title="Bit 7 (128)" type="checkbox">
+              <input name="bit" title="Bit 6 (64)" type="checkbox">
+              <input name="bit" title="Bit 5 (32)" type="checkbox">
+              <input name="bit" title="Bit 4 (16)" type="checkbox">
+              <input name="bit" title="Bit 3 (8)" type="checkbox">
+              <input name="bit" title="Bit 2 (4)" type="checkbox">
+              <input name="bit" title="Bit 1 (2)" type="checkbox">
+              <input name="bit" title="Bit 0 (1)" type="checkbox">
+            </div>
+          </fieldset>
         </form>
-    </aside>
-  </template>
+      </aside>
+    </template>
 
   <template id="dockTemplate">
-    <aside>
-      <button data-window="file-picker" title="File picker"><svg-icon name="files"></svg-icon></button>
-      <button data-window="memory-editor" title="Memory editor"><svg-icon name="memory"></svg-icon></button>
-      <button data-window="state-editor" title="State"><svg-icon name="state"></svg-icon></button>
-      <button data-window="documentation-viewer" title="Documentation"><svg-icon
-          name="documentation"></svg-icon></button>
-      <button data-window="screen-editor" title="Screen editor"><svg-icon name="screen-editor"></svg-icon></button>
-      <button data-window="config-editor" title="Settings"><svg-icon name="settings"></svg-icon></button>
-      <button data-window="screen-viewer" title="Screen"><svg-icon name="screen"></svg-icon></button>
-      <button data-window="log-viewer" title="Log"><svg-icon name="log"></svg-icon></button>
-    </aside>
+      <aside>
+          <button data-window="state-editor" title="State"><svg-icon name="executeCurrentStatement"></svg-icon></button>
+        <button data-window="file-picker" title="File picker"><svg-icon name="folder"></svg-icon></button>
+        <button data-window="memory-editor" title="Memory editor"><svg-icon name="editMemory"></svg-icon></button>
+        <button data-window="screen-editor" title="Screen editor"><svg-icon name="editScreen"></svg-icon></button>
+        <button data-window="config-editor" title="Settings"><svg-icon name="settings"></svg-icon></button>
+        <button data-window="screen-viewer" title="Screen"><svg-icon name="screens"></svg-icon></button>
+        <button data-window="log-viewer" title="Log"><svg-icon name="showLogs"></svg-icon></button>
+        <button data-window="documentation-viewer" title="Documentation"><svg-icon
+            name="documentation"></svg-icon></button>
+      </aside>
   </template>
 
   <template id="stateViewTemplate">
-    <form onsubmit="return false;">
-      <div>
-        <button name="build">
-          <svg-icon name="build"></svg-icon> Build
-        </button>
-        <select name="file"></select>
-      </div>
-      <div>
-        <button name="reset"><svg-icon name="reset"></svg-icon> Reset</button>
-        <button name="play"><svg-icon name="play"></svg-icon> Play</button>
-        <button name="stop"><svg-icon name="stop"></svg-icon> Stop</button>
-        <button name="next"><svg-icon name="next"></svg-icon> Next</button>
-      </div>
-
-      <div class="frequency">
-        <input name="frequency" type="range" value="6" min="0" max="7" step="1" /><span>1 MHz</span>
-      </div>
-    </form>
-
-    <fieldset>
-      <legend>Registers</legend>
       <form onsubmit="return false;">
         <div>
-          <label class="register"><span>R0:</span><input type="text" value="0000" /></label>
-          <label class="register"><span>R1:</span><input type="text" value="0000" /></label>
-          <label class="register"><span>R2:</span><input type="text" value="0000" /></label>
-          <label class="register"><span>R3:</span><input type="text" value="0000" /></label>
+          <button name="build">
+            <svg-icon name="build"></svg-icon> Build
+          </button>
+          <select name="file"></select>
         </div>
         <div>
-          <label class="register"><span>R4:</span><input type="text" value="0000" /></label>
-          <label class="register"><span>R5:</span><input type="text" value="0000" /></label>
-          <label class="register"><span>R6:</span><input type="text" value="0000" /></label>
-          <label class="register"><span>R7:</span><input type="text" value="0000" /></label>
+          <button name="reset"><svg-icon name="restartStop"></svg-icon> Reset</button>
+          <button name="play"><svg-icon name="run"></svg-icon> Run</button>
+          <button name="stop"><svg-icon name="stop"></svg-icon> Stop</button>
+          <button name="next"><svg-icon name="playForward"></svg-icon> Step in</button>
         </div>
-      </form>
-    </fieldset>
 
-    <fieldset>
-      <legend>Internal Registers</legend>
-      <form onsubmit="return false;">
-        <div>
-          <label class="register"><span>FR:</span><input type="text" value="0000" /></label>
-          <label class="register"><span>SP:</span><input type="text" value="FFFF" /></label>
-          <label class="register"><span>PC:</span><input type="text" value="0000" /></label>
-          <label class="register"><span>IR:</span><input type="text" value="0000" /></label>
-        </div>
-        <div>
-          <label class="register"><span>KB:</span><input type="text" value="0000" /></label>
-          <label class="register"><span>WC:</span><input type="text" value="0000" /></label>
+        <div class="frequency">
+          <input name="frequency" type="range" value="6" min="0" max="7" step="0.01" list="frequencies" /><span>1 MHz</span>
         </div>
       </form>
-    </fieldset>
+
+      <fieldset>
+        <legend>Registers</legend>
+        <form onsubmit="return false;">
+          <div>
+            <label class="register"><span>R0:</span><input type="text" value="0000" /></label>
+            <label class="register"><span>R1:</span><input type="text" value="0000" /></label>
+            <label class="register"><span>R2:</span><input type="text" value="0000" /></label>
+            <label class="register"><span>R3:</span><input type="text" value="0000" /></label>
+          </div>
+          <div>
+            <label class="register"><span>R4:</span><input type="text" value="0000" /></label>
+            <label class="register"><span>R5:</span><input type="text" value="0000" /></label>
+            <label class="register"><span>R6:</span><input type="text" value="0000" /></label>
+            <label class="register"><span>R7:</span><input type="text" value="0000" /></label>
+          </div>
+        </form>
+      </fieldset>
+
+      <fieldset>
+        <legend>Internal Registers</legend>
+        <form onsubmit="return false;">
+          <div>
+            <label class="register"><span>FR:</span><input type="text" value="0000" /></label>
+            <label class="register"><span>SP:</span><input type="text" value="FFFF" /></label>
+            <label class="register"><span>PC:</span><input type="text" value="0000" /></label>
+            <label class="register"><span>IR:</span><input type="text" value="0000" /></label>
+          </div>
+          <div>
+            <label class="register"><span>KB:</span><input type="text" value="0000" /></label>
+            <label class="register"><span>WC:</span><input type="text" value="0000" /></label>
+          </div>
+        </form>
+      </fieldset>
+
   </template>
 
   <template id="configEditorTemplate">

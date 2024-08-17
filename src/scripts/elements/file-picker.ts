@@ -139,7 +139,7 @@ export default class FilePickerElement extends HTMLElement {
       const button = document.createElement("button");
       const icon = document.createElement("svg-icon");
 
-      icon.setIcon("remove");
+      icon.setIcon("delete");
       button.append(icon);
       button.addEventListener("click", () => {
         this.dispatchEvent(new CustomEvent("fileDelete", { detail: path }));
