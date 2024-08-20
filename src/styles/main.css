@@ -141,6 +141,14 @@
     border-radius: calc(0.5em - 2px);
   }
 
+  select,
+  button {
+    &:hover {
+      background-color: var(--gray3);
+      cursor: pointer;
+    }
+  }
+
   input:focus {
     outline: none;
     /*
@@ -794,16 +802,23 @@
     & .folder {
       & .folder,
       & .file {
-        margin-left: 0.5em;
+        margin-left: 0.75em;
       }
     }
 
     & button {
-      border: solid 1px var(--gray3);
-      background-color: var(--gray2);
-
       &:first-child {
         flex-grow: 1;
+      }
+    }
+
+    & input[type="text"] {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: 0;
+      &[readonly] {
+        pointer-events: none;
       }
     }
   }
@@ -937,6 +952,21 @@
   flex-grow: 1;
   contain: strict;
   position: relative;
+}
+
+.context-menu {
+  position: absolute;
+  z-index: 1000;
+  background-color: var(--gray0);
+  border: solid 1px var(--gray3);
+  padding: 0.25em;
+
+  & button {
+    display: block;
+    width: 100%;
+    padding: 0.35em;
+    text-align: left;
+  }
 }
 
 #loading {

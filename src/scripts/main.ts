@@ -8,6 +8,8 @@ import {
 } from "./windows/mod.js";
 import globalState, { GlobalState } from "./state/global.js";
 import CharMap from "./resources/charmap.js";
+import { contextSetup } from "./context.js";
+import { FsFile } from "./resources/fs.js";
 
 self.MonacoEnvironment = {
   getWorker(label) {
@@ -17,6 +19,7 @@ self.MonacoEnvironment = {
 
 async function main() {
   await createCharmap();
+  contextSetup();
   const windows = createWindows(globalState);
   createDock(globalState, windows);
 
@@ -49,9 +52,9 @@ function createDock(globalState: GlobalState, windows: Partial<Windows>) {
   document.body.prepend(dock);
 }
 
-function openFile(filename: string) {
-  modelCache[filename] ??= (() => {
-    const extension = filename.match(/\.([^.]+)$/);
+function openFile(file: FsFile) {
+  modelCache[file.id] ??= (() => {
+    const extension = file.name.match(/\.([^.]+)$/);
     let language;
 
     if (extension) {
@@ -59,10 +62,7 @@ function openFile(filename: string) {
       console.log(language);
     }
 
-    return monaco.editor.createModel(
-      globalState.resourceManager.get("fs").user.read(filename)!,
-      language,
-    );
+    return monaco.editor.createModel(file.content, language);
   })();
 
   const editor = new SourceEditorWindow({
@@ -75,20 +75,22 @@ function openFile(filename: string) {
     globalState,
   });
 
-  editor.setModel(modelCache[filename], filename);
+  editor.setModel(modelCache[file.id], file.name);
   editor.focus();
 }
 
 async function createCharmap() {
   const fs = globalState.resourceManager.get("fs").internal;
 
+  console.log(fs.root.open("charmap.mif"));
+
   const result = await globalState.resourceManager
     .get("mainWorker")
-    .request("parse-mif", fs.read("charmap.mif")!);
+    .request("parse-mif", (fs.root.open("charmap.mif")! as FsFile).content);
 
   const charmap = CharMap.fromBytes(
     result,
-    fs.readJSON<string[]>("palette/8bit.json")!,
+    JSON.parse((fs.root.open("palette/8bit.json", false)! as FsFile).content),
   );
 
   globalState.resourceManager.set("charmap", charmap);

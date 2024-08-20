@@ -77,10 +77,13 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
 
     // maybe we should pass fs to file-picker intead of updating it through the window?
     const fs = resourceManager.get("fs").user;
-    body.setFiles(fs.files());
+    body.setFiles(fs.root.children);
 
-    body.addEventListener("fileOpen", ({ detail: filename }) => {
-      eventManager.emmit("fileOpen", filename);
+    body.addEventListener("fileOpen", ({ detail: file }) => {
+      eventManager.emmit("fileOpen", file);
+    });
+    body.addEventListener("fileRename", ({ detail: { pathOld, pathNew } }) => {
+      fs.rename(pathOld, pathNew);
     });
     body.addEventListener("fileDelete", ({ detail: filename }) => {
       fs.delete(filename);

@@ -3,7 +3,7 @@ import ConfigManager from "./config.js";
 import EventManager from "./event.js";
 import CharMap from "../resources/charmap.js";
 import ResourceManager from "./resources.js";
-import Fs from "../resources/fs.js";
+import Fs, { FsFile } from "../resources/fs.js";
 import MainWorker from "../resources/main-worker.js";
 
 export interface GlobalState {
@@ -14,7 +14,7 @@ export interface GlobalState {
 
 export interface GlobalEventsMap {
   fileDelete: FileManagerFile;
-  fileOpen: FileManagerFile;
+  fileOpen: FsFile;
   windowOpen: string;
   error: Error;
   render: void;
