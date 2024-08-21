@@ -1,7 +1,10 @@
-import { FsFile, FsFolder } from "../resources/fs";
+import {
+  VirtualFileSystemDirectory,
+  VirtualFileSystemFile,
+} from "../resources/fs";
 
 interface FileOpenEvent {
-  detail: FsFile;
+  detail: VirtualFileSystemFile;
 }
 
 interface FileRenameEvent {
@@ -12,12 +15,10 @@ interface FileRenameEvent {
 }
 
 interface FileDeleteEvent {
-  detail: string;
+  detail: VirtualFileSystemFile;
 }
 
 export default class FilePickerElement extends HTMLElement {
-  #files: Record<string, FsFolder | FsFile> = {};
-
   constructor() {
     super();
   }
@@ -25,16 +26,16 @@ export default class FilePickerElement extends HTMLElement {
   connectedCallback() {
     this.dataset.contextMenuId = "filepicker";
 
-    // this.addEventListener("fileNew", () => {
-    //   const file = this.#generateFile("untitled", "");
-    //   this.append(file);
-    //   file.dispatchEvent(new Event("fileRenameStart"));
-    // });
+    this.addEventListener("fileNew", () => {
+      const file = this.#generateFile(new VirtualFileSystemFile("untitled"));
+      this.append(file);
+      file.dispatchEvent(new Event("fileRenameStart"));
+    });
 
     this.#update();
   }
 
-  #generateFile(file: FsFile) {
+  #generateFile(file: VirtualFileSystemFile) {
     const div = document.createElement("div");
 
     div.classList.add("file");
@@ -45,29 +46,31 @@ export default class FilePickerElement extends HTMLElement {
       const button = document.createElement("button");
       const text = document.createElement("input");
       text.type = "text";
-      text.value = file.name;
+      text.value = file ? file.name : "untitled";
       text.readOnly = true;
 
       const form = document.createElement("form");
-      // form.onsubmit = () => {
-      //   const pathNewS = path.split("/");
-      //   pathNewS[pathNewS.length - 1] = text.value;
-      //   const pathNew = pathNewS.join("/");
+      form.onsubmit = () => {
+        if (!file.created) {
+          file.create();
+        }
 
-      //   if (path != pathNew) {
-      //     this.dispatchEvent(
-      //       new CustomEvent("fileRename", {
-      //         detail: {
-      //           pathOld: path,
-      //           pathNew,
-      //         },
-      //       }),
-      //     );
-      //   }
+        // const name = text.value;
 
-      //  text.readOnly = true;
-      //  return false;
-      //};
+        // if (path != pathNew) {
+        //   this.dispatchEvent(
+        //     new CustomEvent("fileRename", {
+        //       detail: {
+        //         pathOld: path,
+        //         pathNew,
+        //       },
+        //     }),
+        //   );
+        // }
+
+        text.readOnly = true;
+        return false;
+      };
 
       div.addEventListener("fileRenameStart", () => {
         text.readOnly = false;
@@ -94,16 +97,14 @@ export default class FilePickerElement extends HTMLElement {
     return div;
   }
 
-  #generateFolder(folder: FsFolder) {
+  #generateFolder(folder: VirtualFileSystemDirectory) {
     const div = document.createElement("div");
-
     div.classList.add("folder");
 
     const childDiv = document.createElement("div");
 
     {
       const button = document.createElement("button");
-
       button.innerText = folder.name;
 
       button.addEventListener("click", () => {
@@ -118,15 +119,19 @@ export default class FilePickerElement extends HTMLElement {
     return { mainNode: div, childNode: childDiv };
   }
 
-  #buildFileTree(files: Record<string, FsFile | FsFolder>) {
+  async #buildFileTree(directory: VirtualFileSystemDirectory) {
     const filesDiv = document.createElement("div");
 
-    for (const file of Object.values(files)) {
-      if (file instanceof FsFile) {
+    for await (const file of directory.list()) {
+      if (file instanceof VirtualFileSystemFile) {
         filesDiv.appendChild(this.#generateFile(file));
       } else {
-        const { mainNode, childNode } = this.#generateFolder(file);
-        childNode.appendChild(this.#buildFileTree(file.children));
+        const { mainNode, childNode } = this.#generateFolder(
+          file as VirtualFileSystemDirectory,
+        );
+        childNode.appendChild(
+          await this.#buildFileTree(file as VirtualFileSystemDirectory),
+        );
         filesDiv.appendChild(mainNode);
       }
     }
@@ -134,80 +139,25 @@ export default class FilePickerElement extends HTMLElement {
     return filesDiv;
   }
 
-  // #buildFileTree() {
-  //   type FileNode = {
-  //     mainNode: HTMLElement;
-  //     filesNode: HTMLElement;
-  //     children: Record<string, FileNode>;
-  //   };
-
-  //   const fileTree: FileNode = {
-  //     mainNode: this,
-  //     filesNode: this,
-  //     children: {},
-  //   };
-
-  //   for (const file of this.#files) {
-  //     // const realPath = this.#resolvePath(path);
-  //     // const filename = realPath.pop()!;
-
-  //     let currentDir = fileTree;
-
-  //     for (const subdir of realPath) {
-  //       let nextDir = fileTree.children[subdir];
-
-  //       if (!nextDir) {
-  //         const { mainNode, filesNode } = this.#generateFolder(subdir);
-  //         nextDir = {
-  //           mainNode,
-  //           filesNode,
-  //           children: {},
-  //         };
-
-  //         fileTree.children[subdir] = nextDir;
-
-  //         currentDir.filesNode.appendChild(nextDir.mainNode);
-  //       }
-
-  //       currentDir = nextDir;
-  //     }
-
-  //     currentDir.filesNode.appendChild(this.#generateFile(filename, path));
-  //   }
-
-  //  return fileTree.mainNode;
-  // }
-
-  // #resolvePath(path: string) {
-  //   const stack: string[] = [];
-
-  //   path.split("/").forEach((filename: string) => {
-  //     if (filename == "..") {
-  //       stack.pop();
-  //     } else if (filename == ".") {
-  //       //
-  //     } else if (filename == "") {
-  //       //
-  //     } else {
-  //       stack.push(filename);
-  //     }
-  //   });
-
-  //   return stack;
-  // }
-
-  #update() {
+  async #update() {
     this.replaceChildren();
-    this.append(this.#buildFileTree(this.#files));
+    this.append(
+      await this.#buildFileTree(
+        new VirtualFileSystemDirectory(
+          "",
+          await navigator.storage.getDirectory(),
+        ),
+      ),
+    );
   }
 
-  setFiles(files: Record<string, FsFolder | FsFile>) {
-    this.#files = files;
+  // setFiles(files: Record<string, FsFolder | FsFile>) {
+  //   this.#files = files;
 
-    if (this.isConnected) {
-      this.#update();
-    }
-  }
+  //   if (this.isConnected) {
+  //     this.#update();
+  //   }
+  // }
 }
 
 customElements.define("file-picker", FilePickerElement);

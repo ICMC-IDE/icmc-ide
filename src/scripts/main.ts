@@ -9,7 +9,7 @@ import {
 import globalState, { GlobalState } from "./state/global.js";
 import CharMap from "./resources/charmap.js";
 import { contextSetup } from "./context.js";
-import { FsFile } from "./resources/fs.js";
+import { VirtualFileSystemFile } from "./resources/fs.js";
 
 self.MonacoEnvironment = {
   getWorker(label) {
@@ -52,17 +52,17 @@ function createDock(globalState: GlobalState, windows: Partial<Windows>) {
   document.body.prepend(dock);
 }
 
-function openFile(file: FsFile) {
-  modelCache[file.id] ??= (() => {
+async function openFile(file: VirtualFileSystemFile) {
+  // REPLACE file.name WITH SOMETHING UNIQUE
+  modelCache[file.name] ??= await (async () => {
     const extension = file.name.match(/\.([^.]+)$/);
     let language;
 
     if (extension) {
       language = extension[1].toLowerCase();
-      console.log(language);
     }
 
-    return monaco.editor.createModel(file.content, language);
+    return monaco.editor.createModel(await file.read(), language);
   })();
 
   const editor = new SourceEditorWindow({
@@ -75,22 +75,20 @@ function openFile(file: FsFile) {
     globalState,
   });
 
-  editor.setModel(modelCache[file.id], file.name);
+  editor.setModel(modelCache[file.name], file);
   editor.focus();
 }
 
 async function createCharmap() {
-  const fs = globalState.resourceManager.get("fs").internal;
-
-  console.log(fs.root.open("charmap.mif"));
+  // const fs = globalState.resourceManager.get("fs").internal;
 
   const result = await globalState.resourceManager
     .get("mainWorker")
-    .request("parse-mif", (fs.root.open("charmap.mif")! as FsFile).content);
+    .request("parse-mif", await (await fetch("assets/charmap.mif")).text());
 
   const charmap = CharMap.fromBytes(
     result,
-    JSON.parse((fs.root.open("palette/8bit.json", false)! as FsFile).content),
+    await (await fetch("assets/palette/8bit.json")).json(),
   );
 
   globalState.resourceManager.set("charmap", charmap);

@@ -1,10 +1,12 @@
-import { FileManagerFile } from "../types";
 import ConfigManager from "./config.js";
 import EventManager from "./event.js";
 import CharMap from "../resources/charmap.js";
 import ResourceManager from "./resources.js";
-import Fs, { FsFile } from "../resources/fs.js";
 import MainWorker from "../resources/main-worker.js";
+import {
+  VirtualFileSystemDirectory,
+  VirtualFileSystemFile,
+} from "../resources/fs.js";
 
 export interface GlobalState {
   eventManager: EventManager<GlobalEventsMap>;
@@ -13,8 +15,8 @@ export interface GlobalState {
 }
 
 export interface GlobalEventsMap {
-  fileDelete: FileManagerFile;
-  fileOpen: FsFile;
+  fileDelete: VirtualFileSystemFile;
+  fileOpen: VirtualFileSystemFile;
   windowOpen: string;
   error: Error;
   render: void;
@@ -32,10 +34,7 @@ export interface GlobalConfigsMap {
 
 export interface GlobalResourcesMap {
   charmap: CharMap;
-  fs: {
-    internal: Fs;
-    user: Fs;
-  };
+  fs: VirtualFileSystemDirectory;
   registers: Uint16Array;
   internalRegisters: Uint16Array;
   ram: Uint16Array;
@@ -58,15 +57,19 @@ const configManager = new ConfigManager<GlobalConfigsMap>({
 configManager.loadAll();
 
 const resourceManager = new ResourceManager<GlobalResourcesMap>();
-const internalFs = new Fs("internal");
-const userFs = new Fs("user");
 const mainWorker = new MainWorker();
+
+const fs = new VirtualFileSystemDirectory(
+  "",
+  await navigator.storage.getDirectory(),
+);
+
 await Promise.all([
-  internalFs.loadAssets(),
-  userFs.loadAssets(),
+  // internalFs.loadAssets(),
+  // userFs.loadAssets(),
   mainWorker.isReady,
 ]);
-resourceManager.set("fs", { internal: internalFs, user: userFs });
+resourceManager.set("fs", fs);
 resourceManager.set("mainWorker", mainWorker);
 
 export default <GlobalState>{
