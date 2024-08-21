@@ -1,7 +1,9 @@
-class VirtualFileSystemObject<T extends FileSystemHandle> {
+class VirtualFileSystemObject<
+  T extends FileSystemFileHandle | FileSystemDirectoryHandle,
+> {
+  name: string;
   handle?: T;
-  readonly name: string;
-  readonly parent?: VirtualFileSystemDirectory;
+  parent?: VirtualFileSystemDirectory;
 
   constructor(name: string, handle?: T, parent?: VirtualFileSystemDirectory) {
     this.name = name;
@@ -11,6 +13,11 @@ class VirtualFileSystemObject<T extends FileSystemHandle> {
 
   get created() {
     return this.handle !== undefined;
+  }
+
+  async delete() {
+    await this.parent!.handle!.removeEntry(this.name, { recursive: true });
+    this.handle = undefined;
   }
 }
 
@@ -25,7 +32,7 @@ export class VirtualFileSystemFile extends VirtualFileSystemObject<FileSystemFil
     return (await this.handle!.getFile()).text();
   }
 
-  async write(data: string, position?: number, size: number = data.length) {
+  async write(data: string, position: number = 0, size: number = data.length) {
     const handle = await this.handle!.createWritable();
     await handle.write({
       data,
@@ -34,6 +41,20 @@ export class VirtualFileSystemFile extends VirtualFileSystemObject<FileSystemFil
       type: "write",
     } as FileSystemWriteChunkType);
     await handle.close();
+  }
+
+  async copy(directory: VirtualFileSystemDirectory, name: string = this.name) {
+    const content = await this.read();
+    const newFile = directory.createFile(name);
+    await newFile.create();
+    await newFile.write(content);
+    return newFile;
+  }
+
+  async move(directory: VirtualFileSystemDirectory, name: string = this.name) {
+    const newFile = await this.copy(directory, name);
+    await this.delete();
+    return newFile;
   }
 }
 
@@ -44,12 +65,17 @@ export class VirtualFileSystemDirectory extends VirtualFileSystemObject<FileSyst
     });
   }
 
-  createFile() {
-    return new VirtualFileSystemFile(this.name, undefined, this);
+  createDirectory(name: string) {
+    return new VirtualFileSystemDirectory(name, undefined, this);
   }
 
-  createDirectory() {
-    return new VirtualFileSystemDirectory(this.name, undefined, this);
+  createFile(name: string) {
+    return new VirtualFileSystemFile(name, undefined, this);
+  }
+
+  async getDirectory(name: string) {
+    const handle = await this.handle!.getDirectoryHandle(name);
+    return new VirtualFileSystemDirectory(name, handle, this);
   }
 
   async getFile(name: string) {
@@ -57,9 +83,21 @@ export class VirtualFileSystemDirectory extends VirtualFileSystemObject<FileSyst
     return new VirtualFileSystemDirectory(name, handle, this);
   }
 
-  async getDirectory(name: string) {
-    const handle = await this.handle!.getDirectoryHandle(name);
-    return new VirtualFileSystemDirectory(name, handle, this);
+  async copy(directory: VirtualFileSystemDirectory, name: string = this.name) {
+    const newDirectory = directory.createDirectory(name);
+    await newDirectory.create();
+
+    for await (const object of this.list()) {
+      await object.copy(newDirectory);
+    }
+
+    return newDirectory;
+  }
+
+  async move(directory: VirtualFileSystemDirectory, name: string = this.name) {
+    const newDirectory = await this.copy(directory, name);
+    await this.delete();
+    return newDirectory;
   }
 
   async *list() {

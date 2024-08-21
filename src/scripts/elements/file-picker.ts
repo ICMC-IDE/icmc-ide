@@ -19,6 +19,8 @@ interface FileDeleteEvent {
 }
 
 export default class FilePickerElement extends HTMLElement {
+  #fs?: VirtualFileSystemDirectory;
+
   constructor() {
     super();
   }
@@ -27,7 +29,7 @@ export default class FilePickerElement extends HTMLElement {
     this.dataset.contextMenuId = "filepicker";
 
     this.addEventListener("fileNew", () => {
-      const file = this.#generateFile(new VirtualFileSystemFile("untitled"));
+      const file = this.#generateFile(this.#fs!.createFile("untitled"));
       this.append(file);
       file.dispatchEvent(new Event("fileRenameStart"));
     });
@@ -46,11 +48,12 @@ export default class FilePickerElement extends HTMLElement {
       const button = document.createElement("button");
       const text = document.createElement("input");
       text.type = "text";
-      text.value = file ? file.name : "untitled";
+      text.value = file.name;
       text.readOnly = true;
 
       const form = document.createElement("form");
       form.onsubmit = () => {
+        file.name = text.value;
         if (!file.created) {
           file.create();
         }
@@ -76,6 +79,11 @@ export default class FilePickerElement extends HTMLElement {
         text.readOnly = false;
         text.focus();
         text.select();
+      });
+
+      div.addEventListener("fileDelete", () => {
+        file.delete();
+        div.remove();
       });
 
       button.addEventListener("click", () => {
@@ -151,13 +159,10 @@ export default class FilePickerElement extends HTMLElement {
     );
   }
 
-  // setFiles(files: Record<string, FsFolder | FsFile>) {
-  //   this.#files = files;
-
-  //   if (this.isConnected) {
-  //     this.#update();
-  //   }
-  // }
+  setFs(fs: VirtualFileSystemDirectory) {
+    this.#fs = fs;
+    this.#update();
+  }
 }
 
 customElements.define("file-picker", FilePickerElement);

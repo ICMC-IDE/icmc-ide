@@ -7,7 +7,7 @@ import { WindowConstructor } from "../types/windows";
 export default class StateEditorWindow extends Fenster<FilePickerElement> {
   constructor({
     style,
-    globalState: { eventManager },
+    globalState: { eventManager, resourceManager },
     globalState,
   }: WindowConstructor) {
     const body = document.createElement("file-picker");
@@ -94,6 +94,7 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
       globalState,
     });
 
+    body.setFs(resourceManager.get("fs"));
     // const fsSubscriber = fs.getSubscriber();
 
     // this.#fs = fs;
