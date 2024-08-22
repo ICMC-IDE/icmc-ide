@@ -24,7 +24,7 @@ export default class Fenster<T extends HTMLElement> {
   #body;
   #dragger;
   #wrapper;
-  #window;
+  #container;
   #onCloseHandlers: EventHandler<void>[] = [];
 
   isOpen = true;
@@ -40,7 +40,7 @@ export default class Fenster<T extends HTMLElement> {
   }: FensterConstructor<T>) {
     const wrapper = (this.#wrapper = document.createElement("div"));
     const dragger = (this.#dragger = document.createElement("summary"));
-    const window = (this.#window = document.createElement("details"));
+    const container = (this.#container = document.createElement("details"));
 
     const { left, top, ...others } = style ?? {};
 
@@ -58,7 +58,7 @@ export default class Fenster<T extends HTMLElement> {
 
     wrapper.classList.add("wrapper");
     dragger.classList.add("dragger");
-    window.classList.add("window");
+    container.classList.add("window");
 
     // TODO: IMPROVE THIS !!!!!
     const snap = interact.modifiers.snap({
@@ -66,6 +66,12 @@ export default class Fenster<T extends HTMLElement> {
         interact.snappers.grid({
           x: configManager.get("gridWidth"),
           y: configManager.get("gridHeight"),
+          limits: {
+            left: 0,
+            right: window.screen.width,
+            top: 0,
+            bottom: window.screen.height,
+          },
         }),
       ],
       range: Infinity,
@@ -76,6 +82,12 @@ export default class Fenster<T extends HTMLElement> {
       const snapGrid = interact.snappers.grid({
         x: configManager.get("gridWidth"),
         y: configManager.get("gridHeight"),
+        limits: {
+          left: 0,
+          right: window.screen.width,
+          top: 0,
+          bottom: window.screen.height,
+        },
       });
       snap.options.targets = [snapGrid];
     });
@@ -98,7 +110,7 @@ export default class Fenster<T extends HTMLElement> {
       },
     });
 
-    interact(window).resizable({
+    interact(container).resizable({
       modifiers: [snap],
       edges: { top: true, left: true, bottom: true, right: true },
       listeners: {
@@ -116,7 +128,7 @@ export default class Fenster<T extends HTMLElement> {
       },
     });
 
-    window.open = open ?? true;
+    container.open = open ?? true;
 
     this.#body = body;
 
@@ -132,8 +144,8 @@ export default class Fenster<T extends HTMLElement> {
         this.toggleMinimize();
       });
 
-      window.addEventListener("toggle", () => {
-        icon.setIcon(window.open ? "minimize" : "unminimize");
+      container.addEventListener("toggle", () => {
+        icon.setIcon(container.open ? "minimize" : "unminimize");
       });
 
       dragger.append(button);
@@ -162,8 +174,8 @@ export default class Fenster<T extends HTMLElement> {
       dragger.append(button);
     }
 
-    window.append(dragger, body);
-    wrapper.append(window);
+    container.append(dragger, body);
+    wrapper.append(container);
 
     wrapper.addEventListener("pointerdown", () => {
       this.focus();
@@ -187,7 +199,7 @@ export default class Fenster<T extends HTMLElement> {
     this.#body.remove();
     this.#dragger.remove();
     this.#wrapper.remove();
-    this.#window.remove();
+    this.#container.remove();
   }
 
   focus() {
@@ -199,7 +211,7 @@ export default class Fenster<T extends HTMLElement> {
   }
 
   getClientRect() {
-    return this.#window.getBoundingClientRect();
+    return this.#container.getBoundingClientRect();
   }
 
   get body() {
@@ -207,9 +219,9 @@ export default class Fenster<T extends HTMLElement> {
   }
 
   toggleMinimize(force?: boolean) {
-    const value = force ?? this.#window.open;
-    this.#window.open = !value;
-    return this.#window.open;
+    const value = force ?? this.#container.open;
+    this.#container.open = !value;
+    return this.#container.open;
   }
 
   onClose(handler: EventHandler<void>) {

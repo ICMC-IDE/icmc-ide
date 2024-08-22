@@ -1,3 +1,4 @@
+import { VirtualFileSystemFile } from "../resources/fs.js";
 import {
   assemble,
   Compiler,
@@ -105,42 +106,43 @@ setInterval(function () {
   lastCheck = now;
 }, 1000);
 
-const fs = {
-  _files: {} as Record<string, string>,
+// const fs = {
+//   _files: {} as Record<string, string>,
 
-  read(filename: string) {
-    return this._files[filename];
-  },
+//   read(filename: string) {
+//     return this._files[filename];
+//   },
 
-  write(filename: string, data: string) {
-    this._files[filename] = data;
-  },
+//   write(filename: string, data: string) {
+//     this._files[filename] = data;
+//   },
 
-  files(): string[] {
-    return Object.keys(this._files);
-  },
-};
+//   files(): string[] {
+//     return Object.keys(this._files);
+//   },
+// };
 
-function build({
-  entry,
+async function build({
   files,
   syntax,
 }: {
-  entry: string;
-  files: { [index: string]: string };
+  files: [VirtualFileSystemFile];
   syntax: string;
 }) {
-  fs._files = files;
-
-  const language = entry.match(/\.([^.]+)$/)![1].toLowerCase();
+  // TODO: Support multiple files (for imports)
+  const file = files[0];
+  const language = file.name.match(/\.([^.]+)$/)![1].toLowerCase();
   let asm;
 
+  const data = { [file.name]: await file.read() };
+
+  // TODO: Improve this
   if (language === "c") {
-    asm = Compiler.compile(fs, entry);
-    fs.write((entry += ".asm"), asm);
+    asm = Compiler.compile(data, file.name);
+    // fs.write((entry += ".asm"), asm);
   }
 
-  const assembly = assemble(fs, entry, `syntax/${syntax}.toml`);
+  const assembly = assemble(data, file.name, `syntax/${syntax}.toml`);
 
   emulator.load(assembly.binary());
 

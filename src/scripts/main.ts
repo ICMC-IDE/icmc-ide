@@ -33,7 +33,8 @@ async function main() {
   requestAnimationFrame(draw);
 }
 
-const modelCache: Record<string, monaco.editor.ITextModel> = {};
+const modelCache: Map<VirtualFileSystemFile, monaco.editor.ITextModel> =
+  new Map();
 
 function createDock(globalState: GlobalState, windows: Partial<Windows>) {
   const dock = document.createElement("apps-dock");
@@ -53,17 +54,21 @@ function createDock(globalState: GlobalState, windows: Partial<Windows>) {
 }
 
 async function openFile(file: VirtualFileSystemFile) {
-  // REPLACE file.name WITH SOMETHING UNIQUE
-  modelCache[file.name] ??= await (async () => {
-    const extension = file.name.match(/\.([^.]+)$/);
-    let language;
+  if (!modelCache.has(file)) {
+    modelCache.set(
+      file,
+      await (async () => {
+        const extension = file.name.match(/\.([^.]+)$/);
+        let language;
 
-    if (extension) {
-      language = extension[1].toLowerCase();
-    }
+        if (extension) {
+          language = extension[1].toLowerCase();
+        }
 
-    return monaco.editor.createModel(await file.read(), language);
-  })();
+        return monaco.editor.createModel(await file.read(), language);
+      })(),
+    );
+  }
 
   const editor = new SourceEditorWindow({
     style: {
@@ -75,7 +80,7 @@ async function openFile(file: VirtualFileSystemFile) {
     globalState,
   });
 
-  editor.setModel(modelCache[file.name], file);
+  editor.setModel(modelCache.get(file)!, file);
   editor.focus();
 }
 

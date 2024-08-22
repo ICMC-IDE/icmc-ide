@@ -7,17 +7,6 @@ interface FileOpenEvent {
   detail: VirtualFileSystemFile;
 }
 
-interface FileRenameEvent {
-  detail: {
-    pathOld: string;
-    pathNew: string;
-  };
-}
-
-interface FileDeleteEvent {
-  detail: VirtualFileSystemFile;
-}
-
 export default class FilePickerElement extends HTMLElement {
   #fs?: VirtualFileSystemDirectory;
 
@@ -42,68 +31,7 @@ export default class FilePickerElement extends HTMLElement {
     });
   }
 
-  #generateFile(file: VirtualFileSystemFile) {
-    const div = document.createElement("div");
-
-    div.classList.add("file");
-    div.dataset.contextMenuId = "file";
-
-    {
-      const button = document.createElement("button");
-      const text = document.createElement("input");
-      text.type = "text";
-      text.value = file.name;
-      text.readOnly = true;
-
-      const form = document.createElement("form");
-      form.onsubmit = () => {
-        text.readOnly = true;
-
-        const name = text.value;
-        if (!file.created) {
-          file.name = name;
-          file.create();
-        } else {
-          file.rename(name).then((renamed) => {
-            file = renamed;
-          });
-        }
-
-        return false;
-      };
-
-      div.addEventListener("fileRename", () => {
-        text.readOnly = false;
-        text.focus();
-        text.select();
-      });
-
-      div.addEventListener("fileDelete", () => {
-        file.delete();
-        div.remove();
-      });
-
-      button.addEventListener("click", () => {
-        if (text.readOnly) {
-          this.dispatchEvent(new CustomEvent("fileOpen", { detail: file }));
-        }
-      });
-
-      text.addEventListener("blur", () => {
-        if (!text.readOnly) {
-          form.onsubmit!(new SubmitEvent("submit"));
-        }
-      });
-
-      form.append(text);
-      button.append(form);
-      div.append(button);
-    }
-
-    return div;
-  }
-
-  #generateFolder(folder: VirtualFileSystemDirectory) {
+  #generateFolder(folder: VirtualFileSystemDirectory, ident: number = 0) {
     const div = document.createElement("div");
     div.classList.add("folder");
     div.dataset.contextMenuId = "folder";
@@ -112,21 +40,34 @@ export default class FilePickerElement extends HTMLElement {
 
     div.addEventListener("fileNew", (event) => {
       event.stopPropagation();
-      const file = this.#generateFile(folder.createFile("untitled"));
+      childDiv.hidden = false;
+      const file = this.#generateFile(folder.createFile("untitled"), ident + 1);
       childDiv.append(file);
       file.dispatchEvent(new Event("fileRename"));
     });
     div.addEventListener("folderNew", (event) => {
       event.stopPropagation();
+      childDiv.hidden = false;
       const { mainNode } = this.#generateFolder(
         folder.createDirectory("untitled"),
+        ident + 1,
       );
       childDiv.append(mainNode);
       mainNode.dispatchEvent(new Event("folderRename"));
     });
+    div.addEventListener("folderOpen", (event) => {
+      event.stopPropagation();
+      childDiv.hidden = !childDiv.hidden;
+    });
 
     {
       const button = document.createElement("button");
+      for (let i = 0; i < ident; i++) {
+        const identDiv = document.createElement("div");
+        identDiv.classList.add("ident");
+        button.append(identDiv);
+      }
+
       const text = document.createElement("input");
       text.type = "text";
       text.value = folder.name;
@@ -178,18 +119,90 @@ export default class FilePickerElement extends HTMLElement {
     return { mainNode: div, childNode: childDiv };
   }
 
-  async #buildFileTree(directory: VirtualFileSystemDirectory) {
+  #generateFile(file: VirtualFileSystemFile, ident: number = 0) {
+    const div = document.createElement("div");
+
+    div.classList.add("file");
+    div.dataset.contextMenuId = "file";
+
+    {
+      const button = document.createElement("button");
+      for (let i = 0; i < ident; i++) {
+        const identDiv = document.createElement("div");
+        identDiv.classList.add("ident");
+        button.append(identDiv);
+      }
+
+      const text = document.createElement("input");
+      text.type = "text";
+      text.value = file.name;
+      text.readOnly = true;
+
+      const form = document.createElement("form");
+      form.onsubmit = () => {
+        text.readOnly = true;
+
+        const name = text.value;
+        if (!file.created) {
+          file.name = name;
+          file.create();
+        } else {
+          file.rename(name);
+        }
+
+        return false;
+      };
+
+      div.addEventListener("fileRename", () => {
+        text.readOnly = false;
+        text.focus();
+        text.select();
+      });
+
+      div.addEventListener("fileDelete", () => {
+        file.delete();
+        div.remove();
+      });
+
+      button.addEventListener("click", () => {
+        if (text.readOnly) {
+          this.dispatchEvent(new CustomEvent("fileOpen", { detail: file }));
+        }
+      });
+
+      text.addEventListener("blur", () => {
+        if (!text.readOnly) {
+          form.onsubmit!(new SubmitEvent("submit"));
+        }
+      });
+
+      form.append(text);
+      button.append(form);
+      div.append(button);
+    }
+
+    return div;
+  }
+
+  async #buildFileTree(
+    directory: VirtualFileSystemDirectory,
+    ident: number = 0,
+  ) {
     const filesDiv = document.createElement("div");
 
     for await (const file of directory.list()) {
       if (file instanceof VirtualFileSystemFile) {
-        filesDiv.appendChild(this.#generateFile(file));
+        filesDiv.appendChild(this.#generateFile(file, ident));
       } else {
         const { mainNode, childNode } = this.#generateFolder(
           file as VirtualFileSystemDirectory,
+          ident,
         );
         childNode.appendChild(
-          await this.#buildFileTree(file as VirtualFileSystemDirectory),
+          await this.#buildFileTree(
+            file as VirtualFileSystemDirectory,
+            ident + 1,
+          ),
         );
         filesDiv.appendChild(mainNode);
       }
@@ -217,7 +230,5 @@ declare global {
   }
   interface HTMLElementEventMap {
     fileOpen: FileOpenEvent;
-    fileRename: FileRenameEvent;
-    fileDelete: FileDeleteEvent;
   }
 }

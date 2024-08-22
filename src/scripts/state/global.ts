@@ -27,7 +27,6 @@ export interface GlobalConfigsMap {
   screenWidth: number;
   screenHeight: number;
   frequency: number;
-  entryFile: string;
   gridWidth: number;
   gridHeight: number;
 }
@@ -50,7 +49,6 @@ const configManager = new ConfigManager<GlobalConfigsMap>({
   screenWidth: 40,
   screenHeight: 30,
   frequency: 6,
-  entryFile: "example.asm",
   gridWidth: 30,
   gridHeight: 30,
 });

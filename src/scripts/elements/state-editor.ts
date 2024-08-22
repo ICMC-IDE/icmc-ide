@@ -25,8 +25,6 @@ interface StateEditorElements {
     play: HTMLButtonElement;
     next: HTMLButtonElement;
     reset: HTMLButtonElement;
-    build: HTMLButtonElement;
-    file: HTMLSelectElement;
     frequency: HTMLInputElement;
   };
   registers: HTMLInputElement[];
@@ -65,14 +63,6 @@ export default class StateEditorElement extends HTMLElement {
       );
     });
 
-    this.#elements.buttons.file.addEventListener("input", ({ target }) => {
-      this.dispatchEvent(
-        new CustomEvent("changeFile", {
-          detail: (target! as HTMLSelectElement).value,
-        }),
-      );
-    });
-
     this.#elements.buttons.play.addEventListener("click", () => {
       this.dispatchEvent(new CustomEvent("play", {}));
     });
@@ -83,10 +73,6 @@ export default class StateEditorElement extends HTMLElement {
 
     this.#elements.buttons.next.addEventListener("click", () => {
       this.dispatchEvent(new CustomEvent("next", {}));
-    });
-
-    this.#elements.buttons.build.addEventListener("click", () => {
-      this.dispatchEvent(new CustomEvent("build", {}));
     });
 
     this.#elements.buttons.reset.addEventListener("click", () => {
@@ -143,28 +129,6 @@ export default class StateEditorElement extends HTMLElement {
 
     this.#elements.buttons.stop.style.display = value ? "" : "none";
     this.#elements.buttons.play.style.display = value ? "none" : "";
-  }
-
-  setFiles(filenames: string[]) {
-    const select = this.#elements.buttons.file;
-    const value = select.value;
-    const options = [];
-
-    for (const filename of filenames) {
-      if (!filename.match(/\.c$|\.asm/i)) continue;
-
-      const option = document.createElement("option");
-      option.value = filename;
-      option.innerText = filename;
-      option.selected = filename === value;
-      options.push(option);
-    }
-
-    select.replaceChildren(...options);
-  }
-
-  setEntryFile(filename: string) {
-    this.#elements.buttons.file.value = filename;
   }
 }
 

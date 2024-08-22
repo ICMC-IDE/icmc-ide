@@ -21,55 +21,6 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
         configManager.set("frequency", frequency);
       });
 
-      body.addEventListener("changeFile", ({ detail: fileName }) => {
-        configManager.set("entryFile", fileName);
-      });
-
-      body.addEventListener("build", () => {
-        // const userFs = resourceManager.get("fs").user;
-        // const internalFs = resourceManager.get("fs").internal;
-        // const files = { ...userFs.all(), ...internalFs.all() };
-        const [entry, syntax] = configManager.getMany("entryFile", "syntax");
-
-        resourceManager
-          .get("mainWorker")
-          .request("build", {
-            files,
-            entry,
-            syntax,
-          })
-          .then(
-            ({
-              ram,
-              vram,
-              symbols,
-              registers,
-              internalRegisters,
-              // asm,
-              // mif,
-            }) => {
-              // const fs = resourceManager.get("fs").internal;
-
-              resourceManager.set("ram", ram);
-              resourceManager.set("vram", vram);
-              resourceManager.set("registers", registers);
-              resourceManager.set("internalRegisters", internalRegisters);
-              resourceManager.set("symbols", symbols);
-
-              // fs.write(entry!.replace(/\.[^.]+$/, ".mif"), mif);
-
-              // TODO: Write asm to fs
-              // if (asm) {
-              //   fs.write(entry!.replace(/\.[^.]+$/, ".asm"), asm);
-              // }
-            },
-          )
-          .catch((error) => {
-            eventManager.emmit("error", error);
-          })
-          .finally(() => {});
-      });
-
       body.addEventListener("play", () => {
         resourceManager
           .get("mainWorker")
@@ -145,9 +96,6 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
 
     configSubscriber.subscribe("frequency", (frequency: number) => {
       body.setFrequency(frequency);
-    });
-    configSubscriber.subscribe("entryFile", (fileName: string) => {
-      body.setEntryFile(fileName);
     });
 
     // resourceSubscriber.subscribe("fs", (fs) => {

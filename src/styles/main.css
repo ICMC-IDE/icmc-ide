@@ -785,14 +785,19 @@
     overflow: auto;
     padding: 0.25em;
 
-    & .folder {
-      & input[type="text"] {
-        padding-left: 0.75em;
-      }
+    & .ident {
+      width: 0.75em;
     }
 
     & button {
       width: 100%;
+      padding: 0.25em;
+      background: none;
+      border: none;
+    }
+
+    & button:hover {
+      background-color: var(--gray1);
     }
 
     & input[type="text"] {
