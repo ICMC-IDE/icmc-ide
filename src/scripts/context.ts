@@ -6,11 +6,33 @@ const contextMenusMap = {
     },
     {
       text: "Rename",
-      event: "fileRenameStart",
+      event: "fileRename",
     },
     {
       text: "Delete",
       event: "fileDelete",
+    },
+  ],
+  folder: [
+    {
+      text: "New File...",
+      event: "fileNew",
+    },
+    {
+      text: "New Folder...",
+      event: "folderNew",
+    },
+    {
+      text: "Collapse",
+      event: "folderOpen",
+    },
+    {
+      text: "Rename",
+      event: "folderRename",
+    },
+    {
+      text: "Delete",
+      event: "folderDelete",
     },
   ],
   filepicker: [

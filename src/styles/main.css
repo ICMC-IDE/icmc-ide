@@ -785,31 +785,14 @@
     overflow: auto;
     padding: 0.25em;
 
-    flex-grow: 1;
-
-    &,
-    & .folder,
-    & .file {
-      display: flex;
-      gap: 0.25em;
-    }
-
-    &,
     & .folder {
-      flex-direction: column;
-    }
-
-    & .folder {
-      & .folder,
-      & .file {
-        margin-left: 0.75em;
+      & input[type="text"] {
+        padding-left: 0.75em;
       }
     }
 
     & button {
-      &:first-child {
-        flex-grow: 1;
-      }
+      width: 100%;
     }
 
     & input[type="text"] {
@@ -961,11 +944,18 @@
   border: solid 1px var(--gray3);
   padding: 0.25em;
 
+  border-radius: 0.5em;
+
   & button {
     display: block;
     width: 100%;
-    padding: 0.35em;
+    padding: 0.3em 1em 0.3em 1em;
     text-align: left;
+    border: none;
+    background-color: var(--gray0);
+    &:hover {
+      background-color: var(--gray1);
+    }
   }
 }
 

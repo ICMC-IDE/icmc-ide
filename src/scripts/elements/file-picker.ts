@@ -31,10 +31,15 @@ export default class FilePickerElement extends HTMLElement {
     this.addEventListener("fileNew", () => {
       const file = this.#generateFile(this.#fs!.createFile("untitled"));
       this.append(file);
-      file.dispatchEvent(new Event("fileRenameStart"));
+      file.dispatchEvent(new Event("fileRename"));
     });
-
-    this.#update();
+    this.addEventListener("folderNew", () => {
+      const { mainNode: folder } = this.#generateFolder(
+        this.#fs!.createDirectory("untitled"),
+      );
+      this.append(folder);
+      folder.dispatchEvent(new Event("folderRename"));
+    });
   }
 
   #generateFile(file: VirtualFileSystemFile) {
@@ -42,7 +47,6 @@ export default class FilePickerElement extends HTMLElement {
 
     div.classList.add("file");
     div.dataset.contextMenuId = "file";
-    // div.dataset.contextMenuData = path;
 
     {
       const button = document.createElement("button");
@@ -53,29 +57,22 @@ export default class FilePickerElement extends HTMLElement {
 
       const form = document.createElement("form");
       form.onsubmit = () => {
-        file.name = text.value;
+        text.readOnly = true;
+
+        const name = text.value;
         if (!file.created) {
+          file.name = name;
           file.create();
+        } else {
+          file.rename(name).then((renamed) => {
+            file = renamed;
+          });
         }
 
-        // const name = text.value;
-
-        // if (path != pathNew) {
-        //   this.dispatchEvent(
-        //     new CustomEvent("fileRename", {
-        //       detail: {
-        //         pathOld: path,
-        //         pathNew,
-        //       },
-        //     }),
-        //   );
-        // }
-
-        text.readOnly = true;
         return false;
       };
 
-      div.addEventListener("fileRenameStart", () => {
+      div.addEventListener("fileRename", () => {
         text.readOnly = false;
         text.focus();
         text.select();
@@ -93,8 +90,9 @@ export default class FilePickerElement extends HTMLElement {
       });
 
       text.addEventListener("blur", () => {
-        console.log("blur");
-        form.onsubmit!(new SubmitEvent("submit"));
+        if (!text.readOnly) {
+          form.onsubmit!(new SubmitEvent("submit"));
+        }
       });
 
       form.append(text);
@@ -108,17 +106,70 @@ export default class FilePickerElement extends HTMLElement {
   #generateFolder(folder: VirtualFileSystemDirectory) {
     const div = document.createElement("div");
     div.classList.add("folder");
+    div.dataset.contextMenuId = "folder";
 
     const childDiv = document.createElement("div");
 
+    div.addEventListener("fileNew", (event) => {
+      event.stopPropagation();
+      const file = this.#generateFile(folder.createFile("untitled"));
+      childDiv.append(file);
+      file.dispatchEvent(new Event("fileRename"));
+    });
+    div.addEventListener("folderNew", (event) => {
+      event.stopPropagation();
+      const { mainNode } = this.#generateFolder(
+        folder.createDirectory("untitled"),
+      );
+      childDiv.append(mainNode);
+      mainNode.dispatchEvent(new Event("folderRename"));
+    });
+
     {
       const button = document.createElement("button");
-      button.innerText = folder.name;
+      const text = document.createElement("input");
+      text.type = "text";
+      text.value = folder.name;
+      text.readOnly = true;
+
+      const form = document.createElement("form");
+      form.onsubmit = () => {
+        text.readOnly = true;
+
+        const name = text.value;
+        if (!folder.created) {
+          folder.name = name;
+          folder.create();
+        } else {
+          folder.rename(name);
+        }
+
+        return false;
+      };
+
+      div.addEventListener("folderRename", () => {
+        text.readOnly = false;
+        text.focus();
+        text.select();
+      });
+
+      div.addEventListener("folderDelete", () => {
+        folder.delete();
+        div.remove();
+      });
 
       button.addEventListener("click", () => {
         childDiv.hidden = !childDiv.hidden;
       });
 
+      text.addEventListener("blur", () => {
+        if (!text.readOnly) {
+          form.onsubmit!(new SubmitEvent("submit"));
+        }
+      });
+
+      form.append(text);
+      button.append(form);
       div.append(button);
     }
 
@@ -149,14 +200,7 @@ export default class FilePickerElement extends HTMLElement {
 
   async #update() {
     this.replaceChildren();
-    this.append(
-      await this.#buildFileTree(
-        new VirtualFileSystemDirectory(
-          "",
-          await navigator.storage.getDirectory(),
-        ),
-      ),
-    );
+    this.append(await this.#buildFileTree(this.#fs!));
   }
 
   setFs(fs: VirtualFileSystemDirectory) {
