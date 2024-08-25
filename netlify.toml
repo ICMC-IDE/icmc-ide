@@ -6,6 +6,6 @@ for = "/*"
 
 [[redirects]]
 from = "/docs/*"
-to = "https://icmc-ide.github.io/docs/"
+to = "https://icmc-ide.github.io/docs/:splat"
 status = 200
 force = true
