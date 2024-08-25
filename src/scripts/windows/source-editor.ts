@@ -54,8 +54,7 @@ export default class SourceEditorWindow extends Fenster<TextEditorElement> {
         resourceManager
           .get("mainWorker")
           .request("build", {
-            files: [this.#file],
-            entry: this.#file!.name,
+            file: this.#file!.path,
             syntax,
           })
           .then(

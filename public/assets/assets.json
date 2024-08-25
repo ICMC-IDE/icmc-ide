@@ -1,12 +1,6 @@
-{
-  "internal": [
+[
     "palette/4bit.json",
     "palette/8bit.json",
     "syntax/icmc.toml",
     "charmap.mif"
-  ],
-  "user": [
-    "example.asm",
-    "example.c"
-  ]
-}
+]

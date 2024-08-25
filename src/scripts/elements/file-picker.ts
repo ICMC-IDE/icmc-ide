@@ -17,14 +17,16 @@ export default class FilePickerElement extends HTMLElement {
   connectedCallback() {
     this.dataset.contextMenuId = "filepicker";
 
-    this.addEventListener("fileNew", () => {
-      const file = this.#generateFile(this.#fs!.createFile("untitled"));
+    this.addEventListener("fileNew", async () => {
+      const file = this.#generateFile(
+        await this.#fs!.getFile("untitled", false),
+      );
       this.append(file);
       file.dispatchEvent(new Event("fileRename"));
     });
-    this.addEventListener("folderNew", () => {
+    this.addEventListener("folderNew", async () => {
       const { mainNode: folder } = this.#generateFolder(
-        this.#fs!.createDirectory("untitled"),
+        await this.#fs!.getDirectory("untitled", false),
       );
       this.append(folder);
       folder.dispatchEvent(new Event("folderRename"));
@@ -38,18 +40,21 @@ export default class FilePickerElement extends HTMLElement {
 
     const childDiv = document.createElement("div");
 
-    div.addEventListener("fileNew", (event) => {
+    div.addEventListener("fileNew", async (event) => {
       event.stopPropagation();
       childDiv.hidden = false;
-      const file = this.#generateFile(folder.createFile("untitled"), ident + 1);
+      const file = this.#generateFile(
+        await folder.getFile("untitled", false),
+        ident + 1,
+      );
       childDiv.append(file);
       file.dispatchEvent(new Event("fileRename"));
     });
-    div.addEventListener("folderNew", (event) => {
+    div.addEventListener("folderNew", async (event) => {
       event.stopPropagation();
       childDiv.hidden = false;
       const { mainNode } = this.#generateFolder(
-        folder.createDirectory("untitled"),
+        await folder.getDirectory("untitled", false),
         ident + 1,
       );
       childDiv.append(mainNode);
@@ -78,7 +83,7 @@ export default class FilePickerElement extends HTMLElement {
         text.readOnly = true;
 
         const name = text.value;
-        if (!folder.created) {
+        if (!folder.loaded) {
           folder.name = name;
           folder.create();
         } else {
@@ -88,13 +93,15 @@ export default class FilePickerElement extends HTMLElement {
         return false;
       };
 
-      div.addEventListener("folderRename", () => {
+      div.addEventListener("folderRename", (event) => {
+        event.stopPropagation();
         text.readOnly = false;
         text.focus();
         text.select();
       });
 
-      div.addEventListener("folderDelete", () => {
+      div.addEventListener("folderDelete", (event) => {
+        event.stopPropagation();
         folder.delete();
         div.remove();
       });
@@ -143,7 +150,7 @@ export default class FilePickerElement extends HTMLElement {
         text.readOnly = true;
 
         const name = text.value;
-        if (!file.created) {
+        if (!file.loaded) {
           file.name = name;
           file.create();
         } else {
@@ -153,13 +160,15 @@ export default class FilePickerElement extends HTMLElement {
         return false;
       };
 
-      div.addEventListener("fileRename", () => {
+      div.addEventListener("fileRename", (event) => {
+        event.stopPropagation();
         text.readOnly = false;
         text.focus();
         text.select();
       });
 
-      div.addEventListener("fileDelete", () => {
+      div.addEventListener("fileDelete", (event) => {
+        event.stopPropagation();
         file.delete();
         div.remove();
       });

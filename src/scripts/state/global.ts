@@ -4,6 +4,7 @@ import CharMap from "../resources/charmap.js";
 import ResourceManager from "./resources.js";
 import MainWorker from "../resources/main-worker.js";
 import {
+  loadAssets,
   VirtualFileSystemDirectory,
   VirtualFileSystemFile,
 } from "../resources/fs.js";
@@ -59,12 +60,13 @@ const mainWorker = new MainWorker();
 
 const fs = new VirtualFileSystemDirectory(
   "",
+  undefined,
   await navigator.storage.getDirectory(),
 );
 
 await Promise.all([
   // internalFs.loadAssets(),
-  // userFs.loadAssets(),
+  loadAssets(fs),
   mainWorker.isReady,
 ]);
 resourceManager.set("fs", fs);

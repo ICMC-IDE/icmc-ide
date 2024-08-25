@@ -1,4 +1,4 @@
-import { VirtualFileSystemFile } from "../resources/fs.js";
+import { VirtualFileSystemDirectory } from "../resources/fs.js";
 import {
   assemble,
   Compiler,
@@ -106,43 +106,60 @@ setInterval(function () {
   lastCheck = now;
 }, 1000);
 
-// const fs = {
-//   _files: {} as Record<string, string>,
+// TODO: solve rust FS async issues
+class Fs {
+  #root: VirtualFileSystemDirectory;
+  #files: Record<string, string> = {};
 
-//   read(filename: string) {
-//     return this._files[filename];
-//   },
+  constructor(root: VirtualFileSystemDirectory) {
+    this.#root = root;
+  }
 
-//   write(filename: string, data: string) {
-//     this._files[filename] = data;
-//   },
+  async init(files: string[]) {
+    for (const file of files) {
+      this.#files[file] = await (await this.#root.getFile(file)).read();
+    }
+  }
 
-//   files(): string[] {
-//     return Object.keys(this._files);
-//   },
-// };
+  clear() {
+    this.#files = {};
+  }
 
-async function build({
-  files,
-  syntax,
-}: {
-  files: [VirtualFileSystemFile];
-  syntax: string;
-}) {
+  read(path: string) {
+    return this.#files[path];
+  }
+
+  async write(path: string, data: string) {
+    return await (await this.#root.getFile(path)).write(data);
+  }
+
+  files() {
+    return Object.keys(this.#files);
+  }
+}
+
+const fs = new Fs(
+  new VirtualFileSystemDirectory(
+    "",
+    undefined,
+    await navigator.storage.getDirectory(),
+  ),
+);
+
+async function build({ file, syntax }: { file: string; syntax: string }) {
   // TODO: Support multiple files (for imports)
-  const file = files[0];
-  const language = file.name.match(/\.([^.]+)$/)![1].toLowerCase();
+  const language = file.match(/\.([^.]+)$/)![1].toLowerCase();
   let asm;
 
-  const data = { [file.name]: await file.read() };
+  await fs.init([file, `syntax/${syntax}.toml`]);
 
   // TODO: Improve this
   if (language === "c") {
-    asm = Compiler.compile(data, file.name);
+    asm = Compiler.compile(fs, file);
     // fs.write((entry += ".asm"), asm);
   }
 
-  const assembly = assemble(data, file.name, `syntax/${syntax}.toml`);
+  const assembly = assemble(fs, file, `syntax/${syntax}.toml`);
 
   emulator.load(assembly.binary());
 
@@ -156,6 +173,7 @@ async function build({
     ...getEmulatorMemories(emulator),
   };
 
+  fs.clear();
   return result;
 }
 
@@ -175,7 +193,7 @@ function setFrequency(value: number) {
 
 self.addEventListener(
   "message",
-  <T extends keyof Actions>({
+  async <T extends keyof Actions>({
     data: { type, id, content },
   }: {
     data: {
@@ -186,29 +204,29 @@ self.addEventListener(
   }) => {
     let message: Message<T>;
 
-    try {
-      const action = actions[type] as Actions[T];
+    //try {
+    const action = actions[type] as Actions[T];
 
-      if (action) {
-        // @ts-ignore
-        // FIXME
-        message = {
-          id,
-          // @ts-ignore
-          content: action(content),
-        };
-      } else {
-        message = {
-          id,
-          error: `Unknown request type '${type}' with id ${id}`,
-        };
-      }
-    } catch (error: unknown) {
+    if (action) {
+      // @ts-ignore
+      // FIXME
       message = {
         id,
-        error: error!.toString(),
+        // @ts-ignore
+        content: await action(content),
+      };
+    } else {
+      message = {
+        id,
+        error: `Unknown request type '${type}' with id ${id}`,
       };
     }
+    //} catch (error: unknown) {
+    // message = {
+    //  id,
+    //  error: error!.toString(),
+    //};
+    //}
 
     self.postMessage({
       type: "response",
