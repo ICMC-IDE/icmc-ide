@@ -89,11 +89,14 @@ async function createCharmap() {
 
   const result = await globalState.resourceManager
     .get("mainWorker")
-    .request("parse-mif", await (await fetch("assets/charmap.mif")).text());
+    .request(
+      "parse-mif",
+      await (await fetch("assets/internal/charmap.mif")).text(),
+    );
 
   const charmap = CharMap.fromBytes(
     result,
-    await (await fetch("assets/palette/8bit.json")).json(),
+    await (await fetch("assets/internal/palette/8bit.json")).json(),
   );
 
   globalState.resourceManager.set("charmap", charmap);

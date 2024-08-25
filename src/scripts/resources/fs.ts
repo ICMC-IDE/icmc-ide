@@ -1,3 +1,5 @@
+const fileExtensions = new Set(["json", "txt", "c", "asm", "mif", "toml"]);
+
 class VirtualFileSystemObject<
   T extends FileSystemFileHandle | FileSystemDirectoryHandle,
 > {
@@ -122,6 +124,24 @@ export class VirtualFileSystemDirectory extends VirtualFileSystemObject<FileSyst
     await this.move(this.parent!, name);
   }
 
+  async hasDirectory(path: string) {
+    try {
+      await this.getDirectory(path);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async hasFile(path: string) {
+    try {
+      await this.getFile(path);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   async *list() {
     for await (const [name, file] of this.handle!.entries()) {
       if (file instanceof FileSystemFileHandle) {
@@ -138,6 +158,17 @@ export class VirtualFileSystemDirectory extends VirtualFileSystemObject<FileSyst
 }
 
 export class VirtualFileSystemFile extends VirtualFileSystemObject<FileSystemFileHandle> {
+  get extension() {
+    const parts = this.name.split(".");
+
+    if (parts.length === 1) {
+      return "txt";
+    }
+
+    const extension = parts.at(-1)!;
+    return fileExtensions.has(extension) ? extension : "txt";
+  }
+
   async create(createParents = false) {
     if (this.loaded) {
       return;
@@ -209,12 +240,27 @@ export class VirtualFileSystemFile extends VirtualFileSystemObject<FileSystemFil
 const ASSETS_PATH = "assets/";
 const ASSETS_LIST = ASSETS_PATH + "/assets.json";
 
-export async function loadAssets(directory: VirtualFileSystemDirectory) {
-  const assets = (await (await fetch(ASSETS_LIST)).json()) as string[];
+export async function loadAssets(
+  directory: VirtualFileSystemDirectory,
+  loadUserAssets: boolean,
+  overwrite = false,
+) {
+  const assets = (await (await fetch(ASSETS_LIST)).json()) as {
+    user: string[];
+    internal: string[];
+  };
 
-  for (const asset of assets) {
-    const content = await (await fetch(ASSETS_PATH + asset)).text();
-    const file = await directory.createFile(asset, true);
-    await file.write(content);
-  }
+  await Promise.all(
+    [assets.internal, loadUserAssets ? assets.user : []]
+      .flat()
+      .map(async (asset) => {
+        if (!overwrite && (await directory.hasFile(asset))) {
+          return;
+        }
+
+        const content = await (await fetch(ASSETS_PATH + asset)).text();
+        const file = await directory.createFile(asset, true);
+        return await file.write(content);
+      }),
+  );
 }

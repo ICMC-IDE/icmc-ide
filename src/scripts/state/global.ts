@@ -64,11 +64,7 @@ const fs = new VirtualFileSystemDirectory(
   await navigator.storage.getDirectory(),
 );
 
-await Promise.all([
-  // internalFs.loadAssets(),
-  loadAssets(fs),
-  mainWorker.isReady,
-]);
+await Promise.all([loadAssets(fs, true), mainWorker.isReady]);
 resourceManager.set("fs", fs);
 resourceManager.set("mainWorker", mainWorker);
 

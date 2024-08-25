@@ -1,6 +1,12 @@
-[
-    "palette/4bit.json",
-    "palette/8bit.json",
-    "syntax/icmc.toml",
-    "charmap.mif"
-]
+{
+  "internal": [
+    "internal/palette/4bit.json",
+    "internal/palette/8bit.json",
+    "internal/syntax/icmc.toml",
+    "internal/charmap.mif"
+  ],
+  "user": [
+    "user/example.c",
+    "user/example.asm"
+  ]
+}

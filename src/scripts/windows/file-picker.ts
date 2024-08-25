@@ -84,6 +84,9 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
       globalState,
     });
 
-    body.setFs(resourceManager.get("fs"));
+    resourceManager
+      .get("fs")
+      .getDirectory("user")
+      .then((directory) => body.setFs(directory));
   }
 }
