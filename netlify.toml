@@ -3,3 +3,9 @@ for = "/*"
   [headers.values]
     Cross-Origin-Opener-Policy = "same-origin"
     Cross-Origin-Embedder-Policy = "require-corp"
+
+[[redirects]]
+from = "/docs/*"
+to = "https://icmc-ide.github.io/docs/"
+status = 200
+force = true
