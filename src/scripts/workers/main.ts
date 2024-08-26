@@ -151,7 +151,7 @@ async function build({ file, syntax }: { file: string; syntax: string }) {
   const language = file.match(/\.([^.]+)$/)![1].toLowerCase();
   let asm;
 
-  await fs.init([file, `syntax/${syntax}.toml`]);
+  await fs.init([file, `internal/syntax/${syntax}.toml`]);
 
   // TODO: Improve this
   if (language === "c") {
@@ -159,7 +159,7 @@ async function build({ file, syntax }: { file: string; syntax: string }) {
     // fs.write((entry += ".asm"), asm);
   }
 
-  const assembly = assemble(fs, file, `syntax/${syntax}.toml`);
+  const assembly = assemble(fs, file, `internal/syntax/${syntax}.toml`);
 
   emulator.load(assembly.binary());
 
