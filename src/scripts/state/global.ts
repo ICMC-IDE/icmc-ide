@@ -49,7 +49,7 @@ const configManager = new ConfigManager<GlobalConfigsMap>({
   syntax: "icmc",
   screenWidth: 40,
   screenHeight: 30,
-  frequency: 6,
+  frequency: 1_000_000,
   gridWidth: 30,
   gridHeight: 30,
 });

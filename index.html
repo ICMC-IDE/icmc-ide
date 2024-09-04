@@ -95,7 +95,13 @@
         </div>
 
         <div class="frequency">
-          <input name="frequency" type="range" value="6" min="0" max="7" step="0.01" list="frequencies" /><span>1 MHz</span>
+          <input name="frequency" type="range" value="1000000" min="1" max="60000000" step="1" list="frequencies" /><span>1 MHz</span>
+          <datalist id="frequencies">
+            <option>1</option>
+            <option>1000</option>
+            <option>1000000</option>
+            <option>10000000</option>
+          </datalist>
         </div>
       </form>
 

@@ -1,5 +1,7 @@
 const fileExtensions = new Set(["json", "txt", "c", "asm", "mif", "toml"]);
 
+// TODO: Optimizations
+
 class VirtualFileSystemObject<
   T extends FileSystemFileHandle | FileSystemDirectoryHandle,
 > {
@@ -23,21 +25,43 @@ class VirtualFileSystemObject<
 }
 
 export class VirtualFileSystemDirectory extends VirtualFileSystemObject<FileSystemDirectoryHandle> {
-  async #resolveDirectory(path: string[]) {
-    let currentDirectory = this as VirtualFileSystemDirectory;
+  #childDirectoriesCache: VirtualFileSystemDirectory[] = [];
+  #childFilesCache: VirtualFileSystemFile[] = [];
 
-    for (const part of path) {
-      if (part === "" || part === ".") {
-        continue;
-      }
-      currentDirectory = new VirtualFileSystemDirectory(part, currentDirectory);
+  resolveDirectory(path: string[]): VirtualFileSystemDirectory {
+    if (path.length === 0) {
+      return this;
     }
-    return currentDirectory;
+
+    let part = path.shift()!;
+    while (part === "." || part === "") {
+      part = path.shift()!;
+    }
+
+    let nextDirectory = this.#childDirectoriesCache.find(
+      (directory) => directory.name === part,
+    );
+    if (!nextDirectory) {
+      nextDirectory = new VirtualFileSystemDirectory(part, this);
+      this.#childDirectoriesCache.push(nextDirectory);
+    }
+
+    if (path.length === 0) {
+      return nextDirectory;
+    }
+    return nextDirectory.resolveDirectory(path);
   }
 
-  async #resolveFile(path: string[]) {
-    const directory = await this.#resolveDirectory(path.slice(0, -1));
-    const file = new VirtualFileSystemFile(path.at(-1)!, directory);
+  resolveFile(path: string[]) {
+    const directory = this.resolveDirectory(path.slice(0, -1));
+    const filename = path.at(-1)!;
+
+    let file = this.#childFilesCache.find((file) => file.name === filename);
+    if (!file) {
+      file = new VirtualFileSystemFile(filename, directory);
+      this.#childFilesCache.push(file);
+    }
+
     return file;
   }
 
@@ -49,7 +73,7 @@ export class VirtualFileSystemDirectory extends VirtualFileSystemObject<FileSyst
       await this.parent!.create(true);
     }
 
-    this.handle = await this.parent!.handle!.getDirectoryHandle(this.name!, {
+    this.handle = await this.parent!.handle!.getDirectoryHandle(this.name, {
       create: true,
     });
   }
@@ -66,7 +90,7 @@ export class VirtualFileSystemDirectory extends VirtualFileSystemObject<FileSyst
   }
 
   async getDirectory(path: string, load = true) {
-    const directory = await this.#resolveDirectory(path.split("/"));
+    const directory = this.resolveDirectory(path.split("/"));
     if (load) {
       await directory.load();
     }
@@ -74,7 +98,7 @@ export class VirtualFileSystemDirectory extends VirtualFileSystemObject<FileSyst
   }
 
   async getFile(path: string, load = true) {
-    const file = await this.#resolveFile(path.split("/"));
+    const file = this.resolveFile(path.split("/"));
     if (load) {
       await file.load();
     }

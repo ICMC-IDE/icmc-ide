@@ -183,12 +183,12 @@ const actions = {
   stop,
   reset,
   next,
-  "parse-mif": parseMif,
-  "set-frequency": setFrequency,
+  parseMif,
+  setFrequency,
 };
 
 function setFrequency(value: number) {
-  frequency = 10 ** value;
+  frequency = value;
 }
 
 self.addEventListener(

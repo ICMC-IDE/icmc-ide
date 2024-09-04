@@ -24,6 +24,11 @@ async function main() {
   createDock(globalState, windows);
 
   globalState.eventManager.subscribe("fileOpen", openFile);
+  globalState.configManager.subscribe("frequency", (frequency) => {
+    globalState.resourceManager
+      .get("mainWorker")
+      .request("setFrequency", frequency);
+  });
 
   function draw() {
     globalState.eventManager.emmit("render", undefined);
@@ -85,18 +90,18 @@ async function openFile(file: VirtualFileSystemFile) {
 }
 
 async function createCharmap() {
-  // const fs = globalState.resourceManager.get("fs").internal;
+  const fs = globalState.resourceManager.get("fs");
 
   const result = await globalState.resourceManager
     .get("mainWorker")
     .request(
-      "parse-mif",
-      await (await fetch("assets/internal/charmap.mif")).text(),
+      "parseMif",
+      await (await fs.getFile("internal/charmap.mif")).read(),
     );
 
   const charmap = CharMap.fromBytes(
     result,
-    await (await fetch("assets/internal/palette/8bit.json")).json(),
+    JSON.parse(await (await fs.getFile("internal/palette/8bit.json")).read()),
   );
 
   globalState.resourceManager.set("charmap", charmap);
