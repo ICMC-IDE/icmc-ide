@@ -328,7 +328,7 @@
     align-items: start;
     justify-items: end;
 
-    padding: 0.25em;
+    padding: 0.5em;
     min-width: calc(8em + 1em * max(var(--width), 32) + 0.75em);
     min-height: calc(8em + 1em * max(var(--height), 32) + 0.75em);
 
@@ -342,8 +342,8 @@
     }
 
     & > screen-viewer {
-      width: calc(1em * var(--width));
-      height: calc(1em * var(--height));
+      width: 100%;
+      height: 100%;
 
       & > div {
         flex-grow: 1;
@@ -858,7 +858,6 @@
 
       & button {
         padding: 0.25em;
-        margin: -1px;
         border-radius: 0;
       }
     }

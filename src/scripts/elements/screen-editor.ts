@@ -6,11 +6,13 @@ const TEMPLATE = document.getElementById(
 )! as HTMLTemplateElement;
 
 function calcXY(event: PointerEvent) {
-  const canvas = event.currentTarget as HTMLCanvasElement;
+  const canvas = event.target as HTMLCanvasElement;
 
   const rect = canvas.getBoundingClientRect();
   const x = (((event.clientX - rect.left) / rect.width) * canvas.width) | 0;
   const y = (((event.clientY - rect.top) / rect.height) * canvas.height) | 0;
+  // const x = (event.clientX - rect.left) | 0;
+  // const y = (event.clientY - rect.top) | 0;
 
   return [x, y];
 }
@@ -40,24 +42,31 @@ export default class ScreenEditorElement extends HTMLElement {
 
     this.#colors.addEventListener("pointerdown", (event: PointerEvent) => {
       const [x, y] = calcXY(event);
-      this.pickColor(8 * y + x);
+      this.pickColor(this.#charmap!.charHeight * y + x);
     });
 
     // FIXME
     this.#coloredChar.addEventListener("pointerdown", (event: PointerEvent) => {
       const [x, y] = calcXY(event);
-      this.#charmap!.togglePixel(x % 8, 8 * this.#char + y);
+      this.#charmap!.togglePixel(
+        x % this.#charmap!.charWidth,
+        this.#charmap!.charHeight * this.#char + y,
+      );
     });
 
     this.#chars.addEventListener("pointerdown", (event: PointerEvent) => {
       const [x, y] = calcXY(event);
-      this.pickChar(32 * y + x);
+      this.pickChar(
+        32 * Math.floor(y / this.#charmap!.charHeight) +
+          Math.floor(x / this.#charmap!.charWidth),
+      );
     });
 
     this.#screen.addEventListener("pointerdown", (event: PointerEvent) => {
       const [x, y] = calcXY(event);
       this.#screen.updateCell(
-        (event.target as HTMLCanvasElement).width * y + x,
+        this.#screen.width * Math.floor(y / this.#charmap!.charHeight) +
+          Math.floor(x / this.#charmap!.charWidth),
         this.#char | (this.#color << 8),
       );
     });
@@ -67,9 +76,9 @@ export default class ScreenEditorElement extends HTMLElement {
     this.appendChild(this.#fragment); // this.#fragment becomes an empty array after being appended. so there is no problem doing it multiple times
   }
 
-  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    console.log("[ATTR CHG]", name, oldValue, newValue);
-  }
+  // attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+  //   console.log("[ATTR CHG]", name, oldValue, newValue);
+  // }
 
   render() {
     if (!this.isConnected) return;
@@ -110,7 +119,6 @@ export default class ScreenEditorElement extends HTMLElement {
     this.#generatePalette(value.colorPalette());
 
     customElements.whenDefined("screen-viewer").then(() => {
-      console.log("ScreenEditorElement::setCharmap[2]");
       this.#screen.setCharmap(value);
       this.#chars.setCharmap(value);
       this.#coloredChar.setCharmap(value);
@@ -120,20 +128,19 @@ export default class ScreenEditorElement extends HTMLElement {
   setWidth(value: number) {
     this.style.setProperty("--width", value.toString());
 
-    customElements.whenDefined("screen-viewer").then(() => {
-      console.log("ScreenEditorElement::setWidth[2]");
-      console.log(this.#screen);
-      // this.#screen.setWidth(value);
-    });
+    // customElements.whenDefined("screen-viewer").then(() => {
+    //   console.log(this.#screen);
+    //   // this.#screen.setWidth(value);
+    // });
   }
 
   setHeight(value: number) {
     this.style.setProperty("--height", value.toString());
 
-    customElements.whenDefined("screen-viewer").then(() => {
-      console.log("ScreenEditorElement::setHeight[2]");
-      // this.#screen.setHeight(value);
-    });
+    // customElements.whenDefined("screen-viewer").then(() => {
+    //   console.log("ScreenEditorElement::setHeight[2]");
+    //   // this.#screen.setHeight(value);
+    // });
   }
 }
 

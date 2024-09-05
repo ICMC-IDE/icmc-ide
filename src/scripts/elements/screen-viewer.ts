@@ -5,8 +5,8 @@ export default class ScreenViewerElement extends HTMLElement {
   #canvas = document.createElement("canvas");
   #renderer?: Renderer;
 
-  #width: number = 1;
-  #height: number = 1;
+  width: number = 1;
+  height: number = 1;
 
   shouldUpdate = false;
   memory = new Uint16Array(0x10000);
@@ -52,9 +52,7 @@ export default class ScreenViewerElement extends HTMLElement {
 
     if (this.#renderer) {
       this.shouldUpdate = false;
-      this.#renderer.render(
-        this.memory.subarray(0, this.#width * this.#height),
-      );
+      this.#renderer.render(this.memory.subarray(0, this.width * this.height));
     } else {
       // unreachable (in theory)
     }
@@ -66,21 +64,21 @@ export default class ScreenViewerElement extends HTMLElement {
 
   #resize() {
     if (this.#renderer) {
-      this.#renderer.resize(this.#width, this.#height);
+      this.#renderer.resize(this.width, this.height);
     }
 
-    this.style.setProperty("--width", this.#width.toString());
-    this.style.setProperty("--height", this.#height.toString());
+    this.style.setProperty("--width", this.width.toString());
+    this.style.setProperty("--height", this.height.toString());
     this.shouldUpdate = true;
   }
 
   setWidth(value: number) {
-    this.#width = value;
+    this.width = value;
     this.#resize();
   }
 
   setHeight(value: number) {
-    this.#height = value;
+    this.height = value;
     this.#resize();
   }
 
@@ -89,8 +87,8 @@ export default class ScreenViewerElement extends HTMLElement {
       this.#renderer = new Renderer(
         this.#canvas,
         value,
-        this.#width,
-        this.#height,
+        this.width,
+        this.height,
       );
     } else {
       this.#renderer.setCharmap(value);

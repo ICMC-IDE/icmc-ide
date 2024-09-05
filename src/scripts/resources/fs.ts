@@ -25,8 +25,28 @@ class VirtualFileSystemObject<
 }
 
 export class VirtualFileSystemDirectory extends VirtualFileSystemObject<FileSystemDirectoryHandle> {
-  #childDirectoriesCache: VirtualFileSystemDirectory[] = [];
-  #childFilesCache: VirtualFileSystemFile[] = [];
+  #directoriesCache: VirtualFileSystemDirectory[] = [];
+  #filesCache: VirtualFileSystemFile[] = [];
+
+  newChildDirectory(name: string) {
+    let directory = this.#directoriesCache.find(
+      (directory) => directory.name === name,
+    );
+    if (!directory) {
+      directory = new VirtualFileSystemDirectory(name, this);
+      this.#directoriesCache.push(directory);
+    }
+    return directory;
+  }
+
+  newChildFile(name: string) {
+    let file = this.#filesCache.find((file) => file.name === name);
+    if (!file) {
+      file = new VirtualFileSystemFile(name, this);
+      this.#filesCache.push(file);
+    }
+    return file;
+  }
 
   resolveDirectory(path: string[]): VirtualFileSystemDirectory {
     if (path.length === 0) {
@@ -38,13 +58,7 @@ export class VirtualFileSystemDirectory extends VirtualFileSystemObject<FileSyst
       part = path.shift()!;
     }
 
-    let nextDirectory = this.#childDirectoriesCache.find(
-      (directory) => directory.name === part,
-    );
-    if (!nextDirectory) {
-      nextDirectory = new VirtualFileSystemDirectory(part, this);
-      this.#childDirectoriesCache.push(nextDirectory);
-    }
+    const nextDirectory = this.newChildDirectory(part);
 
     if (path.length === 0) {
       return nextDirectory;
@@ -56,13 +70,7 @@ export class VirtualFileSystemDirectory extends VirtualFileSystemObject<FileSyst
     const directory = this.resolveDirectory(path.slice(0, -1));
     const filename = path.at(-1)!;
 
-    let file = this.#childFilesCache.find((file) => file.name === filename);
-    if (!file) {
-      file = new VirtualFileSystemFile(filename, directory);
-      this.#childFilesCache.push(file);
-    }
-
-    return file;
+    return directory.newChildFile(filename);
   }
 
   async create(createParents = false) {
@@ -167,15 +175,15 @@ export class VirtualFileSystemDirectory extends VirtualFileSystemObject<FileSyst
   }
 
   async *list() {
-    for await (const [name, file] of this.handle!.entries()) {
-      if (file instanceof FileSystemFileHandle) {
-        yield new VirtualFileSystemFile(name, this, file);
+    for await (const [name, handle] of this.handle!.entries()) {
+      if (handle instanceof FileSystemFileHandle) {
+        const file = this.newChildFile(name);
+        file.handle = handle;
+        yield file;
       } else {
-        yield new VirtualFileSystemDirectory(
-          name,
-          this,
-          file as FileSystemDirectoryHandle,
-        );
+        const directory = this.newChildDirectory(name);
+        directory.handle = handle as FileSystemDirectoryHandle;
+        yield directory;
       }
     }
   }

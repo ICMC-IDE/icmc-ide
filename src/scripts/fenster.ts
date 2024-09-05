@@ -33,14 +33,13 @@ export default class Fenster<T extends HTMLElement> {
     body,
     title,
     style,
-    open,
     buttonsLeft,
     buttonsRight,
     globalState: { configManager },
   }: FensterConstructor<T>) {
     const wrapper = (this.#wrapper = document.createElement("div"));
-    const dragger = (this.#dragger = document.createElement("summary"));
-    const container = (this.#container = document.createElement("details"));
+    const dragger = (this.#dragger = document.createElement("div"));
+    const container = (this.#container = document.createElement("div"));
 
     const { left, top, ...others } = style ?? {};
 
@@ -128,28 +127,7 @@ export default class Fenster<T extends HTMLElement> {
       },
     });
 
-    container.open = open ?? true;
-
     this.#body = body;
-
-    {
-      const button = document.createElement("button");
-      const icon = document.createElement("svg-icon");
-
-      icon.setIcon("minimize");
-      button.append(icon);
-      title.appendChild(button);
-
-      button.addEventListener("click", () => {
-        this.toggleMinimize();
-      });
-
-      container.addEventListener("toggle", () => {
-        icon.setIcon(container.open ? "minimize" : "unminimize");
-      });
-
-      dragger.append(button);
-    }
 
     if (buttonsLeft) {
       dragger.append(...buttonsLeft);
@@ -179,11 +157,6 @@ export default class Fenster<T extends HTMLElement> {
 
     wrapper.addEventListener("pointerdown", () => {
       this.focus();
-    });
-
-    dragger.addEventListener("click", (event) => {
-      event.preventDefault();
-      return false;
     });
 
     document.body.appendChild(wrapper);
@@ -216,12 +189,6 @@ export default class Fenster<T extends HTMLElement> {
 
   get body() {
     return this.#body;
-  }
-
-  toggleMinimize(force?: boolean) {
-    const value = force ?? this.#container.open;
-    this.#container.open = !value;
-    return this.#container.open;
   }
 
   onClose(handler: EventHandler<void>) {

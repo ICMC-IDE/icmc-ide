@@ -24,7 +24,6 @@ export default class CharMap extends OffscreenCanvas {
 
     for (let i = 0; i < 0x100; i++) {
       ctx.fillStyle = on ? "#000" : this.#colorPalette[i];
-      console.log(ctx.fillStyle);
       ctx.fillRect(8 * i + x, y, 1, 1);
     }
 
