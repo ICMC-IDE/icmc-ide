@@ -45,7 +45,6 @@ export default class ScreenEditorElement extends HTMLElement {
       this.pickColor(this.#charmap!.charHeight * y + x);
     });
 
-    // FIXME
     this.#coloredChar.addEventListener("pointerdown", (event: PointerEvent) => {
       const [x, y] = calcXY(event);
       this.#charmap!.togglePixel(
@@ -74,6 +73,7 @@ export default class ScreenEditorElement extends HTMLElement {
 
   connectedCallback() {
     this.appendChild(this.#fragment); // this.#fragment becomes an empty array after being appended. so there is no problem doing it multiple times
+    this.pickColor(this.#color);
   }
 
   // attributeChangedCallback(name: string, oldValue: string, newValue: string) {
