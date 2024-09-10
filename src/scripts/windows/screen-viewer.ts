@@ -62,9 +62,14 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
 
       body.tabIndex = 1;
 
-      body.addEventListener("keydown", ({ keyCode }) => {
+      // FIX THIS
+      body.addEventListener("keydown", ({ keyCode, key }) => {
         if (this.#internalRegisters) {
-          this.#internalRegisters[IREG_KB] = keyCode;
+          if (key.length === 1) {
+            this.#internalRegisters[IREG_KB] = key.charCodeAt(0);
+          } else {
+            this.#internalRegisters[IREG_KB] = keyCode;
+          }
         }
       });
 
