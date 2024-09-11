@@ -58,8 +58,6 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
       body.setWidth(width!);
       body.setHeight(height!);
 
-      body.setCharmap(resourceManager.get("charmap"));
-
       body.tabIndex = 1;
 
       // FIX THIS
@@ -89,6 +87,12 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
       globalState,
     });
 
+    const charmap = resourceManager.get("charmap");
+    charmap.subscribe(() => {
+      this.render(true);
+    });
+    body.setCharmap(charmap);
+
     const eventSubscriber = eventManager.getSubscriber();
     const configSubscriber = configManager.getSubscriber();
     const resourceSubscriber = resourceManager.getSubscriber();
@@ -117,6 +121,10 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
       this.#internalRegisters = internalRegisters;
     });
     resourceSubscriber.subscribe("charmap", (charmap) => {
+      charmap.subscribe(() => {
+        console.log("test");
+        this.render(true);
+      });
       body.setCharmap(charmap);
     });
 
@@ -125,10 +133,10 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
     this.render();
   }
 
-  render() {
+  render(force = false) {
     if (!this.#internalRegisters) return;
     const newWc = this.#internalRegisters[IREG_WC];
-    if (newWc === this.#wc) return;
+    if (!force && newWc === this.#wc) return;
 
     this.body.shouldUpdate = true;
     this.body.render();

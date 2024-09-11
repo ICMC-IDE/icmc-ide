@@ -51,7 +51,6 @@ function createDock(globalState: GlobalState, windows: Partial<Windows>) {
       win = windows[type] = openWindow(type, { globalState });
     }
 
-    win.toggleMinimize(false);
     win.focus();
   });
 
