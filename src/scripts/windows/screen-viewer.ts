@@ -126,6 +126,7 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
         this.render(true);
       });
       body.setCharmap(charmap);
+      this.render(true);
     });
 
     body.memory = resourceManager.get("vram");
