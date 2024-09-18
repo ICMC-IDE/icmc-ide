@@ -210,24 +210,24 @@ self.addEventListener(
     if (action) {
       // @ts-ignore
       // FIXME
-      message = {
-        id,
-        // @ts-ignore
-        content: await action(content),
-      };
+      try {
+        message = {
+          id,
+          // @ts-ignore
+          content: await action(content),
+        };
+      } catch (error: unknown) {
+        message = {
+          id,
+          error: error!.toString(),
+        };
+      }
     } else {
       message = {
         id,
         error: `Unknown request type '${type}' with id ${id}`,
       };
     }
-    //} catch (error: unknown) {
-    // message = {
-    //  id,
-    //  error: error!.toString(),
-    //};
-    //}
-
     self.postMessage({
       type: "response",
       content: message,
