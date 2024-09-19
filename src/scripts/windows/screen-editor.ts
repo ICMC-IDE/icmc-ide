@@ -64,7 +64,7 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
         const reader = new FileReader();
         reader.onload = async (event) => {
           const fs = resourceManager.get("fs");
-          const file = await fs.getFile("internal/charmap.mif");
+          const file = await fs.getFile("internal/charmap.bin");
 
           const mif = await resourceManager
             .get("mainWorker")

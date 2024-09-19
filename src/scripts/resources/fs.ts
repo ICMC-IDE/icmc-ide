@@ -289,7 +289,7 @@ export async function loadAssets(
           return;
         }
 
-        const content = await (await fetch(ASSETS_PATH + asset)).text();
+        const content = await (await fetch(ASSETS_PATH + asset)).arrayBuffer();
         const file = await directory.createFile(asset, true);
         return await file.write(content);
       }),

@@ -98,7 +98,9 @@ async function createCharmap() {
   //     await (await fs.getFile("internal/charmap.mif")).read(),
   //   );
 
-  const file = await fs.getFile("internal/charmap.mif");
+  const file = await fs.getFile("internal/charmap.bin");
+
+  console.log(new Uint8Array(await file.arrayBuffer()).toString());
 
   const charmap = CharMap.fromBytes(
     new Uint8Array(await file.arrayBuffer()),
