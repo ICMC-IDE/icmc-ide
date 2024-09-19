@@ -91,16 +91,19 @@ async function openFile(file: VirtualFileSystemFile) {
 async function createCharmap() {
   const fs = globalState.resourceManager.get("fs");
 
-  const result = await globalState.resourceManager
-    .get("mainWorker")
-    .request(
-      "parseMif",
-      await (await fs.getFile("internal/charmap.mif")).read(),
-    );
+  // const result = await globalState.resourceManager
+  //   .get("mainWorker")
+  //   .request(
+  //     "parseMif",
+  //     await (await fs.getFile("internal/charmap.mif")).read(),
+  //   );
+
+  const file = await fs.getFile("internal/charmap.mif");
 
   const charmap = CharMap.fromBytes(
-    result,
+    new Uint8Array(await file.arrayBuffer()),
     JSON.parse(await (await fs.getFile("internal/palette/8bit.json")).read()),
+    file,
   );
 
   globalState.resourceManager.set("charmap", charmap);

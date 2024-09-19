@@ -27,18 +27,20 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
 
       const button = document.createElement("button");
       button.addEventListener("click", async () => {
-        const fs = resourceManager.get("fs");
-        const charmap = await (await fs.getFile("internal/charmap.mif")).read();
-
-        const blob = new Blob([charmap], {
-          type: "application/octet-stream",
-        });
-        const anchor = Object.assign(document.createElement("a"), {
-          download: "charmap.mif",
-          href: URL.createObjectURL(blob),
-        });
-        anchor.click();
-        URL.revokeObjectURL(anchor.href);
+        resourceManager
+          .get("mainWorker")
+          .request("encodeMif8", resourceManager.get("charmap").bytes())
+          .then((mif) => {
+            const blob = new Blob([mif], {
+              type: "application/octet-stream",
+            });
+            const anchor = Object.assign(document.createElement("a"), {
+              download: "charmap.mif",
+              href: URL.createObjectURL(blob),
+            });
+            anchor.click();
+            URL.revokeObjectURL(anchor.href);
+          });
       });
 
       button.append(icon, "Export");
@@ -63,16 +65,17 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
         reader.onload = async (event) => {
           const fs = resourceManager.get("fs");
           const file = await fs.getFile("internal/charmap.mif");
-          await file.write(event.target?.result as string);
 
-          const result = await resourceManager
+          const mif = await resourceManager
             .get("mainWorker")
             .request("parseMif", event.target?.result as string);
+
           const charmap = CharMap.fromBytes(
-            result,
+            mif,
             JSON.parse(
               await (await fs.getFile("internal/palette/8bit.json")).read(),
             ),
+            file,
           );
           resourceManager.set("charmap", charmap);
         };

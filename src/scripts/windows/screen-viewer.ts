@@ -122,7 +122,6 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
     });
     resourceSubscriber.subscribe("charmap", (charmap) => {
       charmap.subscribe(() => {
-        console.log("test");
         this.render(true);
       });
       body.setCharmap(charmap);

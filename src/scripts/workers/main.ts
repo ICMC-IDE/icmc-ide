@@ -163,8 +163,8 @@ async function build({ file, syntax }: { file: string; syntax: string }) {
 
   emulator.load(assembly.binary());
 
-  console.log(Mif.encodeUint16Array(assembly.binary(), Radix.Uns, Radix.Bin));
-  console.log(assembly.symbols());
+  // console.log(Mif.encodeUint16Array(assembly.binary(), Radix.Uns, Radix.Bin));
+  // console.log(assembly.symbols());
 
   const result = {
     mif: assembly.mif(),
@@ -184,6 +184,8 @@ const actions = {
   reset,
   next,
   parseMif,
+  encodeMif8: (data: Uint8Array) =>
+    Mif.encodeUint8Array(data, Radix.Uns, Radix.Bin),
   setFrequency,
 };
 

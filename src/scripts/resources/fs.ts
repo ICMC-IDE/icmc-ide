@@ -226,17 +226,16 @@ export class VirtualFileSystemFile extends VirtualFileSystemObject<FileSystemFil
   }
 
   async read() {
-    return (await this.handle!.getFile()).text();
+    return await (await this.handle!.getFile()).text();
   }
 
-  async write(data: string, position: number = 0, size: number = data.length) {
+  async arrayBuffer() {
+    return await (await this.handle!.getFile()).arrayBuffer();
+  }
+
+  async write(data: string | BufferSource | Blob) {
     const handle = await this.handle!.createWritable();
-    await handle.write({
-      data,
-      position,
-      size,
-      type: "write",
-    } as FileSystemWriteChunkType);
+    await handle.write(data);
     await handle.close();
   }
 

@@ -1,17 +1,20 @@
 import { EventHandler } from "../types";
+import { VirtualFileSystemFile } from "./fs";
 
 export default class CharMap extends OffscreenCanvas {
   #context = this.getContext("2d", { willReadFrequently: true });
   #handlers: EventHandler<void>[] = [];
-  #colorPalette;
   #bytes = new Uint8Array(8 * 256);
   charWidth = 8;
   charHeight = 8;
+  #colorPalette;
+  #file;
   // TODO: Make charmap relative to charWidth and charHeight
 
-  constructor(colorPalette: string[]) {
+  constructor(colorPalette: string[], file: VirtualFileSystemFile) {
     super(8 * 256, 8 * 256);
     this.#colorPalette = colorPalette;
+    this.#file = file;
   }
 
   togglePixel(x: number, y: number) {
@@ -36,6 +39,7 @@ export default class CharMap extends OffscreenCanvas {
 
   emmit() {
     const handlers = this.#handlers;
+    this.#file.write(this.#bytes.buffer);
 
     queueMicrotask(() => {
       for (const callback of handlers) {
@@ -48,12 +52,20 @@ export default class CharMap extends OffscreenCanvas {
     return this.#context!.getImageData(0, 0, this.width, this.height);
   }
 
+  bytes() {
+    return this.#bytes;
+  }
+
   colorPalette() {
     return this.#colorPalette;
   }
 
-  static fromBytes(data: Uint8Array, colorPalette: string[]) {
-    const charmap = new CharMap(colorPalette);
+  static fromBytes(
+    data: Uint8Array,
+    colorPalette: string[],
+    file: VirtualFileSystemFile,
+  ) {
+    const charmap = new CharMap(colorPalette, file);
     const chars = new OffscreenCanvas(8, 8 * 256);
 
     {
@@ -94,6 +106,7 @@ export default class CharMap extends OffscreenCanvas {
       ctx.restore();
     }
 
+    charmap.emmit();
     return charmap;
   }
 }
