@@ -100,8 +100,6 @@ async function createCharmap() {
 
   const file = await fs.getFile("internal/charmap.bin");
 
-  console.log(new Uint8Array(await file.arrayBuffer()).toString());
-
   const charmap = CharMap.fromBytes(
     new Uint8Array(await file.arrayBuffer()),
     JSON.parse(await (await fs.getFile("internal/palette/8bit.json")).read()),
