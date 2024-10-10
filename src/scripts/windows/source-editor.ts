@@ -49,6 +49,7 @@ export default class SourceEditorWindow extends Fenster<TextEditorElement> {
         // const userFs = resourceManager.get("fs").user;
         // const internalFs = resourceManager.get("fs").internal;
         // const files = { ...userFs.all(), ...internalFs.all() };
+        eventManager.emmit("build", undefined);
         const syntax = configManager.get("syntax");
 
         resourceManager

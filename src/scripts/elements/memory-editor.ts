@@ -25,8 +25,14 @@ export default class MemoryEditorElement extends HTMLElement {
 
   #elements: Elements;
 
+  #observer: IntersectionObserver;
+
   constructor() {
     super();
+
+    this.#observer = new IntersectionObserver((entries) =>
+      requestIdleCallback(() => this.#intersectionHandler(entries)),
+    );
 
     const fragment = this.#fragment;
 
@@ -158,8 +164,7 @@ export default class MemoryEditorElement extends HTMLElement {
     return span;
   }
 
-  #renderMemoryBlock(
-    data: Uint16Array,
+  #createMemoryBlock(
     region_name: string,
     offset: number,
     length: number,
@@ -167,33 +172,73 @@ export default class MemoryEditorElement extends HTMLElement {
   ) {
     const region = document.createElement("details");
     const name = document.createElement("summary");
-    const block = document.createElement("div");
-
-    const address = document.createElement("div");
-    const hex = document.createElement("div");
-    const ascii = document.createElement("div");
 
     region.classList.add("memory");
-    block.classList.add("region");
 
-    block.style.setProperty("--length", length.toString());
     name.innerText = `${region_name} (${length} B)`;
+    region.appendChild(name);
 
-    address.classList.add("address");
+    for (
+      let ptr = offset,
+        end = offset + length,
+        size = Math.min(8 * 8, end - ptr);
+      ptr < end;
+      ptr += size
+    ) {
+      const chunk = document.createElement("div");
+      chunk.classList.add("region");
+      chunk.style.setProperty("--length", size.toString());
+      chunk.dataset.addrStart = ptr.toString();
+      chunk.dataset.addrEnd = (ptr + size).toString();
 
+      this.#observer.observe(chunk);
+      region.appendChild(chunk);
+    }
+
+    return region;
+  }
+
+  #createMemory() {
+    let end = this.#memory.length;
+
+    const main = this.firstElementChild!;
+    main.replaceChildren();
+
+    const symbols = this.#symbols;
+
+    for (let i = this.#symbols.length - 1; i >= 0; i--) {
+      const [name, offset] = symbols[i];
+      const result = this.#createMemoryBlock(
+        name,
+        offset,
+        end - offset,
+        // memory.byteOffset,
+      );
+      end = offset as number;
+
+      main.insertBefore(result, main.firstElementChild);
+    }
+  }
+
+  #loadChunk(chunk: HTMLDivElement) {
+    let ptr = parseInt(chunk.dataset.addrStart!);
+    const end = parseInt(chunk.dataset.addrEnd!);
+    const size = end - ptr;
+
+    const hex = document.createElement("div");
+    const ascii = document.createElement("div");
+    const address = document.createElement("div");
     hex.classList.add("hex");
     ascii.classList.add("ascii");
+    address.classList.add("address");
 
-    for (let ptr = offset, end = offset + length; ptr < end; ) {
+    for (let i = 0; i < Math.ceil(size / 8); i++) {
+      const span = document.createElement("span");
       const hexGroup = document.createElement("div");
       const asciiGroup = document.createElement("div");
-      const span = document.createElement("span");
-
-      span.innerText = ptr.toString(16).padStart(4, "0").toUpperCase();
-      address.appendChild(span);
 
       for (let target = Math.min(ptr + 8, end); ptr < target; ptr++) {
-        const value = data[ptr];
+        const value = this.#memory[ptr];
         const hexSpan = this.#hexCells[ptr];
         const asciiSpan = this.#asciiCells[ptr];
 
@@ -205,6 +250,9 @@ export default class MemoryEditorElement extends HTMLElement {
           asciiSpan.innerText = ".";
         }
 
+        span.innerText = ptr.toString(16).padStart(4, "0").toUpperCase();
+        address.appendChild(span);
+
         asciiGroup.appendChild(asciiSpan);
         hexGroup.appendChild(hexSpan);
       }
@@ -213,39 +261,19 @@ export default class MemoryEditorElement extends HTMLElement {
       ascii.appendChild(asciiGroup);
     }
 
-    // debugger;
-    block.appendChild(address);
-    block.appendChild(hex);
-    block.appendChild(ascii);
-
-    region.appendChild(name);
-    region.appendChild(block);
-
-    return region;
+    chunk.appendChild(address);
+    chunk.appendChild(hex);
+    chunk.appendChild(ascii);
+    chunk.dataset.loaded = "1";
   }
 
-  #renderMemory() {
-    const memory = this.#memory;
-    let end = memory.length;
-
-    const main = this.firstElementChild!;
-    main.replaceChildren();
-
-    const symbols = this.#symbols;
-
-    for (let i = this.#symbols.length - 1; i >= 0; i--) {
-      const [name, offset] = symbols[i];
-      const result = this.#renderMemoryBlock(
-        memory,
-        name,
-        offset,
-        end - offset,
-        // memory.byteOffset,
-      );
-      end = offset as number;
-
-      main.insertBefore(result, main.firstElementChild);
-    }
+  #intersectionHandler(entries: IntersectionObserverEntry[]) {
+    entries.forEach((entry) => {
+      const target = entry.target as HTMLDivElement;
+      if (entry.isIntersecting && target.dataset.loaded === undefined) {
+        this.#loadChunk(target);
+      }
+    });
   }
 
   setPc(offset: number) {
@@ -316,7 +344,7 @@ export default class MemoryEditorElement extends HTMLElement {
     }
 
     this.#symbols = labels;
-    this.#renderMemory();
+    this.#createMemory();
   }
 }
 

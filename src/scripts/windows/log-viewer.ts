@@ -26,9 +26,11 @@ export default class LogViewerWindow extends Fenster<LogViewerElement> {
     });
 
     const eventSubscriber = eventManager.getSubscriber();
-
     this.onClose(() => eventSubscriber.unsubscribeAll());
 
+    eventSubscriber.subscribe("build", () => {
+      body.clear();
+    });
     eventSubscriber.subscribe("error", (error) => {
       // FIXME
       body.write(error);
