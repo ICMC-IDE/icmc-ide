@@ -1,8 +1,11 @@
-// import { BlobWriter, TextReader, ZipWriter } from "@zip.js/zip.js";
-
+import { ZipDirectoryEntry, fs as zipjsFs } from "@zip.js/zip.js";
 import FilePickerElement from "../elements/file-picker.js";
 import Fenster from "../fenster.js";
 import { WindowConstructor } from "../types/windows";
+import {
+  VirtualFileSystemDirectory,
+  VirtualFileSystemFile,
+} from "../resources/fs.js";
 
 export default class StateEditorWindow extends Fenster<FilePickerElement> {
   constructor({
@@ -27,28 +30,35 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
       button.appendChild(icon);
       buttonsRight.push(button);
 
-      // button.addEventListener("click", async () => {
-      //   const fs = this.#fs;
-      //   const writer = new ZipWriter(new BlobWriter("application/zip"));
+      button.addEventListener("click", async () => {
+        const fs = await resourceManager.get("fs").getDirectory("user");
+        const zipFs = new zipjsFs.FS();
 
-      //   await Promise.all([
-      //     fs
-      //       .files()
-      //       .map((path: string) =>
-      //         writer.add(path, new TextReader(fs.read(path)!)),
-      //       ),
-      //   ]);
+        const zipDirecory = async (
+          fsDirectory: VirtualFileSystemDirectory,
+          zipfsDirectory: ZipDirectoryEntry,
+        ) => {
+          for await (const file of fsDirectory.list()) {
+            if (file instanceof VirtualFileSystemFile) {
+              zipfsDirectory.addFile(await file.getFileHandle());
+            } else {
+              const newDirectory = zipfsDirectory.addDirectory(file.name);
+              await zipDirecory(file, newDirectory);
+            }
+          }
+        };
 
-      //   const blob = await writer.close();
+        await zipDirecory(fs, zipFs.root);
+        const blob = await zipFs.exportBlob();
 
-      //   const anchor = Object.assign(document.createElement("a"), {
-      //     download: "project.zip",
-      //     href: URL.createObjectURL(blob),
-      //   });
+        const anchor = Object.assign(document.createElement("a"), {
+          download: "project.zip",
+          href: URL.createObjectURL(blob),
+        });
 
-      //   anchor.click();
-      //   URL.revokeObjectURL(anchor.href);
-      // });
+        anchor.click();
+        URL.revokeObjectURL(anchor.href);
+      });
     }
 
     {
@@ -62,10 +72,18 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
       button.addEventListener("click", () => {
         const input = document.createElement("input");
         input.type = "file";
-        input.accept = "application/zip";
+        input.multiple = true;
+        //input.accept = "application/zip";
 
-        input.addEventListener("input", (ev) => {
-          console.log(ev);
+        input.addEventListener("change", async () => {
+          const fs = await resourceManager.get("fs").getDirectory("user");
+
+          for (const file of input.files!) {
+            const fsFile = await fs.createFile(file.name);
+            await file.stream().pipeTo(await fsFile.getWritable());
+          }
+          body.update();
+          input.remove();
         });
 
         input.click();

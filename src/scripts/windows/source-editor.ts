@@ -10,7 +10,7 @@ export default class SourceEditorWindow extends Fenster<TextEditorElement> {
   constructor({
     style,
     globalState,
-    globalState: { eventManager, configManager, resourceManager },
+    globalState: { eventManager },
   }: WindowConstructor) {
     const body = document.createElement("text-editor");
     const title = document.createElement("span");
@@ -49,45 +49,7 @@ export default class SourceEditorWindow extends Fenster<TextEditorElement> {
         // const userFs = resourceManager.get("fs").user;
         // const internalFs = resourceManager.get("fs").internal;
         // const files = { ...userFs.all(), ...internalFs.all() };
-        eventManager.emmit("build", undefined);
-        const syntax = configManager.get("syntax");
-
-        resourceManager
-          .get("mainWorker")
-          .request("build", {
-            file: this.#file!.path,
-            syntax,
-          })
-          .then(
-            ({
-              ram,
-              vram,
-              symbols,
-              registers,
-              internalRegisters,
-              // asm,
-              // mif,
-            }) => {
-              // const fs = resourceManager.get("fs").internal;
-
-              resourceManager.set("ram", ram);
-              resourceManager.set("vram", vram);
-              resourceManager.set("registers", registers);
-              resourceManager.set("internalRegisters", internalRegisters);
-              resourceManager.set("symbols", symbols);
-
-              // fs.write(entry!.replace(/\.[^.]+$/, ".mif"), mif);
-
-              // TODO: Write asm to fs
-              // if (asm) {
-              //   fs.write(entry!.replace(/\.[^.]+$/, ".asm"), asm);
-              // }
-            },
-          )
-          .catch((error) => {
-            eventManager.emmit("error", error);
-          })
-          .finally(() => {});
+        eventManager.emmit("build", this.#file!);
       });
 
       buttonsRight.push(button);

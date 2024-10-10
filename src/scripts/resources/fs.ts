@@ -225,12 +225,24 @@ export class VirtualFileSystemFile extends VirtualFileSystemObject<FileSystemFil
     this.handle = await this.parent!.handle!.getFileHandle(this.name);
   }
 
+  async getReadable() {
+    return (await this.handle!.getFile()).stream();
+  }
+
+  async getFileHandle() {
+    return this.handle!.getFile();
+  }
+
+  async getArrayBuffer() {
+    return await (await this.handle!.getFile()).arrayBuffer();
+  }
+
   async read() {
     return await (await this.handle!.getFile()).text();
   }
 
-  async arrayBuffer() {
-    return await (await this.handle!.getFile()).arrayBuffer();
+  async getWritable() {
+    return await this.handle!.createWritable();
   }
 
   async write(data: string | BufferSource | Blob) {

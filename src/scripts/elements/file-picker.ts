@@ -220,14 +220,14 @@ export default class FilePickerElement extends HTMLElement {
     return filesDiv;
   }
 
-  async #update() {
+  async update() {
     this.replaceChildren();
     this.append(await this.#buildFileTree(this.#fs!));
   }
 
   setFs(fs: VirtualFileSystemDirectory) {
     this.#fs = fs;
-    this.#update();
+    this.update();
   }
 }
 

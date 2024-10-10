@@ -198,38 +198,46 @@
   }
 
   input[type="range"] {
-    border: none;
     -webkit-appearance: none;
     appearance: none;
+    border: none;
     background: transparent;
     cursor: pointer;
     padding: 0;
 
-    /*
     &::-webkit-slider-runnable-track {
-      background-color: var(--gray2);
-      border: solid 1px var(--gray3);
+      --border-color: light-dark(oklch(0% 0 0 / 20%), oklch(100% 0 0 / 20%));
+      background-image: linear-gradient(
+          to right,
+          transparent,
+          transparent calc(100% - 1px),
+          var(--border-color) calc(100% - 1px),
+          var(--border-color)
+        ),
+        linear-gradient(
+          to right,
+          var(--blue),
+          var(--green),
+          var(--yellow),
+          var(--red)
+        );
+      border-radius: 4px;
       height: 0.25em;
     }
-    */
 
-    /*
     &::-webkit-slider-thumb {
-      -webkit-appearance: none;
+      --webkit-appearance: none;
       appearance: none;
-      margin-top: -1em;
-
       background-color: var(--gray4);
       border: solid 1px var(--gray5);
-      border-radius: 0.5em;
+      border-radius: 100%;
       height: 1em;
       width: 1em;
+      transform: translate(0, -0.35em);
     }
-    */
 
     &::-moz-range-track {
       --border-color: light-dark(oklch(0% 0 0 / 20%), oklch(100% 0 0 / 20%));
-
       background-image: linear-gradient(
           to right,
           transparent,
@@ -244,30 +252,8 @@
           var(--yellow),
           var(--red)
         );
-      background-image: linear-gradient(
-          to right in oklch,
-          transparent,
-          transparent calc(100% - 1px),
-          var(--border-color) calc(100% - 1px),
-          var(--border-color)
-        ),
-        linear-gradient(
-          to right in oklch,
-          var(--blue),
-          var(--green),
-          var(--yellow),
-          var(--red)
-        );
-      background-repeat: repeat, no-repeat;
-      background-size:
-        calc((100% + 2px - 1em) / 7),
-        calc(100% + 2px) calc(100% + 2px);
-      background-position:
-        calc(-1px + 0.5em) -1px,
-        -1px -1px;
-      border: solid 1px var(--border-color);
       border-radius: 4px;
-      height: 0.125em;
+      height: 0.25em;
     }
 
     &::-moz-range-thumb {
@@ -280,18 +266,6 @@
 
     &:focus {
       outline: none;
-
-      /*
-      &::-webkit-slider-thumb {
-        outline: 3px solid #808080;
-        outline-offset: 0.125rem;
-      }
-
-      &::-moz-range-thumb {
-        outline: 0.125em solid var(--gray5);
-        outline-offset: 0.125em;
-      }
-      */
     }
   }
 

@@ -23,11 +23,12 @@ async function main() {
   const windows = createWindows(globalState);
   createDock(globalState, windows);
 
-  globalState.eventManager.subscribe("fileOpen", openFile);
-  globalState.configManager.subscribe("frequency", (frequency) => {
-    globalState.resourceManager
-      .get("mainWorker")
-      .request("setFrequency", frequency);
+  const { eventManager, resourceManager, configManager } = globalState;
+
+  eventManager.subscribe("fileOpen", openFile);
+  eventManager.subscribe("build", buildFile);
+  configManager.subscribe("frequency", (frequency) => {
+    resourceManager.get("mainWorker").request("setFrequency", frequency);
   });
 
   function draw() {
@@ -55,6 +56,48 @@ function createDock(globalState: GlobalState, windows: Partial<Windows>) {
   });
 
   document.body.prepend(dock);
+}
+
+function buildFile(file: VirtualFileSystemFile) {
+  const { resourceManager, eventManager, configManager } = globalState;
+  const syntax = configManager.get("syntax");
+
+  resourceManager
+    .get("mainWorker")
+    .request("build", {
+      file: file.path,
+      syntax,
+    })
+    .then(
+      ({
+        ram,
+        vram,
+        symbols,
+        registers,
+        internalRegisters,
+        // asm,
+        // mif,
+      }) => {
+        // const fs = resourceManager.get("fs").internal;
+
+        resourceManager.set("ram", ram);
+        resourceManager.set("vram", vram);
+        resourceManager.set("registers", registers);
+        resourceManager.set("internalRegisters", internalRegisters);
+        resourceManager.set("symbols", symbols);
+
+        // fs.write(entry!.replace(/\.[^.]+$/, ".mif"), mif);
+
+        // TODO: Write asm to fs
+        // if (asm) {
+        //   fs.write(entry!.replace(/\.[^.]+$/, ".asm"), asm);
+        // }
+      },
+    )
+    .catch((error) => {
+      eventManager.emmit("error", error);
+    })
+    .finally(() => {});
 }
 
 async function openFile(file: VirtualFileSystemFile) {
@@ -101,7 +144,7 @@ async function createCharmap() {
   const file = await fs.getFile("internal/charmap.bin");
 
   const charmap = CharMap.fromBytes(
-    new Uint8Array(await file.arrayBuffer()),
+    new Uint8Array(await file.getArrayBuffer()),
     JSON.parse(await (await fs.getFile("internal/palette/8bit.json")).read()),
     file,
   );

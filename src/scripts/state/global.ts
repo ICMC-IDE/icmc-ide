@@ -18,10 +18,10 @@ export interface GlobalState {
 export interface GlobalEventsMap {
   fileDelete: VirtualFileSystemFile;
   fileOpen: VirtualFileSystemFile;
+  build: VirtualFileSystemFile;
   windowOpen: string;
   error: Error;
   render: void;
-  build: void;
 }
 
 export interface GlobalConfigsMap {
