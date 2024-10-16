@@ -102,6 +102,14 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
       globalState,
     });
 
+    const eventSubscriber = eventManager.getSubscriber();
+
+    this.onClose(() => {
+      eventSubscriber.unsubscribeAll();
+    });
+
+    eventSubscriber.subscribe("updateFs", () => body.update());
+
     resourceManager
       .get("fs")
       .getDirectory("user")

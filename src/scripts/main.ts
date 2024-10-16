@@ -86,12 +86,7 @@ function buildFile(file: VirtualFileSystemFile) {
         resourceManager.set("internalRegisters", internalRegisters);
         resourceManager.set("symbols", symbols);
 
-        // fs.write(entry!.replace(/\.[^.]+$/, ".mif"), mif);
-
-        // TODO: Write asm to fs
-        // if (asm) {
-        //   fs.write(entry!.replace(/\.[^.]+$/, ".asm"), asm);
-        // }
+        eventManager.emmit("updateFs", undefined);
       },
     )
     .catch((error) => {

@@ -237,6 +237,9 @@ export default class MemoryEditorElement extends HTMLElement {
       const hexGroup = document.createElement("div");
       const asciiGroup = document.createElement("div");
 
+      span.innerText = ptr.toString(16).padStart(4, "0").toUpperCase();
+      address.appendChild(span);
+
       for (let target = Math.min(ptr + 8, end); ptr < target; ptr++) {
         const value = this.#memory[ptr];
         const hexSpan = this.#hexCells[ptr];
@@ -249,9 +252,6 @@ export default class MemoryEditorElement extends HTMLElement {
         } else {
           asciiSpan.innerText = ".";
         }
-
-        span.innerText = ptr.toString(16).padStart(4, "0").toUpperCase();
-        address.appendChild(span);
 
         asciiGroup.appendChild(asciiSpan);
         hexGroup.appendChild(hexSpan);

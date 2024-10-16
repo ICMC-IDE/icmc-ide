@@ -130,7 +130,9 @@ class Fs {
   }
 
   async write(path: string, data: string) {
-    return await (await this.#root.getFile(path)).write(data);
+    this.#files[path] = data;
+    const file = await this.#root.createFile(path, true);
+    return await file.write(data);
   }
 
   files() {
@@ -156,7 +158,7 @@ async function build({ file, syntax }: { file: string; syntax: string }) {
   // TODO: Improve this
   if (language === "c") {
     asm = Compiler.compile(fs, file);
-    // fs.write((entry += ".asm"), asm);
+    await fs.write((file += ".asm"), asm);
   }
 
   const assembly = assemble(fs, file, `internal/syntax/${syntax}.toml`);

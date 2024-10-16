@@ -119,18 +119,18 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
       resourceSubscriber.unsubscribeAll();
     });
 
-    eventManager.subscribe("render", () => {
+    eventSubscriber.subscribe("render", () => {
       body.render();
     });
 
-    configManager.subscribe("screenWidth", (width: number) => {
+    configSubscriber.subscribe("screenWidth", (width: number) => {
       body.setWidth(width);
     });
-    configManager.subscribe("screenHeight", (height: number) => {
+    configSubscriber.subscribe("screenHeight", (height: number) => {
       body.setHeight(height);
     });
 
-    resourceManager.subscribe("charmap", (charmap) => {
+    resourceSubscriber.subscribe("charmap", (charmap) => {
       body.setCharmap(charmap);
     });
   }

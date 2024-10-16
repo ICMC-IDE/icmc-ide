@@ -31,7 +31,7 @@ export default class DocumentationViewerWindow extends Fenster<DocumentationView
 
     this.onClose(() => configSubscriber.unsubscribeAll());
 
-    configManager.subscribe("syntax", (value: string) => {
+    configSubscriber.subscribe("syntax", (value: string) => {
       body.setSyntax(value);
     });
   }

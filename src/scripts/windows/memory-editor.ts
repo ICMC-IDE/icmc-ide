@@ -43,6 +43,9 @@ export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
       globalState,
     });
 
+    body.setRam(resourceManager.get("ram") ?? new Uint16Array());
+    body.setSymbols(resourceManager.get("symbols") ?? "");
+
     const resourceSubscriber = resourceManager.getSubscriber();
 
     this.onClose(() => resourceSubscriber.unsubscribeAll());

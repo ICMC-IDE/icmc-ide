@@ -22,6 +22,7 @@ export interface GlobalEventsMap {
   windowOpen: string;
   error: Error;
   render: void;
+  updateFs: void;
 }
 
 export interface GlobalConfigsMap {
