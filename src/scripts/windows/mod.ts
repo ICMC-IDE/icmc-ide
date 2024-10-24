@@ -10,30 +10,32 @@ import FilePickerWindow from "./file-picker.js";
 import { GlobalState } from "../state/global.js";
 import { WindowConstructor } from "../types/windows";
 
-export interface Windows {
-  "state-editor": StateEditorWindow;
-  "memory-editor": MemoryEditorWindow;
-  "screen-viewer": ScreenViewerWindow;
-  "screen-editor": ScreenEditorWindow;
-  "log-viewer": LogViewerWindow;
-  "config-editor": ConfigEditorWindow;
-  "documentation-viewer": DocumentationViewerWindow;
-  "file-picker": FilePickerWindow;
+export interface WindowsMap {
+  stateEditor: StateEditorWindow;
+  memoryEditor: MemoryEditorWindow;
+  screenViewer: ScreenViewerWindow;
+  screenEditor: ScreenEditorWindow;
+  logViewer: LogViewerWindow;
+  configEditor: ConfigEditorWindow;
+  documentationViewer: DocumentationViewerWindow;
+  filePicker: FilePickerWindow;
 }
 
 type Builders = {
-  [name in keyof Windows]: new (state: WindowConstructor) => Windows[name];
+  [name in keyof WindowsMap]: new (
+    state: WindowConstructor,
+  ) => WindowsMap[name];
 };
 
 const builders: Builders = {
-  "state-editor": StateEditorWindow,
-  "memory-editor": MemoryEditorWindow,
-  "screen-viewer": ScreenViewerWindow,
-  "screen-editor": ScreenEditorWindow,
-  "log-viewer": LogViewerWindow,
-  "config-editor": ConfigEditorWindow,
-  "documentation-viewer": DocumentationViewerWindow,
-  "file-picker": FilePickerWindow,
+  stateEditor: StateEditorWindow,
+  memoryEditor: MemoryEditorWindow,
+  screenViewer: ScreenViewerWindow,
+  screenEditor: ScreenEditorWindow,
+  logViewer: LogViewerWindow,
+  configEditor: ConfigEditorWindow,
+  documentationViewer: DocumentationViewerWindow,
+  filePicker: FilePickerWindow,
 };
 
 export type WindowTypes = keyof typeof builders;
@@ -41,60 +43,48 @@ export type WindowTypes = keyof typeof builders;
 export function openWindow<K extends WindowTypes>(
   type: K,
   constructor: WindowConstructor,
-): Windows[K] {
+): WindowsMap[K] {
   return new builders[type](constructor);
 }
 
 export function createWindows(globalState: GlobalState) {
-  const result: Partial<Windows> = {};
+  const result: Partial<WindowsMap> = {};
 
-  result["state-editor"] = new StateEditorWindow({
-    style: {
-      left: `calc(50ch + 1rem + 0.5rem)`,
-      top: "0.5rem",
-    },
+  result["stateEditor"] = new StateEditorWindow({
+    position: { x: 0, y: 0 },
+    size: { width: 40, height: 30 },
     globalState,
   });
 
-  const stateBounds = result["state-editor"].getClientRect();
+  // const stateBounds = result["stateEditor"].getClientRect();
 
-  result["memory-editor"] = new MemoryEditorWindow({
-    style: {
-      left: `calc(50ch + 1rem + 0.5rem)`,
-      top: `calc(${stateBounds.bottom}px + 0.5rem)`,
-      height: "20rem",
-    },
+  result["memoryEditor"] = new MemoryEditorWindow({
+    name: "memoryEditor",
+    position: { x: 40, y: 0 },
+    size: { width: 40, height: 30 },
     globalState,
   });
 
-  const memoryBounds = result["memory-editor"].getClientRect();
+  // const memoryBounds = result["memoryEditor"].getClientRect();
 
-  result["screen-viewer"] = new ScreenViewerWindow({
-    style: {
-      left: `calc(${stateBounds.right}px + 0.5rem)`,
-      top: "0.5rem",
-      width: "640px",
-      height: "480px",
-      // filter: "url(/#crt)",
-    },
+  result["screenViewer"] = new ScreenViewerWindow({
+    name: "screenViewer",
+    position: { x: 0, y: 0 },
+    size: { width: 640, height: 480 },
     globalState,
   });
 
-  result["log-viewer"] = new LogViewerWindow({
-    style: {
-      left: `calc(50ch + 1rem + 0.5rem)`,
-      top: `calc(${memoryBounds.bottom}px + 0.5rem)`,
-    },
+  result["logViewer"] = new LogViewerWindow({
+    name: "logViewer",
+    position: { x: 0, y: 0 },
+    size: { width: 100, height: 100 },
     globalState,
   });
 
-  result["file-picker"] = new FilePickerWindow({
-    style: {
-      left: `4rem`,
-      top: "0.5rem",
-      width: "30ch",
-      height: "480px",
-    },
+  result["filePicker"] = new FilePickerWindow({
+    name: "filePicker",
+    position: { x: 0, y: 0 },
+    size: { width: 160, height: 480 },
     globalState,
   });
 

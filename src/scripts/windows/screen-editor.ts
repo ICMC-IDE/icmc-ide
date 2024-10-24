@@ -4,11 +4,11 @@ import Fenster from "../fenster.js";
 import CharMap from "../resources/charmap.js";
 
 export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
-  constructor({
-    style,
-    globalState,
-    globalState: { configManager, eventManager, resourceManager },
-  }: WindowConstructor) {
+  constructor(windowProps: WindowConstructor) {
+    const {
+      globalState: { eventManager, configManager, resourceManager },
+    } = windowProps;
+
     const body = document.createElement("screen-editor");
     const title = document.createDocumentFragment();
 
@@ -104,9 +104,8 @@ export default class ScreenEditorWindow extends Fenster<ScreenEditorElement> {
     super({
       title,
       body,
-      style,
       buttonsRight,
-      globalState,
+      ...windowProps,
     });
 
     const eventSubscriber = eventManager.getSubscriber();

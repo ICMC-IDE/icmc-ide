@@ -3,11 +3,11 @@ import Fenster from "../fenster.js";
 import { WindowConstructor } from "../types/windows.js";
 
 export default class StateEditorWindow extends Fenster<StateEditorElement> {
-  constructor({
-    style,
-    globalState,
-    globalState: { configManager, eventManager, resourceManager },
-  }: WindowConstructor) {
+  constructor(windowProps: WindowConstructor) {
+    const {
+      globalState: { eventManager, resourceManager, configManager },
+    } = windowProps;
+
     const body = document.createElement("state-editor");
     const title = document.createElement("span");
 
@@ -76,8 +76,7 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
     super({
       title,
       body,
-      style,
-      globalState,
+      ...windowProps,
     });
 
     const eventSubscriber = eventManager.getSubscriber();

@@ -7,11 +7,11 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
   #internalRegisters: Uint16Array | null = null;
   #wc = -1;
 
-  constructor({
-    style,
-    globalState,
-    globalState: { configManager, eventManager, resourceManager },
-  }: WindowConstructor) {
+  constructor(windowProps: WindowConstructor) {
+    const {
+      globalState: { configManager, resourceManager, eventManager },
+    } = windowProps;
+
     const body = document.createElement("screen-viewer");
     const title = document.createElement("span");
     const buttonsLeft = [];
@@ -81,10 +81,9 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
     super({
       title,
       body,
-      style,
       buttonsLeft,
       buttonsRight,
-      globalState,
+      ...windowProps,
     });
 
     const charmap = resourceManager.get("charmap");

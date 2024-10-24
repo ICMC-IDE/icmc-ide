@@ -3,11 +3,11 @@ import Fenster from "../fenster.js";
 import { WindowConstructor } from "../types/windows";
 
 export default class LogViewerWindow extends Fenster<LogViewerElement> {
-  constructor({
-    style,
-    globalState,
-    globalState: { eventManager },
-  }: WindowConstructor) {
+  constructor(windowProps: WindowConstructor) {
+    const {
+      globalState: { eventManager },
+    } = windowProps;
+
     const body = document.createElement("log-viewer");
     const title = document.createDocumentFragment();
 
@@ -21,8 +21,7 @@ export default class LogViewerWindow extends Fenster<LogViewerElement> {
     super({
       title,
       body,
-      style,
-      globalState,
+      ...windowProps,
     });
 
     const eventSubscriber = eventManager.getSubscriber();

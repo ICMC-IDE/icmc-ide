@@ -7,11 +7,11 @@ import * as monaco from "monaco-editor";
 export default class SourceEditorWindow extends Fenster<TextEditorElement> {
   #file?: VirtualFileSystemFile;
 
-  constructor({
-    style,
-    globalState,
-    globalState: { eventManager },
-  }: WindowConstructor) {
+  constructor(windowProps: WindowConstructor) {
+    const {
+      globalState: { eventManager },
+    } = windowProps;
+
     const body = document.createElement("text-editor");
     const title = document.createElement("span");
     const buttonsRight = [];
@@ -58,9 +58,8 @@ export default class SourceEditorWindow extends Fenster<TextEditorElement> {
     super({
       title,
       body,
-      style,
       buttonsRight,
-      globalState,
+      ...windowProps,
     });
   }
 

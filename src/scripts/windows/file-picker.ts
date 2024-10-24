@@ -8,11 +8,11 @@ import {
 } from "../resources/fs.js";
 
 export default class StateEditorWindow extends Fenster<FilePickerElement> {
-  constructor({
-    style,
-    globalState: { eventManager, resourceManager },
-    globalState,
-  }: WindowConstructor) {
+  constructor(windowProps: WindowConstructor) {
+    const {
+      globalState: { eventManager, resourceManager },
+    } = windowProps;
+
     const body = document.createElement("file-picker");
     const title = document.createElement("span");
     const buttonsRight = [];
@@ -97,9 +97,8 @@ export default class StateEditorWindow extends Fenster<FilePickerElement> {
     super({
       title,
       body,
-      style,
       buttonsRight,
-      globalState,
+      ...windowProps,
     });
 
     const eventSubscriber = eventManager.getSubscriber();

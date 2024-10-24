@@ -8,6 +8,7 @@ import {
   VirtualFileSystemDirectory,
   VirtualFileSystemFile,
 } from "../resources/fs.js";
+import { WindowsMap } from "../windows/mod.js";
 
 export interface GlobalState {
   eventManager: EventManager<GlobalEventsMap>;
@@ -43,17 +44,18 @@ export interface GlobalResourcesMap {
   vram: Uint16Array;
   symbols: string;
   mainWorker: MainWorker;
+  windows: WindowsMap;
 }
 
 const eventManager = new EventManager<GlobalEventsMap>();
 
-const configManager = new ConfigManager<GlobalConfigsMap>({
+const configManager = new ConfigManager<GlobalConfigsMap>("config", {
   syntax: "icmc",
   screenWidth: 40,
   screenHeight: 30,
   frequency: 1_000_000,
-  gridWidth: 30,
-  gridHeight: 30,
+  gridWidth: 10,
+  gridHeight: 10,
 });
 configManager.loadAll();
 

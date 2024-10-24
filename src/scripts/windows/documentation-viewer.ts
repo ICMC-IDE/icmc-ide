@@ -3,11 +3,11 @@ import Fenster from "../fenster.js";
 import { WindowConstructor } from "../types/windows.js";
 
 export default class DocumentationViewerWindow extends Fenster<DocumentationViewerElement> {
-  constructor({
-    style,
-    globalState,
-    globalState: { configManager },
-  }: WindowConstructor) {
+  constructor(windowProps: WindowConstructor) {
+    const {
+      globalState: { configManager },
+    } = windowProps;
+
     const title = document.createDocumentFragment();
     const body = document.createElement("documentation-viewer");
 
@@ -23,8 +23,7 @@ export default class DocumentationViewerWindow extends Fenster<DocumentationView
     super({
       title,
       body,
-      style,
-      globalState,
+      ...windowProps,
     });
 
     const configSubscriber = configManager.getSubscriber();

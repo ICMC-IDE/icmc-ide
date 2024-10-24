@@ -4,7 +4,11 @@ import Fenster from "../fenster.js";
 import { WindowConstructor } from "../types/windows.js";
 
 export default class ConfigEditorWindow extends Fenster<ConfigEditorElement> {
-  constructor({ style, globalState }: WindowConstructor) {
+  constructor(windowProps: WindowConstructor) {
+    const {
+      globalState: { configManager },
+    } = windowProps;
+
     const body = document.createElement("config-editor");
     const title = document.createElement("span");
 
@@ -15,15 +19,14 @@ export default class ConfigEditorWindow extends Fenster<ConfigEditorElement> {
 
     {
       body.addEventListener("change-config", ({ detail: { name, value } }) => {
-        globalState.configManager.set(name as keyof GlobalConfigsMap, value);
+        configManager.set(name as keyof GlobalConfigsMap, value);
       });
     }
 
     super({
       title,
       body,
-      style,
-      globalState,
+      ...windowProps,
     });
   }
 }
