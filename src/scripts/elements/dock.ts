@@ -1,7 +1,7 @@
-import { WindowTypes } from "../windows/mod";
+import { WindowsMap } from "../windows/mod";
 
 interface WindowOpenEvent {
-  detail: WindowTypes;
+  detail: keyof WindowsMap;
 }
 
 const TEMPLATE = document.getElementById("dockTemplate") as HTMLTemplateElement;

@@ -49,7 +49,7 @@ const contextMenusMap = {
 
 let openMenu: HTMLElement | null = null;
 
-export function contextSetup() {
+export function contextMenusSetup() {
   document.addEventListener("contextmenu", (event) => {
     event.preventDefault();
 

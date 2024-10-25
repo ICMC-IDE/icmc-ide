@@ -8,7 +8,7 @@ import {
   VirtualFileSystemDirectory,
   VirtualFileSystemFile,
 } from "../resources/fs.js";
-import { WindowsMap } from "../windows/mod.js";
+import { WindowsManager } from "../windows/mod.js";
 
 export interface GlobalState {
   eventManager: EventManager<GlobalEventsMap>;
@@ -44,36 +44,37 @@ export interface GlobalResourcesMap {
   vram: Uint16Array;
   symbols: string;
   mainWorker: MainWorker;
-  windows: WindowsMap;
+  windowsManager: WindowsManager;
 }
 
 const eventManager = new EventManager<GlobalEventsMap>();
-
 const configManager = new ConfigManager<GlobalConfigsMap>("config", {
   syntax: "icmc",
   screenWidth: 40,
   screenHeight: 30,
   frequency: 1_000_000,
-  gridWidth: 10,
-  gridHeight: 10,
+  gridWidth: 0,
+  gridHeight: 0,
 });
+const resourceManager = new ResourceManager<GlobalResourcesMap>();
+
+const globalState = {
+  eventManager,
+  configManager,
+  resourceManager,
+} as GlobalState;
+
 configManager.loadAll();
 
-const resourceManager = new ResourceManager<GlobalResourcesMap>();
 const mainWorker = new MainWorker();
-
 const fs = new VirtualFileSystemDirectory(
   "",
   undefined,
   await navigator.storage.getDirectory(),
 );
-
 await Promise.all([loadAssets(fs, true), mainWorker.isReady]);
 resourceManager.set("fs", fs);
 resourceManager.set("mainWorker", mainWorker);
+resourceManager.set("windowsManager", new WindowsManager(globalState));
 
-export default <GlobalState>{
-  eventManager,
-  configManager,
-  resourceManager,
-};
+export default globalState;

@@ -21,7 +21,6 @@ interface FensterConstructor<T extends HTMLElement> {
   style?: Record<string, string>;
   name?: string;
   saveState?: boolean;
-  open?: boolean;
 }
 
 interface FensterStateMap {
@@ -52,15 +51,16 @@ export default class Fenster<T extends HTMLElement> {
     buttonsRight,
     style,
     name,
-    saveState = true,
-    open,
   }: FensterConstructor<T>) {
-    if (saveState) {
-      this.#stateManager = new ConfigManager<FensterStateMap>(name!);
+    if (name) {
+      this.#stateManager = new ConfigManager<FensterStateMap>(name);
       this.#stateManager.loadAll();
 
       this.#size = this.#stateManager.get("size") ?? size;
       this.#position = this.#stateManager.get("position") ?? position;
+    } else {
+      this.#size = size;
+      this.#position = position;
     }
 
     const wrapper = (this.#wrapper = document.createElement("div"));
@@ -98,9 +98,9 @@ export default class Fenster<T extends HTMLElement> {
         relativePoints: [{ x: 0, y: 0 }],
       });
 
-      configManager.subscribe("gridWidth", () => {
+      configManager.subscribe("gridWidth", (gridWidth) => {
         const snapGrid = interact.snappers.grid({
-          x: configManager.get("gridWidth"),
+          x: gridWidth,
           y: configManager.get("gridHeight"),
           limits: {
             left: 0,
@@ -111,10 +111,10 @@ export default class Fenster<T extends HTMLElement> {
         });
         snap.options.targets = [snapGrid];
       });
-      configManager.subscribe("gridHeight", () => {
+      configManager.subscribe("gridHeight", (gridHeight) => {
         const snapGrid = interact.snappers.grid({
           x: configManager.get("gridWidth"),
-          y: configManager.get("gridHeight"),
+          y: gridHeight,
         });
         snap.options.targets = [snapGrid];
       });

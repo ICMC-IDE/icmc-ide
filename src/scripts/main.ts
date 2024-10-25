@@ -1,15 +1,10 @@
 import * as monaco from "monaco-editor";
 import MonacoWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
-import {
-  createWindows,
-  openWindow,
-  SourceEditorWindow,
-  Windows,
-} from "./windows/mod.js";
 import globalState, { GlobalState } from "./state/global.js";
 import CharMap from "./resources/charmap.js";
-import { contextSetup } from "./context.js";
+import { contextMenusSetup } from "./context.js";
 import { VirtualFileSystemFile } from "./resources/fs.js";
+import { WindowsManager } from "./windows/mod.js";
 
 self.MonacoEnvironment = {
   getWorker(label) {
@@ -19,13 +14,15 @@ self.MonacoEnvironment = {
 
 async function main() {
   await createCharmap();
-  contextSetup();
-  const windows = createWindows(globalState);
-  createDock(globalState, windows);
+  contextMenusSetup();
+  createDock(globalState);
 
   const { eventManager, resourceManager, configManager } = globalState;
 
-  eventManager.subscribe("fileOpen", openFile);
+  const windowManager = resourceManager.get("windowsManager");
+  windowManager.openSaved();
+
+  eventManager.subscribe("fileOpen", (file) => openFile(windowManager, file));
   eventManager.subscribe("build", buildFile);
   configManager.subscribe("frequency", (frequency) => {
     resourceManager.get("mainWorker").request("setFrequency", frequency);
@@ -42,17 +39,12 @@ async function main() {
 const modelCache: Map<VirtualFileSystemFile, monaco.editor.ITextModel> =
   new Map();
 
-function createDock(globalState: GlobalState, windows: Partial<Windows>) {
+function createDock(globalState: GlobalState) {
   const dock = document.createElement("apps-dock");
+  const windowsManager = globalState.resourceManager.get("windowsManager");
 
-  dock.addEventListener("windowOpen", ({ detail: type }) => {
-    let win = windows[type];
-
-    if (win === undefined || !win.isOpen) {
-      win = windows[type] = openWindow(type, { globalState });
-    }
-
-    win.focus();
+  dock.addEventListener("windowOpen", ({ detail: name }) => {
+    windowsManager.open(name);
   });
 
   document.body.prepend(dock);
@@ -95,7 +87,10 @@ function buildFile(file: VirtualFileSystemFile) {
     .finally(() => {});
 }
 
-async function openFile(file: VirtualFileSystemFile) {
+async function openFile(
+  windowManager: WindowsManager,
+  file: VirtualFileSystemFile,
+) {
   if (!modelCache.has(file)) {
     modelCache.set(
       file,
@@ -112,16 +107,7 @@ async function openFile(file: VirtualFileSystemFile) {
     );
   }
 
-  const editor = new SourceEditorWindow({
-    style: {
-      left: "5em",
-      top: "1em",
-      width: "50ch",
-      height: "50em",
-    },
-    globalState,
-  });
-
+  const editor = windowManager.open("sourceEditor");
   editor.setModel(modelCache.get(file)!, file);
   editor.focus();
 }
