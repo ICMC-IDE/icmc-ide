@@ -8,7 +8,7 @@ import interact from "@interactjs/interact";
 import { GlobalState } from "./state/global";
 import ConfigManager from "./state/config";
 
-let zIndex = 100;
+let globalZIndex = 100;
 
 interface FensterConstructor<T extends HTMLElement> {
   body: T;
@@ -26,6 +26,7 @@ interface FensterConstructor<T extends HTMLElement> {
 interface FensterStateMap {
   position: { x: number; y: number };
   size: { width: number; height: number };
+  zIndex: number;
   open: boolean;
 }
 
@@ -52,20 +53,29 @@ export default class Fenster<T extends HTMLElement> {
     style,
     name,
   }: FensterConstructor<T>) {
+    const wrapper = (this.#wrapper = document.createElement("div"));
+    const dragger = (this.#dragger = document.createElement("div"));
+    const container = (this.#container = document.createElement("div"));
+
     if (name) {
       this.#stateManager = new ConfigManager<FensterStateMap>(name);
       this.#stateManager.loadAll();
 
       this.#size = this.#stateManager.get("size") ?? size;
       this.#position = this.#stateManager.get("position") ?? position;
+      const zIndex = this.#stateManager.get("zIndex");
+      if (zIndex) {
+        wrapper.style.zIndex = zIndex.toString();
+        if (zIndex > globalZIndex) {
+          globalZIndex = zIndex;
+        }
+      } else {
+        wrapper.style.zIndex = (++globalZIndex).toString();
+      }
     } else {
       this.#size = size;
       this.#position = position;
     }
-
-    const wrapper = (this.#wrapper = document.createElement("div"));
-    const dragger = (this.#dragger = document.createElement("div"));
-    const container = (this.#container = document.createElement("div"));
 
     wrapper.classList.add("wrapper");
     dragger.classList.add("dragger");
@@ -212,8 +222,11 @@ export default class Fenster<T extends HTMLElement> {
   focus() {
     const wrapper = this.#wrapper;
 
-    if (+wrapper.style.zIndex < zIndex) {
-      wrapper.style.zIndex = (++zIndex).toString();
+    if (+wrapper.style.zIndex < globalZIndex) {
+      wrapper.style.zIndex = (++globalZIndex).toString();
+      if (this.#stateManager) {
+        this.#stateManager.set("zIndex", globalZIndex);
+      }
     }
   }
 
