@@ -98,9 +98,9 @@ export default class Fenster<T extends HTMLElement> {
             y: configManager.get("gridHeight"),
             limits: {
               left: 0,
-              right: window.screen.width,
+              right: document.body.clientWidth,
               top: 0,
-              bottom: window.screen.height,
+              bottom: document.body.clientHeight,
             },
           }),
         ],
@@ -114,9 +114,9 @@ export default class Fenster<T extends HTMLElement> {
           y: configManager.get("gridHeight"),
           limits: {
             left: 0,
-            right: window.screen.width,
+            right: document.body.clientWidth,
             top: 0,
-            bottom: window.screen.height,
+            bottom: document.body.clientHeight,
           },
         });
         snap.options.targets = [snapGrid];
@@ -125,6 +125,12 @@ export default class Fenster<T extends HTMLElement> {
         const snapGrid = interact.snappers.grid({
           x: configManager.get("gridWidth"),
           y: gridHeight,
+          limits: {
+            left: 0,
+            right: document.body.clientWidth,
+            top: 0,
+            bottom: document.body.clientHeight,
+          },
         });
         snap.options.targets = [snapGrid];
       });
