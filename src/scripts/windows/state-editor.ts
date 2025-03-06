@@ -83,6 +83,8 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
     const configSubscriber = configManager.getSubscriber();
     const resourceSubscriber = resourceManager.getSubscriber();
 
+    body.setNumbersFormat(configManager.get("numbersFormat"));
+
     this.onClose(() => {
       eventSubscriber.unsubscribeAll();
       configSubscriber.unsubscribeAll();
@@ -95,6 +97,9 @@ export default class StateEditorWindow extends Fenster<StateEditorElement> {
 
     configSubscriber.subscribe("frequency", (frequency: number) => {
       body.setFrequency(frequency);
+    });
+    configSubscriber.subscribe("numbersFormat", (format: number) => {
+      body.setNumbersFormat(format);
     });
 
     // resourceSubscriber.subscribe("fs", (fs) => {

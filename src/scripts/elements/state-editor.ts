@@ -36,10 +36,11 @@ const TEMPLATE = document.getElementById(
 ) as HTMLTemplateElement;
 
 export default class StateEditorElement extends HTMLElement {
-  #elements: StateEditorElements;
-  #fragment = TEMPLATE.content.cloneNode(true) as DocumentFragment;
   registers: Uint16Array = new Uint16Array(8);
   internalRegisters: Uint16Array = new Uint16Array(64);
+  #elements: StateEditorElements;
+  #fragment = TEMPLATE.content.cloneNode(true) as DocumentFragment;
+  #numbersFormat: number = 16;
 
   constructor() {
     super();
@@ -90,7 +91,7 @@ export default class StateEditorElement extends HTMLElement {
 
       for (let i = 0, registers = this.registers; i < elements.length; i++) {
         elements[i].value = registers[i]
-          .toString(16)
+          .toString(this.#numbersFormat)
           .padStart(4, "0")
           .toUpperCase();
       }
@@ -105,7 +106,7 @@ export default class StateEditorElement extends HTMLElement {
         i++
       ) {
         elements[i].value = registers[i]
-          .toString(16)
+          .toString(this.#numbersFormat)
           .padStart(4, "0")
           .toUpperCase();
       }
@@ -132,6 +133,10 @@ export default class StateEditorElement extends HTMLElement {
     if (this.#elements.buttons.frequency.valueAsNumber !== value) {
       this.#elements.buttons.frequency.value = value.toString();
     }
+  }
+
+  setNumbersFormat(format: number) {
+    this.#numbersFormat = format;
   }
 
   setRunning(value: boolean) {

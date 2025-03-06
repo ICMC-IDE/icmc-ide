@@ -33,6 +33,7 @@ export interface GlobalConfigsMap {
   frequency: number;
   gridWidth: number;
   gridHeight: number;
+  numbersFormat: number;
 }
 
 export interface GlobalResourcesMap {
@@ -53,8 +54,9 @@ const configManager = new ConfigManager<GlobalConfigsMap>("config", {
   screenWidth: 40,
   screenHeight: 30,
   frequency: 1_000_000,
-  gridWidth: 0,
-  gridHeight: 0,
+  gridWidth: 1,
+  gridHeight: 1,
+  numbersFormat: 16,
 });
 const resourceManager = new ResourceManager<GlobalResourcesMap>();
 

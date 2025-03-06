@@ -5,7 +5,7 @@ import { WindowConstructor } from "../types/windows.js";
 export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
   constructor(windowProps: WindowConstructor) {
     const {
-      globalState: { resourceManager },
+      globalState: { resourceManager, configManager },
     } = windowProps;
 
     const body = document.createElement("memory-editor");
@@ -44,8 +44,10 @@ export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
 
     body.setRam(resourceManager.get("ram") ?? new Uint16Array());
     body.setSymbols(resourceManager.get("symbols") ?? "");
+    body.setNumbersFormat(configManager.get("numbersFormat") ?? 16);
 
     const resourceSubscriber = resourceManager.getSubscriber();
+    const configSubscriber = configManager.getSubscriber();
 
     this.onClose(() => resourceSubscriber.unsubscribeAll());
 
@@ -54,6 +56,10 @@ export default class MemoryEditorWindow extends Fenster<MemoryEditorElement> {
     });
     resourceSubscriber.subscribe("symbols", (symbols) => {
       body.setSymbols(symbols);
+    });
+
+    configSubscriber.subscribe("numbersFormat", (format) => {
+      body.setNumbersFormat(format);
     });
   }
 }

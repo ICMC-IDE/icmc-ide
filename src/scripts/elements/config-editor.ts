@@ -27,19 +27,23 @@ export default class ConfigEditorElement extends HTMLElement {
     const form = fragment.querySelector("form")!;
 
     form.addEventListener("input", (event) => {
-      let value;
       const target = event.target as HTMLInputElement;
 
-      if (
-        target.name === "screenWidth" ||
-        target.name === "screenHeight" ||
-        target.name === "gridWidth" ||
-        target.name === "gridHeight"
-      ) {
-        value = target.valueAsNumber | 0;
-      } else if (target.name) {
+      let value: number | string = parseInt(target.value);
+      if (isNaN(value)) {
         value = target.value;
       }
+      /*    if (
+              target.name === "screenWidth" ||
+              target.name === "screenHeight" ||
+              target.name === "gridWidth" ||
+              target.name === "gridHeight" ||
+              target.name === "numbersFormat"
+            ) {
+              value = target.valueAsNumber | 0;
+            } else if (target.name) {
+              value = target.value;
+            }*/
 
       this.dispatchEvent(
         new CustomEvent("change-config", {

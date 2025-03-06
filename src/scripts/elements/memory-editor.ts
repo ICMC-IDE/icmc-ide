@@ -9,23 +9,17 @@ interface Elements {
 export default class MemoryEditorElement extends HTMLElement {
   #memory: Uint16Array = new Uint16Array(0x10000);
   #smemory: Int16Array = new Int16Array(this.#memory);
-
   #symbols: [string, number][] = [];
-
   #hexCells = new Array(0x10000);
   #asciiCells = new Array(0x10000);
-
   #hovering: number | null = null;
   #pc = 0x0000;
   #sp = 0xffff;
-
   #address = 0x0000;
-
   #fragment = new DocumentFragment();
-
   #elements: Elements;
-
   #observer: IntersectionObserver;
+  #numbersFormat: number = 16;
 
   constructor() {
     super();
@@ -76,8 +70,10 @@ export default class MemoryEditorElement extends HTMLElement {
     this.appendChild(this.#fragment);
 
     for (let i = 0; i < 0x10000; i++) {
-      this.#hexCells[i] = this.#createHexCell(i.toString(16));
-      this.#asciiCells[i] = this.#createAsciiCell(i.toString(16));
+      this.#hexCells[i] = this.#createHexCell(i.toString(this.#numbersFormat));
+      this.#asciiCells[i] = this.#createAsciiCell(
+        i.toString(this.#numbersFormat),
+      );
     }
 
     this.addEventListener("pointermove", (event) => {
@@ -123,7 +119,8 @@ export default class MemoryEditorElement extends HTMLElement {
     const elements = this.#elements;
     const address = this.#address;
 
-    elements.address.value = "0x" + address.toString(16).padStart(4, "0");
+    elements.address.value =
+      "0x" + address.toString(this.#numbersFormat).padStart(4, "0");
     // elements.instruction.value = "hi";
     const value = this.#memory[address];
     elements.signed.valueAsNumber = this.#smemory[address];
@@ -140,16 +137,98 @@ export default class MemoryEditorElement extends HTMLElement {
     const hex = this.#hexCells[offset];
     const ascii = this.#asciiCells[offset];
 
-    hex.innerText = value.toString(16).padStart(4, "0").toUpperCase();
+    hex.innerText = value
+      .toString(this.#numbersFormat)
+      .padStart(4, "0")
+      .toUpperCase();
     ascii.innerText =
       value >= 32 && value <= 126 ? String.fromCharCode(value) : ".";
+  }
+
+  setPc(offset: number) {
+    if (offset === this.#pc) return;
+
+    {
+      const hex = this.#hexCells[this.#pc];
+      const ascii = this.#asciiCells[this.#pc];
+
+      hex.classList.toggle("pc", false);
+      ascii.classList.toggle("pc", false);
+    }
+
+    {
+      const hex = this.#hexCells[offset];
+      const ascii = this.#asciiCells[offset];
+
+      hex.classList.toggle("pc", true);
+      ascii.classList.toggle("pc", true);
+    }
+
+    this.#pc = offset;
+  }
+
+  setSp(offset: number) {
+    if (offset === this.#sp) return;
+
+    {
+      const hex = this.#hexCells[this.#sp];
+      const ascii = this.#asciiCells[this.#sp];
+
+      hex.classList.toggle("sp", false);
+      ascii.classList.toggle("sp", false);
+    }
+
+    {
+      const hex = this.#hexCells[offset];
+      const ascii = this.#asciiCells[offset];
+
+      hex.classList.toggle("sp", true);
+      ascii.classList.toggle("sp", true);
+    }
+
+    this.#sp = offset;
+  }
+
+  setRam(memory: Uint16Array) {
+    this.#memory = memory;
+    this.#smemory = new Int16Array(
+      memory.buffer,
+      memory.byteOffset,
+      memory.byteLength,
+    );
+  }
+
+  setSymbols(symbols: string) {
+    const labels: [string, number][] = symbols
+      .split("\n")
+      .filter((line) => line.includes("="))
+      .map((line): [string, number] => {
+        const [name, address] = line.split(" = ");
+        return [name, parseInt(address)];
+      })
+      .sort((lhs, rhs) => lhs[1] - rhs[1]);
+
+    if (labels.length == 0 || labels[0][1] > 0) {
+      labels.splice(0, 0, ["...", 0]);
+    }
+
+    this.#symbols = labels;
+    this.#createMemory();
+  }
+
+  setNumbersFormat(format: number) {
+    this.#numbersFormat = format;
+    this.#createMemory();
   }
 
   #createHexCell(address: string, value = 0x0000) {
     const span = document.createElement("span");
 
     span.dataset.address = address;
-    span.innerText = value.toString(16).padStart(4, "0").toUpperCase();
+    span.innerText = value
+      .toString(this.#numbersFormat)
+      .padStart(4, "0")
+      .toUpperCase();
 
     return span;
   }
@@ -237,7 +316,10 @@ export default class MemoryEditorElement extends HTMLElement {
       const hexGroup = document.createElement("div");
       const asciiGroup = document.createElement("div");
 
-      span.innerText = ptr.toString(16).padStart(4, "0").toUpperCase();
+      span.innerText = ptr
+        .toString(this.#numbersFormat)
+        .padStart(4, "0")
+        .toUpperCase();
       address.appendChild(span);
 
       for (let target = Math.min(ptr + 8, end); ptr < target; ptr++) {
@@ -245,7 +327,10 @@ export default class MemoryEditorElement extends HTMLElement {
         const hexSpan = this.#hexCells[ptr];
         const asciiSpan = this.#asciiCells[ptr];
 
-        hexSpan.innerText = value.toString(16).padStart(4, "0").toUpperCase();
+        hexSpan.innerText = value
+          .toString(this.#numbersFormat)
+          .padStart(4, "0")
+          .toUpperCase();
 
         if (value >= 32 && value <= 126) {
           asciiSpan.innerText = String.fromCharCode(value);
@@ -274,77 +359,6 @@ export default class MemoryEditorElement extends HTMLElement {
         this.#loadChunk(target);
       }
     });
-  }
-
-  setPc(offset: number) {
-    if (offset === this.#pc) return;
-
-    {
-      const hex = this.#hexCells[this.#pc];
-      const ascii = this.#asciiCells[this.#pc];
-
-      hex.classList.toggle("pc", false);
-      ascii.classList.toggle("pc", false);
-    }
-
-    {
-      const hex = this.#hexCells[offset];
-      const ascii = this.#asciiCells[offset];
-
-      hex.classList.toggle("pc", true);
-      ascii.classList.toggle("pc", true);
-    }
-
-    this.#pc = offset;
-  }
-
-  setSp(offset: number) {
-    if (offset === this.#sp) return;
-
-    {
-      const hex = this.#hexCells[this.#sp];
-      const ascii = this.#asciiCells[this.#sp];
-
-      hex.classList.toggle("sp", false);
-      ascii.classList.toggle("sp", false);
-    }
-
-    {
-      const hex = this.#hexCells[offset];
-      const ascii = this.#asciiCells[offset];
-
-      hex.classList.toggle("sp", true);
-      ascii.classList.toggle("sp", true);
-    }
-
-    this.#sp = offset;
-  }
-
-  setRam(memory: Uint16Array) {
-    this.#memory = memory;
-    this.#smemory = new Int16Array(
-      memory.buffer,
-      memory.byteOffset,
-      memory.byteLength,
-    );
-  }
-
-  setSymbols(symbols: string) {
-    const labels: [string, number][] = symbols
-      .split("\n")
-      .filter((line) => line.includes("="))
-      .map((line): [string, number] => {
-        const [name, address] = line.split(" = ");
-        return [name, parseInt(address)];
-      })
-      .sort((lhs, rhs) => lhs[1] - rhs[1]);
-
-    if (labels.length == 0 || labels[0][1] > 0) {
-      labels.splice(0, 0, ["...", 0]);
-    }
-
-    this.#symbols = labels;
-    this.#createMemory();
   }
 }
 
