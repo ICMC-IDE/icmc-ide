@@ -95,8 +95,8 @@
 
   body {
     color: light-dark(
-            oklch(from var(--source-color) 25% c h / 0.95),
-            oklch(from var(--source-color) 100% c h / 0.95)
+      oklch(from var(--source-color) 25% c h / 0.95),
+      oklch(from var(--source-color) 100% c h / 0.95)
     );
     background-color: var(--gray-1);
 
@@ -208,19 +208,19 @@
     &::-webkit-slider-runnable-track {
       --border-color: light-dark(oklch(0% 0 0 / 20%), oklch(100% 0 0 / 20%));
       background-image: linear-gradient(
-              to right,
-              transparent,
-              transparent calc(100% - 1px),
-              var(--border-color) calc(100% - 1px),
-              var(--border-color)
-      ),
-      linear-gradient(
-              to right,
-              var(--blue),
-              var(--green),
-              var(--yellow),
-              var(--red)
-      );
+          to right,
+          transparent,
+          transparent calc(100% - 1px),
+          var(--border-color) calc(100% - 1px),
+          var(--border-color)
+        ),
+        linear-gradient(
+          to right,
+          var(--blue),
+          var(--green),
+          var(--yellow),
+          var(--red)
+        );
       border-radius: 4px;
       height: 0.25em;
     }
@@ -239,19 +239,19 @@
     &::-moz-range-track {
       --border-color: light-dark(oklch(0% 0 0 / 20%), oklch(100% 0 0 / 20%));
       background-image: linear-gradient(
-              to right,
-              transparent,
-              transparent calc(100% - 1px),
-              var(--border-color) calc(100% - 1px),
-              var(--border-color)
-      ),
-      linear-gradient(
-              to right,
-              var(--blue),
-              var(--green),
-              var(--yellow),
-              var(--red)
-      );
+          to right,
+          transparent,
+          transparent calc(100% - 1px),
+          var(--border-color) calc(100% - 1px),
+          var(--border-color)
+        ),
+        linear-gradient(
+          to right,
+          var(--blue),
+          var(--green),
+          var(--yellow),
+          var(--red)
+        );
       border-radius: 4px;
       height: 0.25em;
     }
@@ -334,7 +334,7 @@
     min-width: calc(8px * var(--width));
     min-height: calc(8px * var(--height));
 
-    background-color: black;
+    background-color: transparent;
 
     /* filter: url(/#crt); */
 

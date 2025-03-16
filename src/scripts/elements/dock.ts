@@ -8,25 +8,31 @@ const TEMPLATE = document.getElementById("dockTemplate") as HTMLTemplateElement;
 
 export default class DockElement extends HTMLElement {
   #fragment = TEMPLATE.content.cloneNode(true) as DocumentFragment;
-
-  constructor() {
-    super();
-
-    const fragment = this.#fragment;
-
-    fragment.querySelectorAll("button[data-window]").forEach((element) => {
-      element.addEventListener("click", () => {
-        this.dispatchEvent(
-          new CustomEvent("windowOpen", {
-            detail: (element as HTMLElement).dataset.window,
-          }),
-        );
-      });
-    });
-  }
+  #controller?: AbortController;
 
   connectedCallback() {
+    this.#controller = new AbortController();
+
     this.appendChild(this.#fragment);
+
+    for (const element of this.querySelectorAll("button[data-window]")) {
+      element.addEventListener(
+        "click",
+        () => {
+          this.dispatchEvent(
+            new CustomEvent("windowOpen", {
+              detail: (element as HTMLElement).dataset.window,
+            }),
+          );
+        },
+        { signal: this.#controller.signal },
+      );
+    }
+  }
+
+  disconnectedCallback() {
+    this.#controller!.abort();
+    this.#controller = undefined;
   }
 }
 

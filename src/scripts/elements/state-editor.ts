@@ -38,15 +38,17 @@ const TEMPLATE = document.getElementById(
 export default class StateEditorElement extends HTMLElement {
   registers: Uint16Array = new Uint16Array(8);
   internalRegisters: Uint16Array = new Uint16Array(64);
-  #elements: StateEditorElements;
+  #elements!: StateEditorElements;
   #fragment = TEMPLATE.content.cloneNode(true) as DocumentFragment;
   #numbersFormat: number = 16;
+  #controller?: AbortController;
 
-  constructor() {
-    super();
+  connectedCallback() {
+    this.#controller = new AbortController();
 
-    const fragment = this.#fragment;
-    const forms = fragment.querySelectorAll("form");
+    this.appendChild(this.#fragment);
+
+    const forms = this.querySelectorAll("form");
 
     this.#elements = {
       buttons: forms[0].elements as unknown as StateEditorElements["buttons"],
@@ -56,33 +58,54 @@ export default class StateEditorElement extends HTMLElement {
         .elements as unknown as StateEditorElements["internalRegisters"],
     };
 
-    this.#elements.buttons.frequency.addEventListener("input", ({ target }) => {
-      this.dispatchEvent(
-        new CustomEvent("changeFrequency", {
-          detail: (target! as HTMLInputElement).valueAsNumber,
-        }),
-      );
-    });
+    this.#elements.buttons.frequency.addEventListener(
+      "input",
+      ({ target }) => {
+        this.dispatchEvent(
+          new CustomEvent("changeFrequency", {
+            detail: (target! as HTMLInputElement).valueAsNumber,
+          }),
+        );
+      },
+      { signal: this.#controller.signal },
+    );
 
-    this.#elements.buttons.play.addEventListener("click", () => {
-      this.dispatchEvent(new CustomEvent("play", {}));
-    });
+    this.#elements.buttons.play.addEventListener(
+      "click",
+      () => {
+        this.dispatchEvent(new CustomEvent("play", {}));
+      },
+      { signal: this.#controller.signal },
+    );
 
-    this.#elements.buttons.stop.addEventListener("click", () => {
-      this.dispatchEvent(new CustomEvent("stop", {}));
-    });
+    this.#elements.buttons.stop.addEventListener(
+      "click",
+      () => {
+        this.dispatchEvent(new CustomEvent("stop", {}));
+      },
+      { signal: this.#controller.signal },
+    );
 
-    this.#elements.buttons.next.addEventListener("click", () => {
-      this.dispatchEvent(new CustomEvent("next", {}));
-    });
+    this.#elements.buttons.next.addEventListener(
+      "click",
+      () => {
+        this.dispatchEvent(new CustomEvent("next", {}));
+      },
+      { signal: this.#controller.signal },
+    );
 
-    this.#elements.buttons.reset.addEventListener("click", () => {
-      this.dispatchEvent(new CustomEvent("reset", {}));
-    });
+    this.#elements.buttons.reset.addEventListener(
+      "click",
+      () => {
+        this.dispatchEvent(new CustomEvent("reset", {}));
+      },
+      { signal: this.#controller.signal },
+    );
   }
 
-  connectedCallback() {
-    this.appendChild(this.#fragment);
+  disconnectedCallback() {
+    this.#controller!.abort();
+    this.#controller = undefined;
   }
 
   render() {
