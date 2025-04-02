@@ -192,7 +192,7 @@ const actions = {
 };
 
 function setFrequency(value: number) {
-  frequency = value;
+  frequency = 10 ** value;
 }
 
 self.addEventListener(

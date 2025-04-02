@@ -1,15 +1,4 @@
-// const FREQUENCIES = [
-//   "1 Hz",
-//   "10 Hz",
-//   "100 Hz",
-//   "1 kHz",
-//   "10 kHz",
-//   "100 kHz",
-//   "1 MHz",
-//   "10 MHz",
-//   "100 MHz",
-//   "FAST!",
-// ];
+const SUFFIXES = ["Hz", "kHz", "MHz"];
 
 interface ChangeFileEvent {
   detail: string;
@@ -117,14 +106,12 @@ export default class StateEditorElement extends HTMLElement {
     if (!this.#elements.buttons) return;
 
     const frequency = this.#elements.buttons.frequency.valueAsNumber;
-    let frequencyText = "";
-    if (frequency >= 1_000_000) {
-      frequencyText = `${(frequency / 1_000_000).toFixed(1)}MHz`;
-    } else if (frequency >= 1_000) {
-      frequencyText = `${(frequency / 1_000).toFixed(1)}kHz`;
-    } else {
-      frequencyText = `${frequency}Hz`;
-    }
+
+    const suffix = SUFFIXES[Math.floor(frequency / 3)];
+    const frequencyText = `${(
+      (10 ** frequency / 10 ** Math.floor(frequency)) *
+      10 ** Math.floor(frequency % 3)
+    ).toFixed(1)} ${suffix}`;
 
     (
       this.#elements.buttons.frequency.nextSibling! as HTMLInputElement
