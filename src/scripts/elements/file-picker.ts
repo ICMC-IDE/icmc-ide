@@ -9,45 +9,28 @@ interface FileOpenEvent {
 
 export default class FilePickerElement extends HTMLElement {
   #fs?: VirtualFileSystemDirectory;
-  #controller?: AbortController;
 
   constructor() {
     super();
   }
 
   connectedCallback() {
-    this.#controller = new AbortController();
-
     this.dataset.contextMenuId = "filepicker";
 
-    this.addEventListener(
-      "fileNew",
-      async () => {
-        const file = this.#generateFile(
-          await this.#fs!.getFile("untitled", false),
-        );
-        this.append(file);
-        file.dispatchEvent(new Event("fileRename"));
-      },
-      { signal: this.#controller.signal },
-    );
-
-    this.addEventListener(
-      "folderNew",
-      async () => {
-        const { mainNode: folder } = this.#generateFolder(
-          await this.#fs!.getDirectory("untitled", false),
-        );
-        this.append(folder);
-        folder.dispatchEvent(new Event("folderRename"));
-      },
-      { signal: this.#controller.signal },
-    );
-  }
-
-  disconnectedCallback() {
-    this.#controller!.abort();
-    this.#controller = undefined;
+    this.addEventListener("fileNew", async () => {
+      const file = this.#generateFile(
+        await this.#fs!.getFile("untitled", false),
+      );
+      this.append(file);
+      file.dispatchEvent(new Event("fileRename"));
+    });
+    this.addEventListener("folderNew", async () => {
+      const { mainNode: folder } = this.#generateFolder(
+        await this.#fs!.getDirectory("untitled", false),
+      );
+      this.append(folder);
+      folder.dispatchEvent(new Event("folderRename"));
+    });
   }
 
   #generateFolder(folder: VirtualFileSystemDirectory, ident: number = 0) {

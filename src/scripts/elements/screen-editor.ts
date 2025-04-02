@@ -11,6 +11,8 @@ function calcXY(event: PointerEvent) {
   const rect = canvas.getBoundingClientRect();
   const x = (((event.clientX - rect.left) / rect.width) * canvas.width) | 0;
   const y = (((event.clientY - rect.top) / rect.height) * canvas.height) | 0;
+  // const x = (event.clientX - rect.left) | 0;
+  // const y = (event.clientY - rect.top) | 0;
 
   return [x, y];
 }
@@ -26,7 +28,6 @@ export default class ScreenEditorElement extends HTMLElement {
   #char = 65;
   #color = 0;
   #fragment = TEMPLATE.content.cloneNode(true) as DocumentFragment;
-  #controller?: AbortController;
 
   constructor() {
     super();
@@ -38,71 +39,46 @@ export default class ScreenEditorElement extends HTMLElement {
     this.#coloredChar = viewers[1] as ScreenViewerElement;
     this.#screen = viewers[2] as ScreenViewerElement;
     this.#colors = fragment.querySelector("canvas")! as HTMLCanvasElement;
+
+    this.#colors.addEventListener("pointerdown", (event: PointerEvent) => {
+      const [x, y] = calcXY(event);
+      this.pickColor(this.#charmap!.charHeight * y + x);
+    });
+
+    this.#coloredChar.addEventListener("pointerdown", (event: PointerEvent) => {
+      const [x, y] = calcXY(event);
+      this.#charmap!.togglePixel(
+        x % this.#charmap!.charWidth,
+        this.#charmap!.charHeight * this.#char + y,
+      );
+    });
+
+    this.#chars.addEventListener("pointerdown", (event: PointerEvent) => {
+      const [x, y] = calcXY(event);
+      this.pickChar(
+        32 * Math.floor(y / this.#charmap!.charHeight) +
+          Math.floor(x / this.#charmap!.charWidth),
+      );
+    });
+
+    this.#screen.addEventListener("pointerdown", (event: PointerEvent) => {
+      const [x, y] = calcXY(event);
+      this.#screen.updateCell(
+        this.#screen.width * Math.floor(y / this.#charmap!.charHeight) +
+          Math.floor(x / this.#charmap!.charWidth),
+        this.#char | (this.#color << 8),
+      );
+    });
   }
 
   connectedCallback() {
-    this.#controller = new AbortController();
-
-    this.#colors.addEventListener(
-      "pointerdown",
-      (event: PointerEvent) => {
-        const [x, y] = calcXY(event);
-        this.pickColor(this.#charmap!.charHeight * y + x);
-      },
-      { signal: this.#controller.signal },
-    );
-
-    this.#coloredChar.addEventListener(
-      "pointerdown",
-      (event: PointerEvent) => {
-        if (!(event.target instanceof HTMLCanvasElement)) return;
-
-        const [x, y] = calcXY(event);
-        this.#charmap!.togglePixel(
-          x % this.#charmap!.charWidth,
-          this.#charmap!.charHeight * this.#char + y,
-        );
-      },
-      { signal: this.#controller.signal },
-    );
-
-    this.#chars.addEventListener(
-      "pointerdown",
-      (event: PointerEvent) => {
-        if (!(event.target instanceof HTMLCanvasElement)) return;
-
-        const [x, y] = calcXY(event);
-        this.pickChar(
-          32 * Math.floor(y / this.#charmap!.charHeight) +
-            Math.floor(x / this.#charmap!.charWidth),
-        );
-      },
-      { signal: this.#controller.signal },
-    );
-
-    this.#screen.addEventListener(
-      "pointerdown",
-      (event: PointerEvent) => {
-        if (!(event.target instanceof HTMLCanvasElement)) return;
-
-        const [x, y] = calcXY(event);
-        this.#screen.updateCell(
-          this.#screen.width * Math.floor(y / this.#charmap!.charHeight) +
-            Math.floor(x / this.#charmap!.charWidth),
-          this.#char | (this.#color << 8),
-        );
-      },
-      { signal: this.#controller.signal },
-    );
-
     this.appendChild(this.#fragment); // this.#fragment becomes an empty array after being appended. so there is no problem doing it multiple times
     this.pickColor(this.#color);
   }
 
-  disconnectedCallback() {
-    this.#controller!.abort();
-    this.#controller = undefined;
-  }
+  // attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+  //   console.log("[ATTR CHG]", name, oldValue, newValue);
+  // }
 
   render() {
     if (!this.isConnected) return;

@@ -19,23 +19,21 @@ interface ChangeConfigEvent<K extends keyof ChangeConfigMap> {
 
 export default class ConfigEditorElement extends HTMLElement {
   #fragment = TEMPLATE.content.cloneNode(true) as DocumentFragment;
-  #controller?: AbortController;
 
-  connectedCallback() {
-    this.#controller = new AbortController();
+  constructor() {
+    super();
 
-    this.appendChild(this.#fragment);
+    const fragment = this.#fragment;
+    const form = fragment.querySelector("form")!;
 
-    this.querySelector("form")!.addEventListener(
-      "input",
-      (event) => {
-        const target = event.target as HTMLInputElement;
+    form.addEventListener("input", (event) => {
+      const target = event.target as HTMLInputElement;
 
-        let value: number | string = parseInt(target.value);
-        if (isNaN(value)) {
-          value = target.value;
-        }
-        /*    if (
+      let value: number | string = parseInt(target.value);
+      if (isNaN(value)) {
+        value = target.value;
+      }
+      /*    if (
               target.name === "screenWidth" ||
               target.name === "screenHeight" ||
               target.name === "gridWidth" ||
@@ -47,22 +45,19 @@ export default class ConfigEditorElement extends HTMLElement {
               value = target.value;
             }*/
 
-        this.dispatchEvent(
-          new CustomEvent("change-config", {
-            detail: {
-              name: target.name,
-              value,
-            },
-          }),
-        );
-      },
-      { signal: this.#controller.signal },
-    );
+      this.dispatchEvent(
+        new CustomEvent("change-config", {
+          detail: {
+            name: target.name,
+            value,
+          },
+        }),
+      );
+    });
   }
 
-  disconnectedCallback() {
-    this.#controller!.abort();
-    this.#controller = undefined;
+  connectedCallback() {
+    this.appendChild(this.#fragment);
   }
 }
 

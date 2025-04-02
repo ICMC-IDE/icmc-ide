@@ -353,12 +353,12 @@ export default class MemoryEditorElement extends HTMLElement {
   }
 
   #intersectionHandler(entries: IntersectionObserverEntry[]) {
-    for (const entry of entries) {
+    entries.forEach((entry) => {
       const target = entry.target as HTMLDivElement;
       if (entry.isIntersecting && target.dataset.loaded === undefined) {
         this.#loadChunk(target);
       }
-    }
+    });
   }
 }
 
