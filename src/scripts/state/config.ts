@@ -16,7 +16,14 @@ export default class ConfigManager<ConfigMap> extends EventManager<ConfigMap> {
   }
 
   getMany<K extends keyof ConfigMap>(...args: K[]) {
-    return args.map((key) => this.#configs[key]);
+    // return args.map((key) => this.#configs[key]);
+    return args.reduce(
+      (acc, key) => {
+        acc[key] = this.#configs[key]!;
+        return acc;
+      },
+      {} as Pick<ConfigMap, K>,
+    );
   }
 
   set<K extends keyof ConfigMap>(config: K, value: ConfigMap[K]) {

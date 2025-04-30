@@ -50,13 +50,13 @@ export default class ScreenViewerWindow extends Fenster<ScreenViewerElement> {
     }
 
     {
-      const [width, height] = configManager.getMany(
+      const { screenWidth, screenHeight } = configManager.getMany(
         "screenWidth",
         "screenHeight",
       );
 
-      body.setWidth(width!);
-      body.setHeight(height!);
+      body.setWidth(screenWidth!);
+      body.setHeight(screenHeight!);
 
       body.tabIndex = 1;
 

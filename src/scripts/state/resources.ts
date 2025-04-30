@@ -10,7 +10,14 @@ export default class ResourceManager<
   }
 
   getMany<K extends keyof ResourceMap>(...args: K[]) {
-    return args.map((key) => this.#resourceManager[key]);
+    // return args.map((key) => this.#resourceManager[key]);
+    return args.reduce(
+      (acc, key) => {
+        acc[key] = this.#resourceManager[key]!;
+        return acc;
+      },
+      {} as Pick<ResourceMap, K>,
+    );
   }
 
   set<K extends keyof ResourceMap>(config: K, value: ResourceMap[K]) {

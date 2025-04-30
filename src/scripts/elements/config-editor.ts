@@ -8,7 +8,17 @@ interface ChangeConfigMap {
   gridWidth: number;
   gridHeight: number;
   syntax: string;
+  numbersFormat: number;
 }
+
+export const CHANGE_CONFIG_MAP_KEYS = [
+  "screenWidth",
+  "screenHeight",
+  "gridWidth",
+  "gridHeight",
+  "syntax",
+  "numbersFormat",
+] as const satisfies (keyof ChangeConfigMap)[];
 
 interface ChangeConfigEvent<K extends keyof ChangeConfigMap> {
   detail: {
@@ -54,6 +64,21 @@ export default class ConfigEditorElement extends HTMLElement {
         }),
       );
     });
+  }
+
+  setConfigs(configs: ChangeConfigMap) {
+    const form = this.#fragment.querySelector("form")!;
+
+    for (const [key, value] of Object.entries(configs)) {
+      const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement;
+      if (input) {
+        if (input.type === "checkbox") {
+          input.checked = Boolean(value);
+        } else {
+          input.value = String(value);
+        }
+      }
+    }
   }
 
   connectedCallback() {
