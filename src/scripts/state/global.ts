@@ -46,6 +46,7 @@ export interface GlobalResourcesMap {
   symbols: string;
   mainWorker: MainWorker;
   windowsManager: WindowsManager;
+  cachedLog: Error | undefined;
 }
 
 const eventManager = new EventManager<GlobalEventsMap>();

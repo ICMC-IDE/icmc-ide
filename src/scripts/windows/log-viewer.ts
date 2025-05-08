@@ -5,7 +5,7 @@ import { WindowConstructor } from "../types/windows";
 export default class LogViewerWindow extends Fenster<LogViewerElement> {
   constructor(windowProps: WindowConstructor) {
     const {
-      globalState: { eventManager },
+      globalState: { eventManager, resourceManager },
     } = windowProps;
 
     const body = document.createElement("log-viewer");
@@ -24,6 +24,12 @@ export default class LogViewerWindow extends Fenster<LogViewerElement> {
       ...windowProps,
     });
 
+    const cachedLog = resourceManager.get("cachedLog");
+
+    if (cachedLog) {
+      body.write(cachedLog);
+    }
+
     const eventSubscriber = eventManager.getSubscriber();
     this.onClose(() => eventSubscriber.unsubscribeAll());
 
@@ -31,7 +37,6 @@ export default class LogViewerWindow extends Fenster<LogViewerElement> {
       body.clear();
     });
     eventSubscriber.subscribe("error", (error) => {
-      console.log("HERE", error);
       body.write(error);
     });
   }

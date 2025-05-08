@@ -77,11 +77,13 @@ function buildFile(file: VirtualFileSystemFile) {
         resourceManager.set("registers", registers);
         resourceManager.set("internalRegisters", internalRegisters);
         resourceManager.set("symbols", symbols);
+        resourceManager.set("cachedLog", undefined);
 
         eventManager.emmit("updateFs", undefined);
       },
     )
     .catch((error) => {
+      resourceManager.set("cachedLog", error);
       eventManager.emmit("error", error);
     })
     .finally(() => {});
