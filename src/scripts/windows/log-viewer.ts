@@ -31,7 +31,7 @@ export default class LogViewerWindow extends Fenster<LogViewerElement> {
       body.clear();
     });
     eventSubscriber.subscribe("error", (error) => {
-      // FIXME
+      console.log("HERE", error);
       body.write(error);
     });
   }

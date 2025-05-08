@@ -1,5 +1,30 @@
 import * as monaco from "monaco-editor";
 
+monaco.editor.addKeybindingRules([
+  {
+    command: "editor.action.fontZoomIn",
+    keybinding: monaco.KeyMod.CtrlCmd | monaco.KeyCode.Equal,
+  },
+  {
+    command: "editor.action.fontZoomIn",
+    keybinding:
+      monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Equal,
+  },
+  {
+    command: "editor.action.fontZoomOut",
+    keybinding: monaco.KeyMod.CtrlCmd | monaco.KeyCode.Minus,
+  },
+  {
+    command: "editor.action.fontZoomOut",
+    keybinding:
+      monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Minus,
+  },
+  {
+    command: "editor.action.fontZoomReset",
+    keybinding: monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit0,
+  },
+]);
+
 export default class TextEditorElement extends HTMLElement {
   #editor?: monaco.editor.IStandaloneCodeEditor;
   #observer?: ResizeObserver;
