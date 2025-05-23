@@ -21,7 +21,7 @@
     "@eslint/js": "^9.8.0",
     "@icmc-ide/assembler": "^0.3.4",
     "@icmc-ide/icmc-cc": "^0.1.0",
-    "@icmc-ide/icmc-emulator": "^0.2.1",
+    "@icmc-ide/icmc-emulator": "^0.2.2",
     "@icmc-ide/mif": "^0.2.0",
     "@interactjs/actions": "^1.10.27",
     "@interactjs/auto-start": "^1.10.27",
